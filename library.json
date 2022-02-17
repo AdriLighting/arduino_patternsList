@@ -2,8 +2,8 @@
   "name": "arduino_patternsList",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "Esp8266 library for creating time-based(NTP) events(alarms) ",
-  "keywords": "scheduler, time, ntp",
+  "description": "a small library for managing pattern lists.",
+  "keywords": "patterns, rgb-patterns, rgb-effects-patterns",
   "repository":
   {
     "type": "git",
