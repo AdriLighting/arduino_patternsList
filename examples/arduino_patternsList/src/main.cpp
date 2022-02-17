@@ -2,7 +2,7 @@
 #include <arduino_patternsList.h>
 
 playlist_management * _playlist = nullptr;
-programme_loop 			* _programme = nullptr;
+programme_loop          * _programme = nullptr;
 
 void setup()
 {
@@ -22,120 +22,120 @@ void setup()
 
 /*
 
-	la playlist se sert des items fournit par la liste principal
+    la playlist se sert des items fournit par la liste principal
 
-	par default les playlist seront creer
-		compilation parametre
-			-D PLAYLIST_MAXEFF 	= nb maximum d'items 			(default = 10)
-			-D PLAYLIST_MAX 		= nb maximum de playlist 	(default = 3)
+    par default les playlist seront creer
+        compilation parametre
+            -D PLAYLIST_MAXEFF  = nb maximum d'items            (default = 10)
+            -D PLAYLIST_MAX         = nb maximum de playlist    (default = 3)
 */
-	_playlist 	= new playlist_management(); 
-	_programme 	= new programme_loop(); 	
+    _playlist   = new playlist_management(); 
+    _programme  = new programme_loop();     
 
   uint8_t cnt = ARRAY_SIZE(LPALLNAMES);
   Serial.println(cnt);  
 
  /*
-		initialization des items(String) de la liste principal 
+        initialization des items(String) de la liste principal 
  */
-	_programme->patternList_initialize(cnt); // definir la taille de la liste
-	for (uint8_t i = 0; i < cnt; i++){_programme->patternList_item_add(FPSTR(LPALLNAMES[i]));} // ajout des items
-	_programme->patternList_print(); // debug patterns items
+    _programme->patternList_initialize(cnt); // definir la taille de la liste
+    for (uint8_t i = 0; i < cnt; i++){_programme->patternList_item_add(FPSTR(LPALLNAMES[i]));} // ajout des items
+    _programme->patternList_print(); // debug patterns items
 
-	SPIFFS_printFiles("/"); // debug fs
-	SPIFFS_fileRead("/playlist/playlist/compoName_0.json"); // debug fs
+    SPIFFS_printFiles("/"); // debug fs
+    SPIFFS_fileRead("/playlist/playlist/compoName_0.json"); // debug fs
 
-	fs_restore_defaultPlaylist(true); // initialisation des playlist pour la Demo
+    fs_restore_defaultPlaylist(true); // initialisation des playlist pour la Demo
 
-	// SPIFFS_printFiles("/");
+    // SPIFFS_printFiles("/");
 
-	_playlist->list_pos(0); 							// selection de la playlist
-	_playlist->item_restore();						// chargement de la playlist selectionnée
-	_playlist->list_statu_set(true);			// activation de la lecture de la playListe
-	_playlist->item_pos_set(0); 					// selection de litem de la playlist selectionnée
-	_playlist->item_print(); 							// debug playlist items
+    _playlist->list_pos(0);                             // selection de la playlist
+    _playlist->item_restore();                      // chargement de la playlist selectionnée
+    _playlist->list_statu_set(true);            // activation de la lecture de la playListe
+    _playlist->item_pos_set(0);                     // selection de litem de la playlist selectionnée
+    _playlist->item_print();                            // debug playlist items
 
-	_programme->patternLoop_pos_set(0); 	// selection de litem de la liste pricipal/playListe(si activer)
-	_programme->delayCurrent_set(20); 		// delay de rotation
-	_programme->play_set(true); 					// activation de la rotation
-	_programme->playRnd_set(false);				// activation de la lecture aléatoire
+    _programme->patternLoop_pos_set(0);     // selection de litem de la liste pricipal/playListe(si activer)
+    _programme->delayCurrent_set(20);       // delay de rotation
+    _programme->play_set(true);                     // activation de la rotation
+    _programme->playRnd_set(false);             // activation de la lecture aléatoire
 
 }
 
 void fs_restore_defaultPlaylist(boolean remove){
 
-	if (remove) {
-		// deleteRecursive(LittleFS, FPSTR(FOPATH_PLAYLISTEFF));
-		deleteRecursive(LittleFS, FPSTR(FOPATH_PLAYLIST));
-		_playlist->list_removeFromSpiff() ;
-	}
+    if (remove) {
+        // deleteRecursive(LittleFS, FPSTR(FOPATH_PLAYLISTEFF));
+        deleteRecursive(LittleFS, FPSTR(FOPATH_PLAYLIST));
+        _playlist->list_removeFromSpiff() ;
+    }
 
-	_playlist->list_fromSpiff() ;
-	_playlist->list_print();
-	
-	// if(!LittleFS.exists(FPSTR(FOPATH_PLAYLIST))) {
-	if(remove) {
-		// LittleFS.mkdir(FPSTR(FOPATH_PLAYLISTEFF));  
-		String 		plName;
-		// String 		listName;
-		uint8_t 	pMax;
-		String 		pName;
+    _playlist->list_fromSpiff() ;
+    _playlist->list_print();
+    
+    // if(!LittleFS.exists(FPSTR(FOPATH_PLAYLIST))) {
+    if(remove) {
+        // LittleFS.mkdir(FPSTR(FOPATH_PLAYLISTEFF));  
+        String      plName;
+        // String       listName;
+        uint8_t     pMax;
+        String      pName;
 
-		_programme->patternLoop_posMax_get(pMax);
+        _programme->patternLoop_posMax_get(pMax);
 
-		for(int i = 0; i < PLAYLIST_MAX; ++i) {
-			_playlist->list_pos(i);
-			_playlist->item_restore();
-			_playlist->list_name(plName);
-			for(int j = 0; j < (PLAYLIST_MAXEFF/2); ++j) {
+        for(int i = 0; i < PLAYLIST_MAX; ++i) {
+            _playlist->list_pos(i);
+            _playlist->item_restore();
+            _playlist->list_name(plName);
+            for(int j = 0; j < (PLAYLIST_MAXEFF/2); ++j) {
 
-				uint8_t rnd = random(0, pMax-1);
-				_programme->patternList_item_getName(pName, rnd);
+                uint8_t rnd = random(0, pMax-1);
+                _programme->patternList_item_getName(pName, rnd);
 
-				// listName = (String)FPSTR(FOPATH_PLAYLISTEFF) + plName + (String)FPSTR(FSLSH) + String(j);
-				_playlist->item_toArray(255, pName, pName + " VALUE");
+                // listName = (String)FPSTR(FOPATH_PLAYLISTEFF) + plName + (String)FPSTR(FSLSH) + String(j);
+                _playlist->item_toArray(255, pName, pName + " VALUE");
 
-				// yield();		
-			}
+                // yield();     
+            }
 
-			// yield();		
-		}
+            // yield();     
+        }
 
-		yield();	
-	}
+        yield();    
+    }
 }
 
 boolean patterns_loop(uint16_t & ret){
-	static mod_pattern_loop pat_check   = programmeLoop_instance()->statuDefault();
-	static String           pat_name    = "";
-	static boolean          playlist;
+    static mod_pattern_loop pat_check   = programmeLoop_instance()->statuDefault();
+    static String           pat_name    = "";
+    static boolean          playlist;
 
-	programmeLoop_instance()->loop(pat_check, pat_name, playlist, false);      
+    programmeLoop_instance()->loop(pat_check, pat_name, playlist, false);      
 
-	if (pat_check == programmeLoop_instance()->statuNext()) {
+    if (pat_check == programmeLoop_instance()->statuNext()) {
 
-		pat_check =  programmeLoop_instance()->statuDefault();
+        pat_check =  programmeLoop_instance()->statuDefault();
 
-		// FOR DEBUG
-		String heap;
-		String time;
-		on_timeD(time);
-		heapStatsPatternLoop_print(heap);
-		Serial.printf_P(PSTR("\n[patterns_loop]\n\t%s\n\t%-15s%s\n"), pat_name.c_str(), time.c_str(), heap.c_str());
+        // FOR DEBUG
+        String heap;
+        String time;
+        on_timeD(time);
+        heapStatsPatternLoop_print(heap);
+        Serial.printf_P(PSTR("\n[patterns_loop]\n\t%s\n\t%-15s%s\n"), pat_name.c_str(), time.c_str(), heap.c_str());
 
-		// if ... Something {
-		// 	return true;
-		// } 
+        // if ... Something {
+        //  return true;
+        // } 
 
-	}   
-	return false;
+    }   
+    return false;
 }
 void loop()
 {
-	uint16_t pos;
-	if (patterns_loop(pos)) {
-			// ... Do something
-	}	
+    uint16_t pos;
+    if (patterns_loop(pos)) {
+            // ... Do something
+    }   
 }
 
 
