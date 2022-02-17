@@ -21,7 +21,7 @@
     {
         "owner": "Benoit Blanchon",
         "name": "ArduinoJson",
-        "version": "https://github.com/arduino-libraries/ArduinoJson.git@"
+        "version": "https://github.com/arduino-libraries/ArduinoJson.git"
     },
     {
         "owner": "Grellard Adrien",
