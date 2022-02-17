@@ -1,0 +1,41 @@
+{
+  "name": "arduino_patternsList",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Esp8266 library for creating time-based(NTP) events(alarms) ",
+  "keywords": "scheduler, time, ntp",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/AdriLighting/arduino_patternsList.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Grellard Adrien",
+      "email": "grellard.adrien@gmail.com",
+      "maintainer": true
+    }
+  ],
+  "dependencies": [
+    {
+        "owner": "Benoit Blanchon",
+        "name": "ArduinoJson",
+        "version": "https://github.com/arduino-libraries/ArduinoJson.git@"
+    },
+    {
+        "owner": "Grellard Adrien",
+        "name": "millisTimer",
+        "version": "https://github.com/bblanchon/millisTimer.git"
+    },
+    {
+        "owner": "Grellard Adrien",
+        "name": "LittlefsHelper",
+        "version": "https://github.com/AdriLighting/LittlefsHelper.git"
+    }
+
+  ],
+  "frameworks": "arduino",
+  "platforms": "espressif8266",
+  "headers": "arduino_patternsList.h"
+}
