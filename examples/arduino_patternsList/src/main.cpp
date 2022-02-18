@@ -3,12 +3,7 @@
 
 playlist_management * _playlist = nullptr;
 programme_loop          * _programme = nullptr;
-void _sort( const char arr[] ){
-      pattern_list * _ptr =  patternList_instance();
-      _ptr->_ListName.sort([](listItem *&a, listItem *&b){ String tmp=FPSTR(&arr[(uint8_t)a->_id]); return strcmp_P(tmp.c_str(), (LPALLNAMES[(uint8_t)b->_id]));});
-      for(int i=0; i<_ptr->_ListName.size(); i++){ Serial.printf_P(PSTR("[%-3d][pos: %3d][name: %S]\n"), i, _ptr->_ListName[i]->_id, _ptr->_ListName[i]->_name.c_str());   }  
 
-}
 void setup()
 {
   Serial.begin(115200);
