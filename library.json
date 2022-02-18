@@ -21,12 +21,12 @@
     {
         "owner": "Benoit Blanchon",
         "name": "ArduinoJson",
-        "version": "https://github.com/arduino-libraries/ArduinoJson.git"
+        "version": "https://github.com/bblanchon/ArduinoJson.git"
     },
     {
         "owner": "Grellard Adrien",
         "name": "millisTimer",
-        "version": "https://github.com/bblanchon/millisTimer.git"
+        "version": "https://github.com/AdriLighting/millisTimer.git"
     },
     {
         "owner": "Grellard Adrien",
