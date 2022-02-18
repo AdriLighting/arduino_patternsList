@@ -47,12 +47,15 @@ void heapStats_print(){
 
 pattern_list * patternList_ptr;
 
-pattern_list::pattern_list(uint8_t maxCnt){
+pattern_list::pattern_list(uint8_t maxCnt, String n){
     patternList_ptr = this;
-    _listName   = new String[maxCnt];
-    _maxcnt     = maxCnt;
+    _name           = n;
+    _listName       = new String[maxCnt];
+    _maxcnt         = maxCnt;
 }
-
+void pattern_list::get_name(String & value){
+    value = _name;
+}
 uint8_t pattern_list::item_add(const String &value){
     #ifdef PATHEAPSTATS
         heapStatArray[_initialize_cnt] = new heap_stats(value);
@@ -64,11 +67,20 @@ uint8_t pattern_list::item_add(const String &value){
     _initialize_cnt++;
     return _initialize_cnt;
 }
+void pattern_list::item_new(const String &value, const uint16_t & id){
+    _ListName.add(new listItem(value, id));
+}
+void pattern_list::item_ceck(){
+
+
+
+}
+
 void pattern_list::listReSort(int pos, const String & value){
     _listName[pos] = value;
 }
 void pattern_list::print(){
-    Serial.println(F("\n[pattern_list::print]\n"));
+    Serial.printf_P(PSTR("\n[pattern_list::print][_initialize_cnt: %d][_maxcnt: %d][_name: %s]\n"),_initialize_cnt, _maxcnt, _name.c_str()  );
     for (int i = 0; i < _maxcnt; ++i)
     {
         Serial.printf_P(PSTR("[%5d] - %s\n"), i, _listName[i].c_str());

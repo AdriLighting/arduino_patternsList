@@ -10,13 +10,14 @@
 
 
     class programme_loop {
-        pattern_loop            * _patterns;
-        pattern_list            * _patterns_list;
-        playlist_management     * _playlist;
+        pattern_loop            * _patterns         = nullptr;
+        pattern_list            * _patterns_list    = nullptr;
+        playlist_management     * _playlist         = nullptr;
     public:
         programme_loop();
         ~programme_loop(){delete this;};
 
+        void patternList_getName(String & value);
         
         void loop(mod_pattern_loop & mod, String & v1, boolean & playlist, boolean delayInMin = false);
         void remainingTime(uint32_t & v);
@@ -41,8 +42,10 @@
 
         void effectRnd(String & ret);
 
-        void patternList_initialize(uint8_t maxCnt);
+        void patternList_initialize(uint8_t maxCnt, String n = "df");
         void patternList_item_add(const String &value);
+        void patternList_item_new(const String &value, const uint16_t & id);
+        void patternList_clear();
         void listReSort(int pos, const String & value); 
         void patternList_randomEffect(String & ret);
 
@@ -69,7 +72,7 @@
         void patternLoop_posMin_get(uint8_t & value);
         void patternLoop_posMax_get(uint8_t & value);
 
-
+        pattern_list * patternsList_instance() { return _patterns_list;}
 
 
     };

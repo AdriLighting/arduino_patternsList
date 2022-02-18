@@ -7,6 +7,7 @@
     #include <adri_timer.h>
 
     #include "config.h"
+    #include "LList.h"
 
     extern uint32_t pInitHeap;
 
@@ -15,18 +16,42 @@
 
     void heapStats_print();
 
+    class listItem
+    {
 
+    public:
+
+        String      _name;
+        uint16_t    _id;
+
+        listItem(String n, uint16_t id) : _name(n), _id(id) {};
+        // ~listItem();
+        
+    };
 
     class pattern_list
     {
-        
+        String      _name           = "df";     
         String      * _listName     = nullptr;
+
         int         _initialize_cnt = 0;
         int         _maxcnt         = 0;
     public:
-        pattern_list(uint8_t maxCnt);
-        ~pattern_list(){delete[] _listName;};
+        LList<listItem*>    _ListName; // список эффектов с флагами из индекса
+
+
+        pattern_list(uint8_t maxCnt, String n);
+        ~pattern_list(){
+            delete[] _listName;
+            while (_ListName.size()) {
+                listItem *eff = _ListName.shift();
+                delete eff;
+            }
+            _ListName.clear();            
+        };
         uint8_t item_add(const String &value);
+        void    item_new(const String &value, const uint16_t & id);
+        void    item_ceck();
         void    item_getRandomName(String & value);
         void    item_getName(String & value, uint8_t pos);
         int     item_getPosByName(const String &search);
@@ -36,6 +61,7 @@
         void    jsonObject(JsonObject & root);
         void    list_cnt(uint8_t & value);
         void    listReSort(int pos, const String & value);
+        void    get_name(String & value);
     };
 
     pattern_list *  patternList_instance();
@@ -70,11 +96,12 @@
 
         pattern_list    * _patterns_list;
 
+
     public:
 
 
         pattern_loop(pattern_list * ptr);
-        ~pattern_loop(){};
+        ~pattern_loop(){delete _timer;};
 
         // 1 play effect + set next effect
         // 2 play effect

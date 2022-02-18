@@ -8,11 +8,16 @@ programme_loop::programme_loop(){
 
 
         
-void programme_loop::patternList_initialize(uint8_t maxCnt){
+void programme_loop::patternList_initialize(uint8_t maxCnt, String n){
     programmeLoop_ptr = this;
     _playlist       = playlist_instance();
-    _patterns_list  = new pattern_list(maxCnt);
+    if (_patterns_list) delete _patterns_list;
+    if (_patterns)      delete _patterns;
+    _patterns_list  = new pattern_list(maxCnt, n);
     _patterns       = new pattern_loop(_patterns_list);
+}
+void programme_loop::patternList_getName(String & value){
+    _patterns_list->get_name(value);
 }
 void programme_loop::listReSort(int pos, const String & value){
     _patterns_list->listReSort(pos, value);
@@ -21,6 +26,10 @@ void programme_loop::patternList_item_add(const String &value){
     uint8_t cnt = _patterns_list->item_add(value);
     _patterns->posMax_set(cnt-1);
 }
+void programme_loop::patternList_item_new(const String &value, const uint16_t & id){
+    _patterns_list->item_new(value, id);
+}
+
 void programme_loop::patternList_item_getName(String & value, uint8_t pos){
     _patterns_list->item_getName(value, pos);
 }

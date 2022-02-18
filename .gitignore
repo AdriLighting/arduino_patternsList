@@ -1,1 +1,4 @@
 .pio
+platformio.ini
+arduino_patternsList/src/main.cpp
+arduino_patternsList/include/main.h

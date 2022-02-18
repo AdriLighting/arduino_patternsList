@@ -79,12 +79,13 @@ playlist_management::playlist_management(){
 
 
 void playlist_management::print(){
-    Serial.printf_P(PSTR("\n[playlist_management::print]\n\tname: %s\n\tpos: %d\n\titemMax: %d\n\titemPos: %d\n\titemStatu: %d\n"), 
+    Serial.printf_P(PSTR("\n[playlist_management::print]\n\t%-15s -> name\n\t%-15d -> pos\n\t%-15d -> itemMax\n\t%-15d -> itemPos\n\t%-15d -> itemStatu\n\t%-15s -> listBase\n"), 
         _list_name.c_str(),
         _list_pos,
         _item_max,
         _item_pos,
-        _list_statu
+        _list_statu,
+        _list_base.c_str()
     );  
 }
 
@@ -138,22 +139,23 @@ void playlist_management::item_print(){
     }
 
 }
-
+/*
 void playlist_management::emptyLists_check(){
     int currentPos = _list_pos;
-    for(int i = 0; i < PLAYLIST_MAX; ++i) {
+    for(int i = 0; i < _list_cnt; ++i) {
         list_pos(i);
         item_restore();
         (_item_max > 0 ) ? Playlistflag[i].isEmpty = true : Playlistflag[i].isEmpty = false; 
     }   
     Serial.print(F("\n[playlist_management::emptyLists_check]\n"));
-    for(int i = 0; i < PLAYLIST_MAX; ++i) {
+    for(int i = 0; i < _list_cnt; ++i) {
         list_pos(i);
         // fsprintf( "[%d][%-15s = %5d]\n", i, _list_name.c_str(), Playlistflag[i].isEmpty);
     }
     list_pos(currentPos);
     item_restore();
 }
+*/
 // void playlist_management::list_print(JsonObject & root){
 //  Serial.print(F("\n[playlist_management::list_print]\n"));
 //  for (int i = 0; i < PLAYLIST_MAX; ++i) {
@@ -260,10 +262,11 @@ void playlist_management::item_toArray(int s_pos, const String & s_patterName, c
     #endif
 }
 boolean playlist_management::item_restore() {
+    if (!_listIsOk) return false;
+
     #ifdef DEBUG
         Serial.printf_P(PSTR("\n[playlist_management::item_restore][START]\n"));
     #endif
-
     _item_pos       = 0;    
     _item_Oldpos    = _item_pos;
     _item_max       = 0;
@@ -359,21 +362,23 @@ void playlist_management::item_remove(int remove) {
     #ifdef DEBUG
         Serial.printf_P(PSTR("[playlist_management::item_remove][DONE]\n"));
     #endif
-
 }
 
-void playlist_management::list_name(String & ret)           {ret        = _list_name;}
+void playlist_management::list_name(String & ret)                       {ret = _list_name;}
 
-void playlist_management::item_patternName(int pos, String & ret)   {ret = playlist_itemArray[pos]._pattern_name;}
-void playlist_management::item_patternName(String & ret)            {ret = playlist_itemArray[_item_pos]._pattern_name;}
+void playlist_management::item_patternName(uint8_t pos, String & ret)   {ret = playlist_itemArray[pos]._pattern_name;}
+void playlist_management::item_patternName(String & ret)                {ret = playlist_itemArray[_item_pos]._pattern_name;}
 
-void playlist_management::item_patternConfig(int pos, String & ret) {ret = playlist_itemArray[pos]._pattern_config;}
-void playlist_management::item_patternConfig(String & ret)          {ret = playlist_itemArray[_item_pos]._pattern_config;}
+void playlist_management::item_patternConfig(uint8_t pos, String & ret) {ret = playlist_itemArray[pos]._pattern_config;}
+void playlist_management::item_patternConfig(String & ret)              {ret = playlist_itemArray[_item_pos]._pattern_config;}
 
-void playlist_management::item_Oldpos(int & ret){ret = _item_Oldpos;}
-void playlist_management::item_pos(int & ret)   {ret = _item_pos;}
-void playlist_management::item_pos_set(int ret) {_item_Oldpos = _item_pos; _item_pos = ret;_item_loop_timer->set_duration(millis());}
-boolean playlist_management::item_pos_set(String ret){
+void playlist_management::item_Oldpos(int & ret)                        {ret = _item_Oldpos;}
+void playlist_management::item_pos(int & ret)                           {ret = _item_pos;}
+void playlist_management::item_pos_set(uint8_t ret) {
+    if (!_listIsOk) return;
+    _item_Oldpos = _item_pos; _item_pos = ret;_item_loop_timer->set_duration(millis());}
+boolean playlist_management::item_pos_set(const String & ret){
+    if (!_listIsOk) return false;
     int pos = -1;
     for(int i = 0; i < _item_max; ++i) {if (ret == playlist_itemArray[i]._pattern_name ) {pos = i; break;}} 
     if (pos == -1) return false ;
@@ -382,10 +387,10 @@ boolean playlist_management::item_pos_set(String ret){
     _item_loop_timer->set_duration(millis());
     return true;
 }
-void playlist_management::item_max(int & ret) {ret = _item_max;}
-void playlist_management::remainingTime(uint32_t & v){_item_loop_timer->get_remainingTime(v);}
+void playlist_management::item_max(uint8_t & ret)                       {ret = _item_max;}
+void playlist_management::remainingTime(uint32_t & v)                   {_item_loop_timer->get_remainingTime(v);}
 void playlist_management::item_loop(pattern_loop * ptr, mod_pattern_loop & mod, String & v1, boolean delayInMin){
-
+    if (!_listIsOk) return;
     if ( !ptr->isPlaying() ) {
         return;
     } 
@@ -441,31 +446,44 @@ void playlist_management::item_rnd(String & ret){
     _item_loop_timer->set_duration(millis());
 }
 
-void playlist_management::list_statu_set(boolean ret)   {_list_statu = ret;_item_loop_timer->set_duration(millis());}
+void playlist_management::list_statu_set(boolean ret) {
+    if (!_listIsOk) return;
+    _list_statu = ret;_item_loop_timer->set_duration(millis());
+}
 void playlist_management::list_statu(boolean & ret)     {ret = _list_statu;}
 boolean playlist_management::list_statu()               {return _list_statu;}
 void playlist_management::list_pos_get(int & ret)       {ret = _list_pos;}
 
 void playlist_management::list_print(){
     Serial.print(F("\n[playlist_management::list_print][START]\n"));
-    for (int i = 0; i < PLAYLIST_MAX; ++i) playlist_listArray[i]->print(i);
+    for (int i = 0; i < _list_cnt; ++i) playlist_listArray[i]->print(i);
     Serial.print(F("[playlist_management::list_print][DONE]\n"));   
 }
 
 void playlist_management::list_dir(boolean dir) {
     if (dir) {
         _list_pos++;
-        if (_list_pos>=PLAYLIST_MAX)_list_pos=0;
+        if (_list_pos>=_list_cnt)_list_pos=0;
     } else {
         _list_pos--;
-        if (_list_pos<0)_list_pos=PLAYLIST_MAX-1;
+        if (_list_pos<0)_list_pos=_list_cnt-1;
     }
     _list_name  = playlist_listArray[_list_pos]->_name;
 }
 
-void playlist_management::list_pos(int pos){
+boolean playlist_management::list_pos(int pos, String currentList){
+    if (_list_cnt == -1) return false;
+    if (pos >= _list_cnt) {
+        Serial.printf_P(PSTR("[playlist_management::list_pos][EROR postion][requete: %d >= %d]\n"),pos ,_list_cnt);
+        _listIsOk=false;return false;}
+    if (playlist_listArray[pos]->_listName != currentList) {
+        Serial.printf_P(PSTR("[playlist_management::list_pos][EROR listeBase][requete: %s <> %s]\n"),playlist_listArray[pos]->_listName.c_str() ,currentList.c_str());
+        _listIsOk=false;return false;}
+    _listIsOk   = true;
     _list_pos   = pos;
+    _list_base  = playlist_listArray[pos]->_listName;
     _list_name  = playlist_listArray[pos]->_name;
+    return true;
 }
 void playlist_management::list_lbl(const String & lbl){
     playlist_listArray[_list_pos]->_lbl = lbl;
@@ -490,6 +508,8 @@ void playlist_management::list_initialize() {
                 object_2[F("name")]     = "compoName_" + String(i);
                 object_2[F("lbl")]      = "compoName_" + String(i);
                 object_2[F("arrayPos")] = i;
+                object_2[F("id")]       = "df";
+                _list_cnt++;
             } 
             serializeJson(json, f);
             f.close();          
@@ -508,7 +528,38 @@ void playlist_management::list_initialize() {
         Serial.printf_P(PSTR("[playlist_management::list_initialize][DONE]\n"));
     #endif     
 }
+boolean playlist_management::list_new(const String & Lname, uint8_t & Pos){
+    #ifdef DEBUG
+        Serial.printf_P(PSTR("\n[playlist_management::list_new][START]\n"));
+    #endif
 
+    if (_list_cnt == -1) _list_cnt = 0;
+
+    if ((_list_cnt) >= PLAYLIST_MAX) {
+        #ifdef DEBUG
+            Serial.printf_P(PSTR("\t[LIMITE MAXIMUM ATTEINTE]\n")); 
+            Serial.printf_P(PSTR("[playlist_management::list_new][FAIL]\n"));
+        #endif
+        return false;
+    }
+
+    playlist_listArray[_list_cnt] = new playlist_list();
+    playlist_listArray[_list_cnt]->_name        = "compoName_" + String(_list_cnt);;
+    playlist_listArray[_list_cnt]->_lbl         = "compoName_" + String(_list_cnt);;
+    playlist_listArray[_list_cnt]->_listName    = Lname;
+    playlist_listArray[_list_cnt]->_pos         = String(_list_cnt);
+
+    Pos = _list_cnt;
+
+    _list_cnt++;
+
+    listAjson_toSpiff();
+
+    #ifdef DEBUG
+        Serial.printf_P(PSTR("[playlist_management::list_new][DONE]\n"));
+    #endif      
+    return true;
+}
 boolean playlist_management::listAjson_toSpiff(){ 
     #ifdef DEBUG
         Serial.printf_P(PSTR("\n[playlist_management::listAjson_toSpiff][START]\n"));
@@ -524,12 +575,13 @@ boolean playlist_management::listAjson_toSpiff(){
             JsonObject root = json.to<JsonObject>();
             JsonObject object_2;
             JsonObject object = root.createNestedObject("componames");
-            object[F("cnt")] = PLAYLIST_MAX;
-            for (int i=0; i < PLAYLIST_MAX; i++) {
+            object[F("cnt")] = _list_cnt;
+            for (int i=0; i < _list_cnt; i++) {
                 object_2 = object.createNestedObject("compo_" + String(i));
                 object_2[F("name")]     = playlist_listArray[i]->_name;
                 object_2[F("lbl")]      = playlist_listArray[i]->_lbl;
                 object_2[F("arrayPos")] = playlist_listArray[i]->_pos;
+                object_2[F("id")]       = playlist_listArray[i]->_listName;
             } 
             serializeJson(json, f);
             f.close();
@@ -547,14 +599,14 @@ boolean playlist_management::listAjson_toSpiff(){
 }
 
 void playlist_management::list_removeFromSpiff(){
-    LittleFS.remove((String)FPSTR(FNPATH_LISTPLAYLLIST) + ".txt");
+    LittleFS.remove((String)FPSTR(FNPATH_LISTPLAYLLIST) + ".json");
 }
-boolean playlist_management::list_fromSpiff(){
+boolean playlist_management::list_fromSpiff(boolean df){
     #ifdef DEBUG
         Serial.printf_P(PSTR("\n[playlist_management::list_fromSpiff][START]\n"));
     #endif
 
-    list_initialize();
+    if (df) list_initialize();
 
     String path = (String)FPSTR(FNPATH_LISTPLAYLLIST) + ".json";
     DynamicJsonDocument doc(2048);
@@ -566,15 +618,18 @@ boolean playlist_management::list_fromSpiff(){
         #endif
         return false;       
     }
+    
+    if (_list_cnt == -1) _list_cnt = 0;
 
     uint8_t cnt = doc[F("componames")][F("cnt")].as<uint8_t>();
     for (int i=0; i < cnt; i++) {
         playlist_listArray[i] = new playlist_list();
         String key = "compo_" + String(i);
-        playlist_listArray[i]->_name    = doc[F("componames")][key][F("name")].as<String>();
-        playlist_listArray[i]->_lbl     = doc[F("componames")][key][F("lbl")].as<String>();
-        playlist_listArray[i]->_pos     = doc[F("componames")][key][F("arrayPos")].as<int>();
-
+        playlist_listArray[i]->_name        = doc[F("componames")][key][F("name")].as<String>();
+        playlist_listArray[i]->_lbl         = doc[F("componames")][key][F("lbl")].as<String>();
+        playlist_listArray[i]->_listName    = doc[F("componames")][key][F("id")].as<String>();
+        playlist_listArray[i]->_pos         = doc[F("componames")][key][F("arrayPos")].as<int>();
+        _list_cnt++;
     }           
 
     #ifdef DEBUG
@@ -582,6 +637,7 @@ boolean playlist_management::list_fromSpiff(){
     #endif      
     return true;
 }
+
 
 boolean playlist_management::list_toSpiff(){ 
 
@@ -623,11 +679,12 @@ void playlist_list::setup(){
 
 }
 void playlist_list::print(int cnt){
-    Serial.printf_P(PSTR("[%3d] [pos: %5s] [name: %-15s] [lbl: %-15s]\n"), 
+    Serial.printf_P(PSTR("[%3d] [pos: %5s] [name: %-15s] [lbl: %-15s] [listName: %-15s]\n"), 
         cnt,
         _pos.c_str(),
         _name.c_str(),
-        _lbl.c_str()
+        _lbl.c_str(),
+        _listName.c_str()
     );
 }
 void playlist_list::printItems(){
