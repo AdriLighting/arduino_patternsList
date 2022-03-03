@@ -8,8 +8,8 @@
 #ifndef STRINGSORT_H
 #define STRINGSORT_H
 
-#include <lists.h>
-#include <resizeBuff.h>
+#include "lists/lists.h"
+#include "resizeBuff/resizeBuff.h"
 
 // The class setup for the list object.
 class stringObj : public linkListObj {
