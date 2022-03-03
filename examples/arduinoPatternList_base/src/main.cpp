@@ -26,7 +26,7 @@ Program * _Program = nullptr;
     if (rSize>0) {v = arg[1];}
 
 		RA action = RAARR[p];
-		_Program->remote_action(action, v.c_str(), NULL);    
+		_Program->remote_action(action, v.c_str(), "", NULL);    
   }  
   void serial_menu_p_3(const String & cmd, const String & value){_Program->print(PM_LB); _Program->print(PM_PL); } 
   void serial_menu_p_1(const String & cmd, const String & value){_Program->print(PM_LOOP); } 
