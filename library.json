@@ -28,12 +28,6 @@
         "name": "millisTimer",
         "version": "https://github.com/AdriLighting/millisTimer.git"
     },
-    {
-        "owner": "Grellard Adrien",
-        "name": "LittlefsHelper",
-        "version": "https://github.com/AdriLighting/LittlefsHelper.git"
-    }
-
   ],
   "frameworks": "arduino",
   "platforms": "espressif8266",
