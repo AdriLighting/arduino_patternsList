@@ -1,2 +1,0 @@
-# arduino_patternsList
-arduino_patternsList
