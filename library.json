@@ -29,6 +29,7 @@
         "version": "https://github.com/AdriLighting/millisTimer.git"
     }
   ],
+  
   "frameworks": "arduino",
   "platforms": "espressif8266",
   "headers": "arduino_patternsList.h"
