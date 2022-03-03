@@ -1,5 +1,5 @@
-arduinoPatternList/.pio
-arduinoPatternList/src/main.cpp
-arduinoPatternList/include/main.h
-arduinoPatternList/platformio.ini
-arduinoPatternList/data
+.pio
+src/main.cpp
+include/main.h
+platformio.ini
+data
