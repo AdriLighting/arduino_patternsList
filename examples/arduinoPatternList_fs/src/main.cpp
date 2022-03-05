@@ -27,8 +27,27 @@ Program * _Program = nullptr;
     if (rSize>0) {v   = arg[1];}
     if (rSize>1) {v2  = arg[2];}
 
-		RA action = RAARR[p];
-		_Program->remote_action(action, v.c_str(), v2.c_str(), NULL);    
+      DynamicJsonDocument doc(1024);
+      JsonArray           arr;
+      JsonObject          var;
+      String              reponse;
+
+      doc[F("op")]    = 0;
+      doc[F("type")]  = "ESP";
+
+      arr = doc.createNestedArray(F("set"));  
+      var = arr.createNestedObject();
+      var[F("n")] = FPSTR(RAALLNAMES[p]);
+      var[F("v")] = v;
+
+      arr = doc.createNestedArray(F("get"));  
+      arr.add("loop");
+
+      _WebserverRequest.parsingRequest(doc, reponse, v2);
+      
+      Serial.printf_P(PSTR("[serial_menu_cmd->reponse]\n%S\n"),reponse.c_str());
+		// RA action = RAARR[p];
+		// _Program->remote_action(action, v.c_str(), v2.c_str(), NULL);    
   }  
   void serial_menu_p_4(const String & cmd, const String & value){LittleFS.format();} 
   void serial_menu_p_3(const String & cmd, const String & value){_Program->print(PM_LB); _Program->print(PM_PL); } 
