@@ -1,5 +1,6 @@
-#ifdef DEBUGSERIAL
 #include "menu_serial.h"
+
+#ifdef DEBUGSERIAL
 #include "tools.h"
 
 void serialReadItem::item_add(   

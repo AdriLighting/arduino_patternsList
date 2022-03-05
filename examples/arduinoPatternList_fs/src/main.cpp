@@ -6,7 +6,9 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-
+#ifdef FSOK
+  #include <LittleFS.h>  
+#endif
 
 Program * _Program = nullptr;
 
@@ -44,7 +46,7 @@ Program * _Program = nullptr;
       // arr.add("loop");
 
       _WebserverRequest.parsingRequest(doc, reponse, v2);
-      
+
       Serial.printf_P(PSTR("[serial_menu_cmd->reponse]\n%S\n"),reponse.c_str());
 		// RA action = RAARR[p];
 		// _Program->remote_action(action, v.c_str(), v2.c_str(), NULL);    
@@ -89,7 +91,7 @@ void setup() {
     _serial->cmd_item_add(  1,  "remote action list", "t", serial_menu_p_2);
     _serial->cmd_item_add(  1,  "lb+allpl",           "y", serial_menu_p_3);
     _serial->cmd_item_add(  1,  "fs format",          "u", serial_menu_p_4);
-    _serial->cmd_array(2, 1); 
+    _serial->cmd_array(2, 1); // !e=v1,v2
     _serial->cmd_item_add(  2, "remote action",       "e", serial_menu_cmd);   
     Serial.printf_P(PSTR("\t[0 | freeheap: %d]\n"), ESP.getFreeHeap()); // debug Serial
   #endif

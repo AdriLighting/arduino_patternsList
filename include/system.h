@@ -3,6 +3,7 @@
 #define SYSTEM_H
   #include <Arduino.h>
   #include <ArduinoJson.h>
+  #include "constants.h"
 
   #ifndef LAMPFRAMEWORK
     #define LAMPFRAMEWORK 0

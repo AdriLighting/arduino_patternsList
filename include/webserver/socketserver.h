@@ -1,3 +1,5 @@
+#include "../constants.h"
+
 #ifdef WEBSOCKETSERVEROK
 #ifndef SOCKETSERVER_H
 #define SOCKETSERVER_H
@@ -11,9 +13,9 @@
 		#include <ESP8266mDNS.h>
 		#include <SPI.h>
 		#include <LittleFS.h>
-#ifdef WEBSOCKETSERVEROK
-		#include <WebSocketsServer.h>	
-#endif
+		#ifdef WEBSOCKETSERVEROK
+			#include <WebSocketsServer.h>	
+		#endif
 
 	#elif defined(ESP32)
 		#include <Arduino.h>

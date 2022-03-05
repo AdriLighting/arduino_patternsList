@@ -1,3 +1,5 @@
+#include "constants.h"
+
 #ifdef DEBUGSERIAL
 #ifndef MENU_SERIAL_H
 	#define MENU_SERIAL_H

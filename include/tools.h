@@ -2,6 +2,7 @@
 #define TOOLS_H
   #include <Arduino.h>
   #include <ArduinoJson.h>
+  #include "constants.h"
 
   extern char * debug_printBuffer;
   void debugPrint();

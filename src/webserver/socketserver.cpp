@@ -1,6 +1,6 @@
-#ifdef WEBSOCKETSERVEROK
 #include "webserver/socketserver.h"
 
+#ifdef WEBSOCKETSERVEROK
     using namespace std::placeholders;
 
     #if defined(ESP8266)

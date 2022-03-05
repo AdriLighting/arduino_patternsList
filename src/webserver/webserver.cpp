@@ -1,5 +1,6 @@
-#ifdef WEBSERVEROK
 #include "webserver/webserver.h"
+
+#ifdef WEBSERVEROK
 #include "../include/system.h"
 #include "../include/webserverRequest.h"
 

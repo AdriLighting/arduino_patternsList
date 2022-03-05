@@ -6,7 +6,7 @@ AUTHOR
 */
 
 
-#include "resizeBuff.h"
+#include "../include/resizeBuff/resizeBuff.h"
 
 //#include <debug.h>
 
