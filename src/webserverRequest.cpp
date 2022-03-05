@@ -132,7 +132,7 @@ void webserverRequest_reponse::make_reponse(DynamicJsonDocument & doc){
         temp.clear();
         root = temp.to<JsonObject>();   
         pPtr->pl_json(root);
-        doc[FPSTR(REQ_006)] = temp;
+        doc[FPSTR(REQ_006)][FPSTR(REQ_003)] = temp;
       } 
     break;
     
