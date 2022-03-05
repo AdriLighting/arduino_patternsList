@@ -427,6 +427,9 @@ void Program::remote_action(RA action, ...){
     break;
     case RA::RA_LGET_PL:
     break;
+    case RA::RA_PL_NEW:
+      if(String(key) != "") pl_item_new((uint8_t)atoi(key));
+    break;    
     default:break;
   }
 
@@ -510,6 +513,20 @@ boolean Program::pl_set_listPos(uint8_t pos, const char * currentList){
   ListLoop::setup(&_pltFlag, pC-1);
 
   return true;
+}
+void Program::pl_item_new(uint8_t pP) {
+  String ilbN;
+  get_itemNameByPos(_lbtFlag._pos, ilbN);
+
+  pl_item_toArray(pP, 255, ilbN, ilbN, ilbN); 
+
+  uint16_t pC = 0;
+  _Playlists[_plStatu.pos].get_items_cnt(pC);
+  ListLoop::updatePos(&_pltFlag, pC-1);
+
+  #ifdef FSOK
+    pl_fs(pP, reponse);  
+  #endif
 }
 void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
   if (!doc.containsKey(F("pl_item_new"))) return;

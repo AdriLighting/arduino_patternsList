@@ -76,6 +76,7 @@
     void initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
 
 
+    void    pl_item_new(uint8_t);
     void    pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & rep);
     void    pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & rep);
     void    pl_item_toArray(uint8_t, uint8_t, const String &, const String &, const String &);
