@@ -11,6 +11,8 @@
   #include "patterns.h"
   #include "lloop.h"
 
+
+
   class ListSortItems {
   public:
     String    _name;
@@ -33,6 +35,7 @@
   };
   class Program : public Listbase, public ListLoop {
     typedef std::function<void(const String & v1, const uint16_t & v2, boolean upd)> callback_function_t;
+    // typedef std::function<void(const String & v1)> callback_error;
 
     LBnames             * _LBnames    = nullptr;  
     LB_flag             _lbStatu;
@@ -41,9 +44,9 @@
 
     HeapStatu           _HeapStatu;
 
-    callback_function_t _callback     = nullptr;
-
-
+    callback_function_t _callback       = nullptr;
+    // callback_error      _callbackError  = nullptr;
+ 
     void get_itemBase(String &);
     void get_itemPosBase(uint16_t &);
     void get_itemPos(uint16_t &);
@@ -73,12 +76,20 @@
     void initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
 
 
+    void    pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & rep);
+    void    pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & rep);
     void    pl_item_toArray(uint8_t, uint8_t, const String &, const String &, const String &);
     boolean pl_item_removeitemIdByArrayPos(uint8_t pP, uint8_t aP);
 
     boolean pl_set_listPos(uint8_t pos, const char  * currentList);
 
 
+    #ifdef FSOK
+      void pl_fs();  
+      void pl_fs(uint8_t pP, DynamicJsonDocument & doc);  
+      void pl_fs_restore(uint8_t pP);  
+      void pl_fs_restore();  
+    #endif
     void pl_json(JsonObject & doc, boolean pI = true, boolean lRef = false);
     void pl_currentJson(uint8_t p, JsonObject & doc, boolean pI = true);
     void pl_currentJson(JsonObject & doc, boolean pI = true);

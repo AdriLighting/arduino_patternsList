@@ -46,6 +46,7 @@
     void prev(LL_flag * flag);
     void rnd(LL_flag * flag); 
 
+    void updatePos(LL_flag * flag, const uint16_t & v);
     void setup(LL_flag * flag, const uint16_t & v);
     void reset(LL_flag * flag, int v);
     void reset();

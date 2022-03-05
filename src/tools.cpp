@@ -1,6 +1,9 @@
 #include "tools.h"
 
 #include <Arduino.h>
+#ifdef FSOK
+  #include <LittleFS.h>  
+#endif
 
 String ch_toString(const char * c){
   return String((const __FlashStringHelper*) c);
@@ -110,6 +113,34 @@ void on_timeD(String & result) {
    seconds2timeD(millis(), t);
    result = String(t);
 }
+
+
+
+#ifdef FSOK
+bool deserializeFile(DynamicJsonDocument& doc, const char* filepath){
+    if (!filepath || !*filepath)
+        return false;
+
+    File jfile = LittleFS.open(filepath, "r");
+    DeserializationError error;
+    if (jfile){
+        error = deserializeJson(doc, jfile);
+        jfile.close();
+    } else {
+        return false;
+    }
+
+    if (error) {
+        // ADRI_LOG(-1,2,2,"\nFile: failed to load json file: %s, deserializeJson error: %d", filepath, error.code());
+        // fsprintf("\t");
+        // Serial.println(error.code());
+        return false;
+    }
+    // ADRI_LOG(-1,2,2,"\nFile: %s ", filepath);
+    return true;
+}  
+#endif
+
 
 
 uint32_t HeapStatu::pInitHeap(0);

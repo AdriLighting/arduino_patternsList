@@ -47,6 +47,10 @@ void ListLoop::setup(LL_flag * flag, const uint16_t & v){
   flag->_pos        = 0;
   flag->_posMax     = v;
 }
+void ListLoop::updatePos(LL_flag * flag, const uint16_t & v){
+  flag->_posMax = v;
+  if (flag->_pos > flag->_posMax) flag->_pos = flag->_posMax;
+}
 void ListLoop::reset(LL_flag * flag, int v){
   flag->_pos        = v;
   _timer->reset();    

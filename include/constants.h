@@ -27,6 +27,11 @@
       uint8_t pos;
   } LB_flag;
 
+
+  static const char FOPATH_PLAYLIST   [] PROGMEM = "/playlist/";
+  static const char FNPREFIX_PLAYLIST [] PROGMEM = "playlist_";
+  static const char FNEXT_PLAYLIST    [] PROGMEM = ".json";
+
   static const char RANAME_001[] PROGMEM = "RA_ITEM";
   static const char RANAME_002[] PROGMEM = "RA_ITEM_NEXT";
   static const char RANAME_003[] PROGMEM = "RA_ITEM_PREV";

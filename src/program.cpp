@@ -1,5 +1,9 @@
 #include "program.h"
 
+#ifdef FSOK
+  #include <LittleFS.h>  
+#endif
+
 #include "Stringsort.h"
 #include "LList/LList.h"
 #include "webserverRequest.h"
@@ -269,19 +273,7 @@ void Program::initialize(const uint16_t & maxCnt, const char* const* arr, const 
   Listbase::get_cnt(pC);
   ListLoop::setup(&_lbtFlag, pC-1);
 }
-void Program::initialize_playlist(uint8_t lCount,  const uint8_t * const &Icount,  const char ** const &Lname) {
-  _plStatu.cnt   = lCount;
-  _Playlists      = new Playlist_list[lCount];
-  for(uint8_t i=0; i<_plStatu.cnt; i++){
-    uint8_t c = Icount[i];
-    _Playlists[i].set_items_max(c);
-    _Playlists[i].set_listRef(Lname[i]);
-    _Playlists[i].set_pos(i);
-    _Playlists[i].set_lbl("playlist_" + String(i));
-    _Playlists[i]._Playlist_itemArray = new Playlist_item[c];
-    _Playlists[i].item_df();
-  }
-}
+
 
 
 void Program::get_itemPosBase(uint16_t & v1){   
@@ -340,32 +332,6 @@ void Program::loop(mod_pattern_loop & mod, String & v1){
     v1  = name;     
   }
 }
-void Program::handle(){
-  if ( !isPlaying() ) {
-    return;
-  } 
-  uint32_t    del;
-  boolean     delMin;
-  get_delay(del);
-  get_delayMin(delMin);
-  if (_timer->loop(del*(delMin ? 60000 : 1000))) {
-    String    name;
-    uint16_t  pB = 0;
-
-    set_itemNext();
-
-    get_itemBase(name);
-    get_itemPosBase(pB);
-
-    if(_callback)_callback(name, pB, true);
-
-  }
-}
-void Program::set_callback(callback_function_t f)  {_callback = std::move(f);}
-/*
-  I DON'T KNOW HOW TO MANAGE THE CALLBACK SYSTEM FOR THE MOMENT 
-    JUST PRINT A STRING
-*/
 void Program::item_callback(boolean upd){ 
   String name;
   get_itemBase(name);
@@ -388,22 +354,30 @@ void Program::item_callback(boolean upd){
     print(PM_LLI);  
   #endif
 }
-/*
-  COMMANDE RECU VIA JSON OU AUTRE
-  requette parse en ammont suivant la methode de reception
 
-    from serial input
-      void serial_menu_cmd(const String & cmd, const String & value){
-        uint8_t p = value.toInt();
-        String v = "";
-        RA action = RAARR[p];
-        int rSize=0;
-        String * arg = LH_explode(value, ',', rSize) ; (rSize>0) v = arg[1]
-    from json
-      deserializeJson
-        cmd
-        value
-*/ 
+void Program::handle(){
+  if ( !isPlaying() ) {
+    return;
+  } 
+  uint32_t    del;
+  boolean     delMin;
+  get_delay(del);
+  get_delayMin(delMin);
+  if (_timer->loop(del*(delMin ? 60000 : 1000))) {
+    String    name;
+    uint16_t  pB = 0;
+
+    set_itemNext();
+
+    get_itemBase(name);
+    get_itemPosBase(pB);
+
+    if(_callback)_callback(name, pB, true);
+
+  }
+}
+void Program::set_callback(callback_function_t f)  {_callback = std::move(f);}
+
 void Program::remote_action(RA action, ...){
 #ifdef DEBUG
   Serial.printf_P(PSTR("RA %-4d[%-20s]: "), action, RAALLNAMES[action]);  
@@ -453,17 +427,20 @@ void Program::remote_action(RA action, ...){
     break;
     default:break;
   }
+
+  // USER CALLBACK
   switch (action) { 
     case RA::RA_ITEM:       ;
     case RA::RA_ITEM_NEXT:  ;
     case RA::RA_ITEM_PREV:  ;
     case RA::RA_ITEM_RND:   
     {
-      String    name;
-      uint16_t  pB = 0;
-      get_itemBase(name);
-      get_itemPosBase(pB);
-      if(_callback) {_callback(name, pB, (String(val) == "upd" )?true:false);}
+      if(_callback) {
+        String    name;
+        uint16_t  pB = 0;
+        get_itemBase(name);
+        get_itemPosBase(pB);
+        _callback(name, pB, (String(val) == "upd" )?true:false);}
     }
     break;
     default:break;
@@ -473,7 +450,19 @@ void Program::remote_action(RA action, ...){
 
 
 
-
+void Program::initialize_playlist(uint8_t lCount,  const uint8_t * const &Icount,  const char ** const &Lname) {
+  _plStatu.cnt   = lCount;
+  _Playlists      = new Playlist_list[lCount];
+  for(uint8_t i=0; i<_plStatu.cnt; i++){
+    uint8_t c = Icount[i];
+    _Playlists[i].set_items_max(c);
+    _Playlists[i].set_listRef(Lname[i]);
+    _Playlists[i].set_pos(i);
+    _Playlists[i].set_lbl("playlist_" + String(i));
+    _Playlists[i]._Playlist_itemArray = new Playlist_item[c];
+    _Playlists[i].item_df();
+  }
+}
 
 // boolean Program::get_itemIdByArrayPos(uint8_t pP, uint8_t aP, uint8_t & result) { 
 //   return _Playlists[pP].get_itemIdByArrayPos(aP, result);
@@ -485,17 +474,29 @@ boolean Program::pl_set_listPos(uint8_t pos, const char * currentList){
   if (_plStatu.cnt == 0) return false;
 
   if (pos >= _plStatu.cnt) {
-#ifdef DEBUG
-    Serial.printf_P(PSTR("[Program::list_pos][EROR postion][requete: %d >= %d]\n"),pos ,_plStatu.cnt);  
-#endif
+    #ifdef DEBUG
+      Serial.printf_P(PSTR("[Program::list_pos][EROR postion][requete: %d >= %d]\n"),pos ,_plStatu.cnt);  
+    #endif
     _plStatu.isPlaying =false; 
     _plStatu.isSet =false; 
     return false;
   }
   if (sLref != currentList) {
-#ifdef DEBUG
-    Serial.printf_P(PSTR("[Program::list_pos][EROR listeBase][pos: %d][requete: %s <> %s]\n"),pos, sLref ,currentList);  
-#endif
+    #ifdef DEBUG
+      Serial.printf_P(PSTR("[Program::list_pos][EROR listeBase][pos: %d][requete: %s <> %s]\n"),pos, sLref ,currentList);  
+    #endif
+    _plStatu.isPlaying =false; 
+    _plStatu.isSet =false; 
+    return false;
+  }
+
+  uint16_t pC = 0;
+  _Playlists[pos].get_items_cnt(pC);
+
+  if (pC == 0) {
+    #ifdef DEBUG
+      Serial.printf_P(PSTR("[Program::list_pos][EROR nb of item low: %d]\n"),pC);  
+    #endif
     _plStatu.isPlaying =false; 
     _plStatu.isSet =false; 
     return false;
@@ -504,12 +505,58 @@ boolean Program::pl_set_listPos(uint8_t pos, const char * currentList){
   _plStatu.isSet      = true;
   _plStatu.pos        = pos;
 
-  uint16_t pC;
-  _Playlists[_plStatu.pos].get_items_cnt(pC);
   ListLoop::setup(&_pltFlag, pC-1);
 
   return true;
 }
+void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
+  if (!doc.containsKey(F("pl_item_new"))) return;
+
+  uint8_t pP          = doc[F("pl_item_new")][F("pP")].as<uint8_t>();
+  uint8_t iP          = doc[F("pl_item_new")][F("iP")].as<uint8_t>();
+  String  lbl         = doc[F("pl_item_new")][F("lbl")].as<String>();
+  String  itemBase    = doc[F("pl_item_new")][F("itemBase")].as<String>();
+  String  itemBaseCfg = doc[F("pl_item_new")][F("itemBaseCfg")].as<String>();  
+  pl_item_toArray(pP, iP, lbl, itemBase, itemBaseCfg); 
+
+  uint16_t pC = 0;
+  _Playlists[_plStatu.pos].get_items_cnt(pC);
+  ListLoop::updatePos(&_pltFlag, pC-1);
+
+  JsonObject root;
+  DynamicJsonDocument temp(2048);
+  reponse.createNestedObject(FPSTR(REP_007));
+  root = temp.to<JsonObject>();   
+  pl_currentJson(pP, root, true);
+  reponse[FPSTR(REP_007)] = temp;
+
+  #ifdef FSOK
+    pl_fs(pP, reponse);  
+  #endif
+}
+void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
+  if (!doc.containsKey(F("pl_item_remove"))) return;
+
+  uint8_t pP = doc[F("pl_item_remove")][F("pP")].as<uint8_t>();
+  uint8_t aP = doc[F("pl_item_remove")][F("iP")].as<uint8_t>();
+  pl_item_removeitemIdByArrayPos(pP, aP);
+
+  uint16_t pC = 0;
+  _Playlists[_plStatu.pos].get_items_cnt(pC);
+  ListLoop::updatePos(&_pltFlag, pC-1);
+
+  JsonObject root;
+  DynamicJsonDocument temp(2048);
+  reponse.createNestedObject(FPSTR(REP_007));
+  root = temp.to<JsonObject>();   
+  pl_currentJson(pP, root, true);
+  reponse[FPSTR(REP_007)] = temp;
+
+  #ifdef FSOK
+    pl_fs(pP, reponse);  
+  #endif
+}
+
 void Program::pl_item_toArray(uint8_t pP, uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg) {
   _Playlists[pP].item_toArray(iP,lbl,itemBase,itemBaseCfg);
 }
@@ -549,6 +596,63 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
   doc[F("cmax")] = cnt;
 
 }
+
+#ifdef FSOK
+  void Program::pl_fs(){
+    String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(_plStatu.pos) + (String)FPSTR(FNEXT_PLAYLIST) ;
+    File f=LittleFS.open(path,"w");
+    if (!f) {
+      #ifdef DEBUG
+        Serial.printf_P(PSTR("[Program::pl_fs][Error open /w]\n\t%s\n"), path.c_str());  
+      #endif
+      return;
+    }
+
+    DynamicJsonDocument doc(5000);
+    DynamicJsonDocument temp(2048);
+
+    doc.createNestedObject(FPSTR(REP_007));
+    temp.clear();
+    JsonObject root = temp.to<JsonObject>();   
+    pl_currentJson(_plStatu.pos, root, true);
+    doc[FPSTR(REP_007)] = temp;  
+
+    serializeJson(doc, f);
+    f.close();  
+  }
+  void Program::pl_fs(uint8_t pPos, DynamicJsonDocument & doc){
+    String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pPos) + (String)FPSTR(FNEXT_PLAYLIST) ;
+    File f=LittleFS.open(path,"w");
+    if (!f) {
+      #ifdef DEBUG
+        Serial.printf_P(PSTR("[Program::pl_fs][Error open /w]\n\t%s\n"), path.c_str());     
+      #endif
+      return;
+    }
+    serializeJson(doc, f);
+    f.close();  
+  }
+  void Program::pl_fs_restore(uint8_t pPos){
+    String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pPos) + (String)FPSTR(FNEXT_PLAYLIST) ;
+    DynamicJsonDocument doc(2048);
+    char buffer[80];
+    sprintf(buffer, "%s", path.c_str());    
+    if (!deserializeFile(doc, buffer)) {
+      #ifdef DEBUG
+        Serial.printf_P(PSTR("[Program::pl_fs_restore][Error open /r]\n\t%s\n"), path.c_str());     
+      #endif
+      return;       
+    }  
+    _Playlists[pPos].item_df();
+    _Playlists[pPos].item_restore(doc);
+  } 
+void Program::pl_fs_restore() {
+  for(uint8_t i=0; i<_plStatu.cnt; i++){
+    pl_fs_restore(i);
+  }
+}     
+#endif
+
 void Program::pl_currentJson(JsonObject & doc, boolean pI) {
   _Playlists[_plStatu.pos].item_json(doc, pI);
 }

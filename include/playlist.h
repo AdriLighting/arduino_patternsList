@@ -41,7 +41,7 @@
 
     void item_print();
     void item_json(JsonObject & doc, boolean pI = true);
-
+    void item_restore(DynamicJsonDocument & doc);
     void item_toArray(uint8_t, const String &, const String &, const String &);
     void item_remove(uint8_t remove); 
     void item_df();

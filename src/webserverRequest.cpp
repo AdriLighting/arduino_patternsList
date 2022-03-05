@@ -134,8 +134,8 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
     Program * pPtr = ProgramPtrGet();
 
     // need to determine size befor
-     DynamicJsonDocument      reponse(5000);
-     webserverRequest_reponse * _webserverRequest_reponse = nullptr;
+    DynamicJsonDocument      reponse(5000);
+    webserverRequest_reponse * _webserverRequest_reponse = nullptr;
 
     // cli
     // porvenance: http server, websocket server, udp/multi
@@ -143,11 +143,23 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
 
     // op
     // fonction avec laquelle traiter le parsing + execution des commandes
-    // if (doc.containsKey(F("op")))   Serial.printf("op: %s\n",     doc[F("op")].as<String>().c_str()); 
+    /*
+      0 = ?
+      1 = playlist items management
+    */
+    if (doc.containsKey(F("op"))) {
+      uint8_t op = doc[F("op")].as<uint8_t>();
+      if (op == 1) {
+        Serial.printf("op: %s\n", doc[F("op")].as<String>().c_str());
+        pPtr->pl_item_new(doc, reponse);
+        pPtr->pl_item_remove(doc, reponse);
+      }
+    }
 
     // type    
     // type de format (nom de commande avc String,int ETC...)
     // if (doc.containsKey(F("type"))) Serial.printf("type: %s\n",   doc[F("type")].as<String>().c_str());   
+
 
 
     if (doc.containsKey(F("set"))) {

@@ -1,17 +1,18 @@
 #include "playlist.h"
-
+#include "constants.h"
+#define DEBUG
 
 void Playlist_list::set_listRef     (const char  * const & v1)  {_listRef = v1;}
 void Playlist_list::set_pos         (uint8_t v1)                {_pos = v1;}
 void Playlist_list::set_lbl         (const String & v1)         {_lbl = v1;}
-void Playlist_list::set_items_max   (uint8_t v1)                {_items_max = v1;}
-void Playlist_list::set_items_cnt   (uint8_t v1)                {_items_cnt = v1;}
+void Playlist_list::set_items_max   (uint8_t v1)        {_items_max = v1;}
+void Playlist_list::set_items_cnt   (uint8_t v1)        {_items_cnt = v1;}
 
-void Playlist_list::get_listRef     (const char * & v1)         {v1 = _listRef;}
-void Playlist_list::get_pos         (uint8_t & v1)              {v1 = _pos;}
-void Playlist_list::get_lbl         (String & v1)               {v1 = _lbl;}
-void Playlist_list::get_items_max   (uint16_t & v1)              {v1 = _items_max;}
-void Playlist_list::get_items_cnt   (uint16_t & v1)              {v1 = _items_cnt;} 
+void Playlist_list::get_listRef     (const char * & v1) {v1 = _listRef;}
+void Playlist_list::get_pos         (uint8_t & v1)      {v1 = _pos;}
+void Playlist_list::get_lbl         (String & v1)       {v1 = _lbl;}
+void Playlist_list::get_items_max   (uint16_t & v1)     {v1 = _items_max;}
+void Playlist_list::get_items_cnt   (uint16_t & v1)     {v1 = _items_cnt;} 
 
 boolean Playlist_list::get_itemIdByArrayPos(uint8_t aP, uint8_t & r) { 
   if (aP > _items_cnt-1) return false;
@@ -32,6 +33,27 @@ void Playlist_list::item_df() {
     _Playlist_itemArray[i].set_lbl("null")          ;
     _Playlist_itemArray[i].set_itemBaseCfg("null")  ;      
   }
+}
+void Playlist_list::item_restore(DynamicJsonDocument & doc) { 
+    JsonArray arr = doc[FPSTR(REP_007)][F("items")].as<JsonArray>();
+    for (size_t i = 0; i < arr.size(); i++) {
+        JsonObject item = arr[i];
+        if (i >= _items_max) {
+            #ifdef DEBUG
+                Serial.printf_P(PSTR("\t[LIMITE MAXIMUM ATTEINTE]\n")); 
+             #endif     
+            break;
+        } else {
+
+          _Playlist_itemArray[i].set_id(item[F("id")].as<uint8_t>());
+          _Playlist_itemArray[i].set_lbl(item[F("lbl")].as<String>());
+          _Playlist_itemArray[i].set_itemBase(item[F("ib")].as<String>());
+          _Playlist_itemArray[i].set_itemBaseCfg(item[F("ibcfg")].as<String>());
+
+        }       
+    }
+    _items_cnt = arr.size();
+
 }
 void Playlist_list::item_remove(uint8_t id) {
     #ifdef DEBUG
@@ -83,7 +105,10 @@ void Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & 
   #ifdef DEBUG
     Serial.printf_P(PSTR("\n[Playlist_list::item_toArray][START]\n"));    
   #endif
-
+  Serial.printf_P(PSTR("[iP][%d]\n"), iP);   
+  Serial.printf_P(PSTR("[lbl][%s]\n"), lbl.c_str());   
+  Serial.printf_P(PSTR("[itemBase][%s]\n"), itemBase.c_str());   
+  Serial.printf_P(PSTR("[itemBaseCfg][%s]\n"), itemBaseCfg.c_str());   
   bool newSav = false;
   if (iP > _items_cnt) {
     if (_items_cnt >= _items_max) {
@@ -108,18 +133,20 @@ void Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & 
   uint8_t newNbr = iP;
   uint8_t sId;
   if (newSav){
-    bool find = true;
-    while (find) {
-      for (uint8_t i=0; i < _items_cnt; i++) {
-        _Playlist_itemArray[i].get_id(sId);
-        if (sId == newNbr) {
-          newNbr = random(0,255);
-          #ifdef DEBUG
-            Serial.printf_P(PSTR("\t[new position : %d]\n"), newNbr);
-          #endif
-        }  
-        else find = false;
-      }
+    if (newNbr>0){
+      bool find = true;
+      while (find) {
+        for (uint8_t i=0; i < _items_cnt; i++) {
+          _Playlist_itemArray[i].get_id(sId);
+          if (sId == newNbr) {
+            newNbr = random(0,255);
+            #ifdef DEBUG
+              Serial.printf_P(PSTR("\t[new position : %d]\n"), newNbr);
+            #endif
+          }  
+          else find = false;
+        }
+      }     
     }
   }
 
