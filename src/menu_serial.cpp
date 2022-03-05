@@ -1,7 +1,7 @@
-#include "menu_serial.h"
+#include "../include/menu_serial.h"
 
 #ifdef DEBUGSERIAL
-#include "tools.h"
+#include "../include/tools.h"
 
 void serialReadItem::item_add(   
         const char* name,

@@ -1,6 +1,6 @@
-#include "playlist.h"
+#include "../include/playlist.h"
 
-#include "constants.h"
+#include "../include/constants.h"
 
 #define DEBUG
 

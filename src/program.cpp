@@ -1,12 +1,12 @@
-#include "program.h"
+#include "../include/program.h"
 
 #ifdef FSOK
   #include <LittleFS.h>  
 #endif
 
-#include "Stringsort.h"
+#include "../include/Stringsort.h"
 #include "LList/LList.h"
-#include "webserverRequest.h"
+#include "../include/webserverRequest.h"
 
 #define DEBUG
 

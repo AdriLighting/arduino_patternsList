@@ -1,5 +1,5 @@
 
-#include "system.h"
+#include "../include/system.h"
 
 #ifdef WEBSERVEROK
 #include <ESP8266WiFi.h>	
@@ -9,7 +9,7 @@
 #include <LittleFS.h>	
 #endif
 
-#include "tools.h"
+#include "../include/tools.h"
 
 
 #ifdef WEBSERVEROK

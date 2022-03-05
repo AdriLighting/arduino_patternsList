@@ -1,6 +1,6 @@
-#include "webserverRequest.h"
-#include "constants.h"
-#include "program.h"
+#include "../include/webserverRequest.h"
+#include "../include/constants.h"
+#include "../include/program.h"
 
 
 WebserverRequest::WebserverRequest() {}

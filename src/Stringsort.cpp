@@ -5,8 +5,8 @@
 
 */
 
-#include "Stringsort.h"
-#include "program.h"
+#include "../include/Stringsort.h"
+#include "../include/program.h"
 
 
 //**************************************************************
