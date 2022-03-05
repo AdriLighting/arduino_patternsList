@@ -2,7 +2,11 @@
 
 #include <Arduino.h>
 #ifdef FSOK
-  #include <LittleFS.h>  
+  #if defined USE_SPIFFS
+    #include <FS.h>
+  #elif defined USE_LITTLEFS
+    #include <LittleFS.h> 
+  #endif
 #endif
 
 String ch_toString(const char * c){
@@ -121,7 +125,7 @@ bool deserializeFile(DynamicJsonDocument& doc, const char* filepath){
     if (!filepath || !*filepath)
         return false;
 
-    File jfile = LittleFS.open(filepath, "r");
+    File jfile = FILESYSTEM.open(filepath, "r");
     DeserializationError error;
     if (jfile){
         error = deserializeJson(doc, jfile);

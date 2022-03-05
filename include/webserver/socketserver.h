@@ -12,10 +12,14 @@
 		#include <ESP8266WebServer.h>
 		#include <ESP8266mDNS.h>
 		#include <SPI.h>
-		#include <LittleFS.h>
-		#ifdef WEBSOCKETSERVEROK
-			#include <WebSocketsServer.h>	
+		#ifdef FSOK
+		  #if defined USE_SPIFFS
+		    #include <FS.h>
+		  #elif defined USE_LITTLEFS
+		    #include <LittleFS.h>	
+		  #endif
 		#endif
+		#include <WebSocketsServer.h>	
 
 	#elif defined(ESP32)
 		#include <Arduino.h>

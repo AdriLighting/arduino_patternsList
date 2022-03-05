@@ -74,7 +74,7 @@ class espwebServer {
   void handleStatus();
   void handleJson();
   
-  #ifdef WSERVER_LITTLEFS
+  #ifdef FSOK
   void handleFileList();  
   bool handleFileRead(const String &);
   void handleFileCreate();

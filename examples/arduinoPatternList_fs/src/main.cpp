@@ -51,7 +51,7 @@ Program * _Program = nullptr;
 		// RA action = RAARR[p];
 		// _Program->remote_action(action, v.c_str(), v2.c_str(), NULL);    
   }  
-  void serial_menu_p_4(const String & cmd, const String & value){LittleFS.format();} 
+  void serial_menu_p_4(const String & cmd, const String & value){FILESYSTEM.format();} 
   void serial_menu_p_3(const String & cmd, const String & value){_Program->print(PM_LB); _Program->print(PM_PL); } 
   void serial_menu_p_1(const String & cmd, const String & value){_Program->print(PM_LOOP); } 
   void serial_menu_p_2(const String & cmd, const String & value){
@@ -92,10 +92,10 @@ void setup() {
   #else
     Serial.println(F("[WEBSOCKETSERVEROK][NO]"));  
   #endif
-  #ifdef WSERVER_LITTLEFS
-    Serial.println(F("[WSERVER_LITTLEFS][OK]"));  
+  #ifdef USE_LITTLEFS
+    Serial.println(F("[USE_LITTLEFS][OK]"));  
   #else
-    Serial.println(F("[WSERVER_LITTLEFS][NO]"));  
+    Serial.println(F("[USE_LITTLEFS][NO]"));  
   #endif
   #ifdef FSOK
     Serial.println(F("[FSOK][OK]"));  
@@ -122,11 +122,13 @@ void setup() {
     Serial.printf_P(PSTR("\t[0 | freeheap: %d]\n"), ESP.getFreeHeap()); // debug Serial
   #endif
 
+  boolean fs = false;
   #ifdef FSOK
-    LittleFS.begin();
+    fs = FILESYSTEM.begin();
   #endif
 
-  _Program = new Program(2);
+  _Program = new Program(2, fs);
+  _Program->set_fs_pl(true);  
   _Program->set_callback(_Program_handleCallback);
 
   // LISTEREF_ADD-------------------------------------------------------------------------------

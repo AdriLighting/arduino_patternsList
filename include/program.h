@@ -13,7 +13,6 @@
   #include "lloop.h"
 
 
-
   class ListSortItems {
   public:
     String    _name;
@@ -63,10 +62,11 @@
 
     void item_callback(boolean upd = true);
 
-
+    boolean _fs_setup = false;
+    boolean _fs_pl    = false;
 
   public:
-    Program (uint8_t nbLb );
+    Program (uint8_t nbLb , boolean fs );
     ~Program ();
 
 
@@ -87,7 +87,7 @@
 
     boolean pl_set_listPos(uint8_t pos, const char  * currentList);
 
-
+    void set_fs_pl(boolean v);
     #ifdef FSOK
       void pl_fs();  
       void pl_fs(uint8_t pP, DynamicJsonDocument & doc);  

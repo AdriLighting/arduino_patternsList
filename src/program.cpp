@@ -1,7 +1,11 @@
 #include "../include/program.h"
 
 #ifdef FSOK
-  #include <LittleFS.h>  
+  #if defined USE_SPIFFS
+    #include <FS.h>
+  #elif defined USE_LITTLEFS
+    #include <LittleFS.h> 
+  #endif
 #endif
 
 #include "../include/Stringsort.h"
@@ -78,8 +82,18 @@ void LBnames::json(JsonArray & arr){
 
 Program * ProgramPtr = nullptr;
 Program * ProgramPtrGet(){return ProgramPtr;}
-Program::Program(uint8_t nbLB){
+Program::Program(uint8_t nbLB, boolean fs){
   ProgramPtr = this;
+
+  #ifdef FSOK
+    if (!fs) {
+      _fs_setup = FILESYSTEM.begin();
+    } else {
+      _fs_setup = fs;
+    }
+
+  #endif
+
   _plStatu.cnt          = 0;
   _plStatu.pos          = 0;
   _plStatu.isSet        = false;
@@ -96,6 +110,14 @@ Program::~Program(){
   delete[] _Playlists;    
   delete[] _LBnames;    
 }
+void Program::set_fs_pl(boolean v) {
+  #ifdef FSOK
+    if (!_fs_setup) _fs_pl = false; else _fs_pl = v;
+  #else 
+    _fs_setup = false;
+    _fs_pl    = false;
+  #endif
+};
 
 void Program::initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr){
   _LBnames[p].setup(name, items, arr);
@@ -670,8 +692,11 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
 
 #ifdef FSOK
   void Program::pl_fs(){
+    if (!_fs_setup) return;
+    if (!_fs_pl)    return;
+
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(_plStatu.pos) + (String)FPSTR(FNEXT_PLAYLIST) ;
-    File f=LittleFS.open(path,"w");
+    File f=FILESYSTEM.open(path,"w");
     if (!f) {
       #ifdef DEBUG
         Serial.printf_P(PSTR("[Program::pl_fs][Error open /w]\n\t%s\n"), path.c_str());  
@@ -692,8 +717,11 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
     f.close();  
   }
   void Program::pl_fs(uint8_t pPos, DynamicJsonDocument & doc){
+    if (!_fs_setup) return;
+    if (!_fs_pl)    return;
+
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pPos) + (String)FPSTR(FNEXT_PLAYLIST) ;
-    File f=LittleFS.open(path,"w");
+    File f=FILESYSTEM.open(path,"w");
     if (!f) {
       #ifdef DEBUG
         Serial.printf_P(PSTR("[Program::pl_fs][Error open /w]\n\t%s\n"), path.c_str());     
@@ -704,6 +732,9 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
     f.close();  
   }
   void Program::pl_fs_restore(uint8_t pPos){
+    if (!_fs_setup) return;
+    if (!_fs_pl)    return;
+
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pPos) + (String)FPSTR(FNEXT_PLAYLIST) ;
     DynamicJsonDocument doc(2048);
     char buffer[80];
@@ -718,6 +749,9 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
     _Playlists[pPos].item_restore(doc);
   } 
 void Program::pl_fs_restore() {
+  if (!_fs_setup) return;
+  if (!_fs_pl)    return;
+
   for(uint8_t i=0; i<_plStatu.cnt; i++){
     pl_fs_restore(i);
   }

@@ -12,24 +12,26 @@
 #include "html.h"  
 #endif
 
-#if defined USE_SPIFFS
-  #include <FS.h>
-  const char* fsName = "SPIFFS";
-  FS* fileSystem = &SPIFFS;
-  SPIFFSConfig fileSystemConfig = SPIFFSConfig();
-#elif defined WSERVER_LITTLEFS
-  #include <LittleFS.h>
-  const char* fsName = "LittleFS";
-  FS* fileSystem = &LittleFS;
-  LittleFSConfig fileSystemConfig = LittleFSConfig();
-#elif defined USE_SDFS
-  #include <SDFS.h>
-  const char* fsName = "SDFS";
-  FS* fileSystem = &SDFS;
-  SDFSConfig fileSystemConfig = SDFSConfig();
-  // fileSystemConfig.setCSPin(chipSelectPin);
-#else
-// #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
+#ifdef FSOK
+  #if defined USE_SPIFFS
+    #include <FS.h>
+    const char* fsName = "SPIFFS";
+    FS* fileSystem = &SPIFFS;
+    SPIFFSConfig fileSystemConfig = SPIFFSConfig();
+  #elif defined USE_LITTLEFS
+    #include <LittleFS.h>
+    const char* fsName = "LittleFS";
+    FS* fileSystem = &LittleFS;
+    LittleFSConfig fileSystemConfig = LittleFSConfig();
+  #elif defined USE_SDFS
+    #include <SDFS.h>
+    const char* fsName = "SDFS";
+    FS* fileSystem = &SDFS;
+    SDFSConfig fileSystemConfig = SDFSConfig();
+    // fileSystemConfig.setCSPin(chipSelectPin);
+  #else
+  // #error Please select a filesystem first by uncommenting one of the "#define USE_xxx" lines at the beginning of the sketch.
+  #endif
 #endif
 
 
@@ -107,7 +109,7 @@ void espwebServer::setup(boolean setHandleRoot){
     server.on("/statu",   HTTP_GET,     std::bind(&espwebServer::handleStatu,       this));
     server.on("/status",  HTTP_GET,     std::bind(&espwebServer::handleStatus,      this));
 
-#ifdef WSERVER_LITTLEFS
+#ifdef FSOK
     server.on("/list",    HTTP_GET,     std::bind(&espwebServer::handleFileList,    this));
     server.on("/edit",    HTTP_GET,     std::bind(&espwebServer::handleGetEdit,     this));
     server.on("/edit",    HTTP_PUT,     std::bind(&espwebServer::handleFileCreate,  this));
@@ -203,7 +205,7 @@ void espwebServer::handleStatu(){
   yield(); 
 }
 
-#ifdef WSERVER_LITTLEFS
+#ifdef FSOK
 void espwebServer::handleRoot() {
   // if (captivePortal()) return;
 
@@ -321,7 +323,7 @@ String checkForUnsupportedPath(const String & filename) {
 /*
    Return the FS type, status and size info
 */
-#ifdef WSERVER_LITTLEFS
+#ifdef FSOK
 void espwebServer::handleStatus() {
 #ifdef DEBUG
   DBG_OUTPUT_PORT.println("handleStatus");  
@@ -373,7 +375,7 @@ void espwebServer::handleStatus(){
 #endif
 
 
-#ifdef WSERVER_LITTLEFS
+#ifdef FSOK
 /*
    Return the list of files in the directory specified by the "dir" query string parameter.
    Also demonstrates the use of chuncked responses.

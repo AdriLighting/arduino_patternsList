@@ -7,7 +7,7 @@
   // #define DEBUGSERIAL
   // #define WEBSERVEROK
   // #define WEBSOCKETSERVEROK
-  // #define WSERVER_LITTLEFS
+  // #define USE_LITTLEFS
   // #define FSOK
 
   enum mod_pattern_loop { 

@@ -6,7 +6,11 @@
 #endif
 
 #ifdef FSOK
-#include <LittleFS.h>	
+  #if defined USE_SPIFFS
+    #include <FS.h>
+  #elif defined USE_LITTLEFS
+    #include <LittleFS.h>	
+  #endif
 #endif
 
 #include "../include/tools.h"
@@ -57,7 +61,7 @@ void serverSystem::sys_firmWareJson(JsonObject & root){
 void serverSystem::sys_json(JsonObject & root){
 #ifdef FSOK
   FSInfo fs_info;
-  LittleFS.info(fs_info);	
+  FILESYSTEM.info(fs_info);	
 #endif
   String upTime;
   on_timeD(upTime);
