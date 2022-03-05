@@ -524,6 +524,14 @@ void Program::pl_item_new(uint8_t pP) {
   _Playlists[_plStatu.pos].get_items_cnt(pC);
   ListLoop::updatePos(&_pltFlag, pC-1);
 
+  JsonObject root;
+  DynamicJsonDocument temp(2048);
+  DynamicJsonDocument reponse(2048);
+  reponse.createNestedObject(FPSTR(REP_007));
+  root = temp.to<JsonObject>();   
+  pl_currentJson(pP, root, true);
+  reponse[FPSTR(REP_007)] = temp;
+  
   #ifdef FSOK
     pl_fs(pP, reponse);  
   #endif
