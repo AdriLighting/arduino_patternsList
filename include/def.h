@@ -5,13 +5,13 @@
     #define DEBUGSERIAL
   #endif
 
-  #ifndef WEBSERVEROK
-    #define WEBSERVEROK
-  #endif
+  // #ifndef WEBSERVEROK
+  //   #define WEBSERVEROK
+  // #endif
 
-  #ifndef WEBSOCKETSERVEROK
-    #define WEBSOCKETSERVEROK
-  #endif
+  // #ifndef WEBSOCKETSERVEROK
+  //   #define WEBSOCKETSERVEROK
+  // #endif
 
   #ifndef FSOK
     #define FSOK

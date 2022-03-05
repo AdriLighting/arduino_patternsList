@@ -1,24 +1,19 @@
 
 #include "../include/system.h"
 
-#ifdef WEBSERVEROK
-#include <ESP8266WiFi.h>	
-#endif
+#include "../include/tools.h"
 
+#ifdef WEBSERVEROK
+  #include <Wificonnect.h>
+  #include <ESP8266WiFi.h>  
+  extern WifiConnect * _DeviceWifi;	
+#endif
 #ifdef FSOK
   #if defined USE_SPIFFS
     #include <FS.h>
   #elif defined USE_LITTLEFS
-    #include <LittleFS.h>	
+    #include <LittleFS.h> 
   #endif
-#endif
-
-#include "../include/tools.h"
-
-
-#ifdef WEBSERVEROK
-#include <Wificonnect.h>
-extern WifiConnect * _DeviceWifi;	
 #endif
 
 

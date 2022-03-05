@@ -14,7 +14,6 @@ Program * _Program = nullptr;
 
 #ifdef DEBUGSERIAL
   //debug files
-  #include "menu_serial.h"
   SerialRead * _serial;
   void serial_menu(const String & cmd, const String & value)    {_serial->menu();}
   void serial_ESPreset(const String & cmd, const String & value){ESP.restart();}   
