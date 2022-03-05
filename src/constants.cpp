@@ -26,5 +26,6 @@
       RA_LSET_LBPREV,     
       RA_LSET_LBRND,
       RA_LGET_PL,
-      RA_PL_NEW
+      RA_PLI_NEW,
+      RA_PLI_REM
     };

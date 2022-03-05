@@ -19,14 +19,16 @@ Program * _Program = nullptr;
   void serial_freeHeap(const String & cmd, const String & value){fsprintf("freeHeap: %d\n", ESP.getFreeHeap());}  
   void serial_menu_cmd(const String & cmd, const String & value){
     Serial.printf_P(PSTR("[serial_menu_cmd] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
-    uint8_t p       = value.toInt();
-    String  v       = "";
-    int     rSize   = 0;
-    String  * arg   = LH_explode(value, ',', rSize) ;
-    if (rSize>0) {v = arg[1];}
+    uint8_t p         = value.toInt();
+    String  v         = "";
+    String  v2        = "";
+    int     rSize     = 0;
+    String  * arg     = LH_explode(value, ',', rSize) ;
+    if (rSize>0) {v   = arg[1];}
+    if (rSize>1) {v2  = arg[2];}
 
 		RA action = RAARR[p];
-		_Program->remote_action(action, v.c_str(), "", NULL);    
+		_Program->remote_action(action, v.c_str(), v2.c_str(), NULL);    
   }  
   void serial_menu_p_4(const String & cmd, const String & value){LittleFS.format();} 
   void serial_menu_p_3(const String & cmd, const String & value){_Program->print(PM_LB); _Program->print(PM_PL); } 

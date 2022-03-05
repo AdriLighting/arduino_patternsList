@@ -57,7 +57,8 @@
   static const char RANAME_023[] PROGMEM = "RA_LSET_LBPREV";
   static const char RANAME_024[] PROGMEM = "RA_LSET_LBRND";
   static const char RANAME_025[] PROGMEM = "RA_LGET_PL";
-  static const char RANAME_026[] PROGMEM = "RA_PL_NEW";
+  static const char RANAME_026[] PROGMEM = "RA_PLI_NEW";
+  static const char RANAME_027[] PROGMEM = "RA_PLI_REM";
   // static const char RANAME_021[] PROGMEM = "RA_LGET_PL";
   // static const char RANAME_022[] PROGMEM = "RA_LGET_LB";
   static const char* const RAALLNAMES[] PROGMEM = {
@@ -66,7 +67,7 @@
   RANAME_011, RANAME_012, RANAME_013, RANAME_014, RANAME_015,
   RANAME_016, RANAME_017, RANAME_018, RANAME_019, RANAME_020, 
   RANAME_021, RANAME_022, RANAME_023, RANAME_024, RANAME_025,
-  RANAME_026
+  RANAME_026, RANAME_027
   };
   typedef enum _remote_action {
     RA_ITEM,      
@@ -94,7 +95,8 @@
     RA_LSET_LBPREV,     
     RA_LSET_LBRND,
     RA_LGET_PL,
-    RA_PL_NEW
+    RA_PLI_NEW,
+    RA_PLI_REM
   } RA;
   extern RA RAARR[];
   

@@ -78,6 +78,7 @@
 
     void    pl_item_new(uint8_t);
     void    pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & rep);
+    void    pl_item_remove(uint8_t, uint8_t);
     void    pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & rep);
     void    pl_item_toArray(uint8_t, uint8_t, const String &, const String &, const String &);
     boolean pl_item_removeitemIdByArrayPos(uint8_t pP, uint8_t aP);

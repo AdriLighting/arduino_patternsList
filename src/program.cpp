@@ -427,9 +427,8 @@ void Program::remote_action(RA action, ...){
     break;
     case RA::RA_LGET_PL:
     break;
-    case RA::RA_PL_NEW:
-      if(String(key) != "") pl_item_new((uint8_t)atoi(key));
-    break;    
+    case RA::RA_PLI_NEW: if(String(key) != "") pl_item_new((uint8_t)atoi(key)); break;    
+    case RA::RA_PLI_REM: if((String(key) != "") && (String(val) != ""))pl_item_remove((uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
     default:break;
   }
 
@@ -531,7 +530,27 @@ void Program::pl_item_new(uint8_t pP) {
   root = temp.to<JsonObject>();   
   pl_currentJson(pP, root, true);
   reponse[FPSTR(REP_007)] = temp;
-  
+
+  #ifdef FSOK
+    pl_fs(pP, reponse);  
+  #endif
+}
+void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
+
+  pl_item_removeitemIdByArrayPos(pP, aP);
+
+  uint16_t pC = 0;
+  _Playlists[_plStatu.pos].get_items_cnt(pC);
+  ListLoop::updatePos(&_pltFlag, pC-1);
+
+  JsonObject root;
+  DynamicJsonDocument temp(2048);
+  DynamicJsonDocument reponse(2048);
+  reponse.createNestedObject(FPSTR(REP_007));
+  root = temp.to<JsonObject>();   
+  pl_currentJson(pP, root, true);
+  reponse[FPSTR(REP_007)] = temp;
+
   #ifdef FSOK
     pl_fs(pP, reponse);  
   #endif
