@@ -124,6 +124,8 @@ void Program::lb_json(JsonObject & doc, boolean pItems) {
 void Program::print(PRINT_MOD mod){
   const char * pN;
   uint16_t pC, pCmax;
+  String ilbN;
+  get_itemNameByPos(_lbtFlag._pos, ilbN);
   get_name(pN);
   get_cnt(pC);
   get_cntMax(pCmax);
@@ -141,9 +143,9 @@ void Program::print(PRINT_MOD mod){
       Serial.printf_P(PSTR("[pl] isSet: %d - isPLaying: %d playlist[%d/%d] timer[pos: %d - min: %d - max: %d]\n"),
         _plStatu.isSet, _plStatu.isPlaying, _plStatu.pos, _plStatu.cnt,  
         _pltFlag._pos,  _pltFlag._posMin,  _pltFlag._posMax);
-      Serial.printf_P(PSTR("[lb] name: %s items[%d/%d] timer[pos: %d - min: %d - max: %d]\n"), 
+      Serial.printf_P(PSTR("[lb] name: %s items[%d/%d] timer[pos: %d - min: %d - max: %d][iName: %s]\n"), 
         pN,pC,pCmax,
-        _lbtFlag._pos,  _lbtFlag._posMin,  _lbtFlag._posMax); 
+        _lbtFlag._pos,  _lbtFlag._posMin,  _lbtFlag._posMax, ilbN.c_str()); 
       Serial.printf_P(PSTR("[lloop] play: %d - pause: %d - rnd: %d - rt: %d\n"), tPlay, tPause, tRnd, tR);             
     break;
     case PM_LB:
