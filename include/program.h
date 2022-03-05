@@ -4,6 +4,7 @@
   #include <Arduino.h>
   #include <ArduinoJson.h>
 
+  #include "def.h"
   #include "LList/LList.h"
   #include "constants.h"
   #include "tools.h"

@@ -46,8 +46,8 @@ Program * _Program = nullptr;
       // arr.add("loop");
 
       _WebserverRequest.parsingRequest(doc, reponse, v2);
-
       Serial.printf_P(PSTR("[serial_menu_cmd->reponse]\n%S\n"),reponse.c_str());
+      
 		// RA action = RAARR[p];
 		// _Program->remote_action(action, v.c_str(), v2.c_str(), NULL);    
   }  
@@ -76,6 +76,32 @@ void setup() {
   Serial.println(F("\n##################################################\n"));
 
   Serial.printf_P(PSTR("\t[freeheap: %d]\n"), ESP.getFreeHeap());
+  
+  #ifdef DEBUGSERIAL
+    Serial.println(F("[DEBUGSERIAL][OK]"));  
+  #else
+    Serial.println(F("[DEBUGSERIAL][NO]"));  
+  #endif
+  #ifdef WEBSERVEROK
+    Serial.println(F("[WEBSERVEROK][OK]"));  
+  #else
+    Serial.println(F("[WEBSERVEROK][NO]"));  
+  #endif
+  #ifdef WEBSOCKETSERVEROK
+    Serial.println(F("[WEBSOCKETSERVEROK][OK]"));  
+  #else
+    Serial.println(F("[WEBSOCKETSERVEROK][NO]"));  
+  #endif
+  #ifdef WSERVER_LITTLEFS
+    Serial.println(F("[WSERVER_LITTLEFS][OK]"));  
+  #else
+    Serial.println(F("[WSERVER_LITTLEFS][NO]"));  
+  #endif
+  #ifdef FSOK
+    Serial.println(F("[FSOK][OK]"));  
+  #else
+    Serial.println(F("[FSOK][NO]"));  
+  #endif
 
   Serial.setDebugOutput(false);
 

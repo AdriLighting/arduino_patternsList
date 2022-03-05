@@ -6,8 +6,6 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-
-
 Program * _Program = nullptr;
 
 #ifdef DEBUGSERIAL
@@ -24,9 +22,29 @@ Program * _Program = nullptr;
     int     rSize   = 0;
     String  * arg   = LH_explode(value, ',', rSize) ;
     if (rSize>0) {v = arg[1];}
+    if (rSize>1) {v2  = arg[2];}
 
-		RA action = RAARR[p];
-		_Program->remote_action(action, v.c_str(), "", NULL);    
+      DynamicJsonDocument doc(1024);
+      JsonArray           arr;
+      JsonObject          var;
+      String              reponse;
+
+      doc[F("op")]    = 0;
+      doc[F("type")]  = "ESP";
+
+      arr = doc.createNestedArray(F("set"));  
+      var = arr.createNestedObject();
+      var[F("n")] = FPSTR(RAALLNAMES[p]);
+      var[F("v")] = v;
+
+      // arr = doc.createNestedArray(F("get"));  
+      // arr.add("loop");
+
+      _WebserverRequest.parsingRequest(doc, reponse, v2);
+      Serial.printf_P(PSTR("[serial_menu_cmd->reponse]\n%S\n"),reponse.c_str());
+
+		// RA action = RAARR[p];
+		// _Program->remote_action(action, v.c_str(), "", NULL);    
   }  
   void serial_menu_p_3(const String & cmd, const String & value){_Program->print(PM_LB); _Program->print(PM_PL); } 
   void serial_menu_p_1(const String & cmd, const String & value){_Program->print(PM_LOOP); } 
@@ -52,6 +70,32 @@ void setup() {
   Serial.println(F("\n##################################################\n"));
 
   Serial.printf_P(PSTR("\t[freeheap: %d]\n"), ESP.getFreeHeap());
+
+  #ifdef DEBUGSERIAL
+    Serial.println(F("[DEBUGSERIAL][OK]"));  
+  #else
+    Serial.println(F("[DEBUGSERIAL][NO]"));  
+  #endif
+  #ifdef WEBSERVEROK
+    Serial.println(F("[WEBSERVEROK][OK]"));  
+  #else
+    Serial.println(F("[WEBSERVEROK][NO]"));  
+  #endif
+  #ifdef WEBSOCKETSERVEROK
+    Serial.println(F("[WEBSOCKETSERVEROK][OK]"));  
+  #else
+    Serial.println(F("[WEBSOCKETSERVEROK][NO]"));  
+  #endif
+  #ifdef WSERVER_LITTLEFS
+    Serial.println(F("[WSERVER_LITTLEFS][OK]"));  
+  #else
+    Serial.println(F("[WSERVER_LITTLEFS][NO]"));  
+  #endif
+  #ifdef FSOK
+    Serial.println(F("[FSOK][OK]"));  
+  #else
+    Serial.println(F("[FSOK][NO]"));  
+  #endif
 
   Serial.setDebugOutput(false);
 

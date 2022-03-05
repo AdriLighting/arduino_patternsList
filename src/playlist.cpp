@@ -1,6 +1,9 @@
 #include "playlist.h"
+
 #include "constants.h"
+
 #define DEBUG
+
 
 void Playlist_list::set_listRef     (const char  * const & v1)  {_listRef = v1;}
 void Playlist_list::set_pos         (uint8_t v1)                {_pos = v1;}

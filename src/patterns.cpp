@@ -1,8 +1,5 @@
 #include "patterns.h"
 
-
-
-
 Listbase * ListbasePtr = nullptr;
 Listbase * ListbasePtrGet(){return ListbasePtr;}
 Listbase::Listbase(){   
