@@ -40,8 +40,8 @@ Program * _Program = nullptr;
       var[F("n")] = FPSTR(RAALLNAMES[p]);
       var[F("v")] = v;
 
-      arr = doc.createNestedArray(F("get"));  
-      arr.add("loop");
+      // arr = doc.createNestedArray(F("get"));  
+      // arr.add("loop");
 
       _WebserverRequest.parsingRequest(doc, reponse, v2);
       

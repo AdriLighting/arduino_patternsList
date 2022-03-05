@@ -127,14 +127,15 @@ void webserverRequest_reponse::make_reponse(DynamicJsonDocument & doc){
     case RA::RA_PLI_NEW:
     case RA::RA_PLI_REM:
     case RA::RA_PLI_REP:
-      if (!doc.containsKey(FPSTR(REQ_003))){
-        doc.createNestedObject(FPSTR(REQ_003));
+      if (!doc.containsKey(FPSTR(REQ_006))){
+        doc.createNestedObject(FPSTR(REQ_006));
         temp.clear();
         root = temp.to<JsonObject>();   
         pPtr->pl_json(root);
-        doc[FPSTR(REP_007)] = temp;
+        doc[FPSTR(REQ_006)] = temp;
       } 
     break;
+    
     default:break;
   }
 }
