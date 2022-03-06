@@ -147,7 +147,7 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
     Program * pPtr = ProgramPtrGet();
 
     // need to determine size befor
-    DynamicJsonDocument      reponse(5000);
+    DynamicJsonDocument      reponse(3000);
     webserverRequest_reponse * _webserverRequest_reponse = nullptr;
 
     // cli
@@ -165,7 +165,11 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
       if (op == 1) {
         Serial.printf("op: %s\n", doc[F("op")].as<String>().c_str());
         pPtr->pl_item_new(doc, reponse);
+        Serial.printf("p_6\n");
         pPtr->pl_item_remove(doc, reponse);
+        Serial.printf("p_7\n");
+        serializeJson(reponse, rep);
+        return;
       }
     }
 

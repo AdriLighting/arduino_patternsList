@@ -92,7 +92,7 @@ void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBas
   Socketserver.sendTXT(0,rep);   
 }
 void webserver_parsingRequest(String s){
-  DynamicJsonDocument doc(1024);  
+  DynamicJsonDocument doc(2000);  
   DeserializationError error = deserializeJson(doc, s);
   if (error) {      
       Serial.printf_P(PSTR("[webserver_parsingRequest][deserializeJson ERROR: %d]\nstring:\n\t%s"), error, s.c_str());  
@@ -194,9 +194,15 @@ void setup() {
     uint8_t iC[]      = {10,      5,        4,        3,        2       };  // nb items max
     const char * Ln[] = {"full",  "full",   "full",   "null",   "null"  };
     _Program->initialize_playlist(plC, iC, Ln);
-    _Program->pl_item_toArray(0, 255, "default", "Philippe", "iref_cfg");
-    _Program->pl_item_toArray(1, 255, "default", "Philippe", "iref_cfg");
-    _Program->pl_item_toArray(2, 255, "default", "Philippe", "iref_cfg");
+    _Program->pl_item_toArray(0, 255, "default_1", "Philippe", "iref_cfg");
+    _Program->pl_item_toArray(0, 255, "default_2", "Catherine", "iref_cfg");
+    _Program->pl_item_toArray(0, 255, "default_3", "Mamie Stella", "iref_cfg");
+    _Program->pl_item_toArray(1, 255, "default_1", "Papi Roger", "iref_cfg");
+    _Program->pl_item_toArray(1, 255, "default_2", "Mamie Christiane", "iref_cfg");
+    _Program->pl_item_toArray(1, 255, "default_3", "Axel", "iref_cfg");
+    _Program->pl_item_toArray(2, 255, "default_1", "Eliza", "iref_cfg");
+    _Program->pl_item_toArray(2, 255, "default_2", "Zap", "iref_cfg");
+    _Program->pl_item_toArray(2, 255, "default_3", "Mystic", "iref_cfg");
     _Program->pl_fs_restore();  
     _Program->print(PM_PL); 
 

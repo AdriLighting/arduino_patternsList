@@ -604,25 +604,26 @@ void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
 
 void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
   if (!doc.containsKey(F("pl_item_new"))) return;
-
+  Serial.printf("p_1\n");
   uint8_t pP          = doc[F("pl_item_new")][F("pP")].as<uint8_t>();
   uint8_t iP          = doc[F("pl_item_new")][F("iP")].as<uint8_t>();
   String  lbl         = doc[F("pl_item_new")][F("lbl")].as<String>();
   String  itemBase    = doc[F("pl_item_new")][F("itemBase")].as<String>();
   String  itemBaseCfg = doc[F("pl_item_new")][F("itemBaseCfg")].as<String>();  
+  Serial.printf("p_2\n");
   pl_item_toArray(pP, iP, lbl, itemBase, itemBaseCfg); 
-
+  Serial.printf("p_3\n");
   uint16_t pC = 0;
   _Playlists[_plStatu.pos].get_items_cnt(pC);
   ListLoop::updatePos(&_pltFlag, pC-1);
-
+  Serial.printf("p_4\n");
   JsonObject root;
   DynamicJsonDocument temp(2048);
   reponse.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
   pl_currentJson(pP, root, true);
   reponse[FPSTR(REP_007)] = temp;
-
+  Serial.printf("p_5\n");
   #ifdef FSOK
     pl_fs(pP, reponse);  
   #endif
