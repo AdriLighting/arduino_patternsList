@@ -12,7 +12,7 @@
 #include "LList/LList.h"
 #include "../include/webserverRequest.h"
 
-#define DEBUG
+// #define DEBUG
 
 LList<ListSortItems*> ListSortItemsPtr; 
 void ListSortItems_sort(SORT_TYPE _effSort) {
@@ -610,28 +610,23 @@ void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
 
 void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
   if (!doc.containsKey(F("pl_item_new"))) return;
-  // Serial.printf("p_1\n");
   uint8_t pP          = doc[F("pl_item_new")][F("pP")].as<uint8_t>();
   uint8_t iP          = doc[F("pl_item_new")][F("iP")].as<uint8_t>();
   String  lbl         = doc[F("pl_item_new")][F("lbl")].as<String>();
   String  itemBase    = doc[F("pl_item_new")][F("itemBase")].as<String>();
   String  itemBaseCfg = doc[F("pl_item_new")][F("itemBaseCfg")].as<String>();  
-  // Serial.printf("p_2\n");
   pl_item_toArray(pP, iP, lbl, itemBase, itemBaseCfg); 
-  // Serial.printf("p_3\n");
   uint16_t pC = 0;
   _Playlists[_plStatu.pos].get_items_cnt(pC);
   ListLoop::updatePos(&_pltFlag, pC-1);
-  // Serial.printf("p_4\n");
   JsonObject root;
   DynamicJsonDocument temp(2048);
   reponse.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
   pl_currentJson(pP, root, true);
   reponse[FPSTR(REP_007)] = temp;
-  // Serial.printf("p_5\n");
   #ifdef FSOK
-    // pl_fs(pP, reponse); 
+    pl_fs(pP, reponse); 
   #endif
 }
 void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
@@ -653,7 +648,7 @@ void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & re
   reponse[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
-    // pl_fs(pP, reponse);  
+    pl_fs(pP, reponse);  
   #endif
 }
 
@@ -667,8 +662,6 @@ boolean Program::pl_item_removeitemIdByArrayPos(uint8_t pP, uint8_t aP) {
   return true;
 }
 
-
-
 void Program::pl_print(uint8_t pP) {
   Serial.printf_P(PSTR("[Program::pl_print][%d/%d]\n"), pP, _plStatu.cnt);
   _Playlists[pP].print();
@@ -678,6 +671,7 @@ void Program::pl_print() {
   Serial.printf_P(PSTR("[Program::pl_print][%d]\n"), _plStatu.cnt);
   for(uint8_t i=0; i<_plStatu.cnt; i++) {_Playlists[i].print(); _Playlists[i].item_print();}
 }
+
 void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
   const char * sPLref;
   const char * sLref;
@@ -710,26 +704,24 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
       #endif
       return;
     }
-
     DynamicJsonDocument doc(5000);
     DynamicJsonDocument temp(2048);
-
     doc.createNestedObject(FPSTR(REP_007));
     temp.clear();
     JsonObject root = temp.to<JsonObject>();   
     pl_currentJson(_plStatu.pos, root, true);
-    doc[FPSTR(REP_007)] = temp;  
-    serializeJson(doc, f);
+    doc[FPSTR(REP_007)] = temp; 
+    temp.clear();
+    serializeJson(doc, f);     
+    doc.clear();
     f.close();  
+    delay(2); 
   }
   void Program::pl_fs(uint8_t pP){
     if (!_fs_setup) return;
-    if (!_fs_pl)    return;
-
     #ifdef DEBUG
       Serial.printf_P(PSTR("[Program::pl_fs][%d]\n"), pP);   
     #endif
-
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pP) + (String)FPSTR(FNEXT_PLAYLIST) ;
     File f=LittleFS.open(path,"w");
     if (!f) {
@@ -740,9 +732,6 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
     }
     DynamicJsonDocument doc(3072);
     DynamicJsonDocument temp(2048);
-    #ifdef DEBUG
-      Serial.printf_P(PSTR("[Program::pl_fs][createNestedObject]\n"));   
-    #endif
     doc.createNestedObject(FPSTR(REP_007));
     temp.clear();
     JsonObject root = temp.to<JsonObject>();   
@@ -771,6 +760,7 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
     f.close();  
     delay(2);  
   }
+
   void Program::pl_fs_restore(uint8_t pPos){
     if (!_fs_setup) return;
     if (!_fs_pl)    return;

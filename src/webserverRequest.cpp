@@ -163,7 +163,7 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
     if (doc.containsKey(F("op"))) {
       uint8_t op = doc[F("op")].as<uint8_t>();
       if (op == 1) {
-        Serial.printf("op: %s\n", doc[F("op")].as<String>().c_str());
+        // Serial.printf("op: %s\n", doc[F("op")].as<String>().c_str());
         pPtr->pl_item_new(doc, reponse);
         pPtr->pl_item_remove(doc, reponse);
       }

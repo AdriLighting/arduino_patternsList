@@ -159,8 +159,8 @@ void setup() {
   
   _DeviceWifi = new WifiConnect(
     "arduinopattern",
-    "freebox_123_EXT",
-    "phcaadax",
+    "SSID",
+    "SSIDPASS",
     "adsap1234",
     "adsota1234");
   _DeviceWifi->setFunc_STAinitServer( std::bind(wehnSTAisReady));

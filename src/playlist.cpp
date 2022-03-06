@@ -2,7 +2,7 @@
 
 #include "../include/constants.h"
 
-#define DEBUG
+// #define DEBUG
 
 
 void Playlist_list::set_listRef     (const char  * const & v1)  {_listRef = v1;}
@@ -34,7 +34,7 @@ void Playlist_list::item_df() {
     _Playlist_itemArray[i].set_id(0)                ;
     _Playlist_itemArray[i].set_itemBase("null")     ;
     _Playlist_itemArray[i].set_lbl("null")          ;
-    _Playlist_itemArray[i].set_itemBaseCfg("null")  ;      
+    _Playlist_itemArray[i].set_itemBaseCfg("null")  ;    
   }
 }
 void Playlist_list::item_restore(DynamicJsonDocument & doc) { 
@@ -60,7 +60,7 @@ void Playlist_list::item_restore(DynamicJsonDocument & doc) {
 }
 void Playlist_list::item_remove(uint8_t id) {
     #ifdef DEBUG
-        Serial.printf_P(PSTR("\n[Playlist_list::item_remove][START]\n"));
+        Serial.printf_P(PSTR("[Playlist_list::item_remove][START]\n"));
     #endif
 
     Playlist_item * temp = new Playlist_item[_items_max];
@@ -106,8 +106,8 @@ void Playlist_list::item_remove(uint8_t id) {
 
 void Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg) {
   #ifdef DEBUG
-    Serial.printf_P(PSTR("\n[Playlist_list::item_toArray][START]\n"));    
-    Serial.printf_P(PSTR("[iP][%d]"), iP);   
+    Serial.printf_P(PSTR("[Playlist_list::item_toArray][START]\n"));    
+    Serial.printf_P(PSTR("\t[iP][%d]"), iP);   
     Serial.printf_P(PSTR("[lbl][%s]"), lbl.c_str());   
     Serial.printf_P(PSTR("[itemBase][%s]"), itemBase.c_str());   
     Serial.printf_P(PSTR("[itemBaseCfg][%s]\n"), itemBaseCfg.c_str());  
@@ -116,8 +116,7 @@ void Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & 
   if (iP > _items_cnt) {
     if (_items_cnt >= _items_max) {
       #ifdef DEBUG
-        Serial.printf_P(PSTR("\t[LIMITE MAXIMUM ATTEINTE]\n")); 
-        Serial.printf_P(PSTR("[Playlist_list::item_toArray][FAIL]\n"));
+        Serial.printf_P(PSTR("\t[LIMITE MAXIMUM ATTEINTE][%d/%d]\n"),_items_cnt, _items_max );
       #endif
       return;
     }   
