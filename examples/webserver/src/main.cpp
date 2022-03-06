@@ -92,16 +92,16 @@ void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBas
   Socketserver.sendTXT(0,rep);   
 }
 void webserver_parsingRequest(String s){
-  DynamicJsonDocument doc(2000);  
+  DynamicJsonDocument doc(1024);  
   DeserializationError error = deserializeJson(doc, s);
   if (error) {      
       Serial.printf_P(PSTR("[webserver_parsingRequest][deserializeJson ERROR: %d]\nstring:\n\t%s"), error, s.c_str());  
   } else {
     String reponse;
+    yield();
     _WebserverRequest.parsingRequest(doc, reponse, "");
-    // Serial.printf_P(PSTR("[webserver_parsingRequest]\n\t[request]\n\t\t%s\n\t[result]\n\t\t%s\n"), s.c_str(), reponse.c_str());  
-      yield();
-      Socketserver.sendTXT(0, reponse);
+    yield();
+    Socketserver.sendTXT(0, reponse);
   }
 }  
 

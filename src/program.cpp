@@ -625,7 +625,9 @@ void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & repon
   reponse[FPSTR(REP_007)] = temp;
   // Serial.printf("p_5\n");
   #ifdef FSOK
-    pl_fs(pP, reponse);  
+    yield(); 
+    pl_fs(pP, reponse); 
+    yield(); 
   #endif
 }
 void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
@@ -647,7 +649,9 @@ void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & re
   reponse[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
+    yield(); 
     pl_fs(pP, reponse);  
+    yield(); 
   #endif
 }
 
