@@ -165,9 +165,7 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
       if (op == 1) {
         Serial.printf("op: %s\n", doc[F("op")].as<String>().c_str());
         pPtr->pl_item_new(doc, reponse);
-        Serial.printf("p_6\n");
         pPtr->pl_item_remove(doc, reponse);
-        Serial.printf("p_7\n");
         serializeJson(reponse, rep);
         return;
       }
