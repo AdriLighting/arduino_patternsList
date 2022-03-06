@@ -166,8 +166,8 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
         Serial.printf("op: %s\n", doc[F("op")].as<String>().c_str());
         pPtr->pl_item_new(doc, reponse);
         pPtr->pl_item_remove(doc, reponse);
-        // serializeJson(reponse, rep);
-        // return;
+        serializeJson(reponse, rep);
+        return;
       }
     }
 

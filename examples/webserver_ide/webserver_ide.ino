@@ -100,7 +100,8 @@ void webserver_parsingRequest(String s){
     String reponse;
     _WebserverRequest.parsingRequest(doc, reponse, "");
     // Serial.printf_P(PSTR("[webserver_parsingRequest]\n\t[request]\n\t\t%s\n\t[result]\n\t\t%s\n"), s.c_str(), reponse.c_str());  
-      Socketserver.sendTXT(0, reponse);
+    yield();
+    Socketserver.sendTXT(0, reponse);
   }
 }  
 
@@ -194,9 +195,6 @@ void setup() {
     uint8_t iC[]      = {10,      5,        4,        3,        2       };  // nb items max
     const char * Ln[] = {"full",  "full",   "full",   "null",   "null"  };
     _Program->initialize_playlist(plC, iC, Ln);
-    _Program->pl_item_toArray(0, 255, "default", "Philippe", "iref_cfg");
-    _Program->pl_item_toArray(1, 255, "default", "Philippe", "iref_cfg");
-    _Program->pl_item_toArray(2, 255, "default", "Philippe", "iref_cfg");
     _Program->pl_fs_restore();  
     _Program->print(PM_PL); 
 
