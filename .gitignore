@@ -1,5 +1,3 @@
 .pio
-src/main.cpp
-include/main.h
-platformio.ini
 /data
+/backup

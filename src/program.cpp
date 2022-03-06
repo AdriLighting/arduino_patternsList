@@ -799,10 +799,14 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
 #endif
 
 void Program::pl_currentJson(JsonObject & doc, boolean pI) {
-  Serial.printf_P(PSTR("[Program::pl_currentJson][%d][%d]\n"),pI,_plStatu.pos); 
+  #ifdef DEBUG
+    Serial.printf_P(PSTR("[Program::pl_currentJson][%d][%d]\n"),pI,_plStatu.pos);   
+  #endif
   _Playlists[_plStatu.pos].item_json(doc, pI);
 }
 void Program::pl_currentJson(uint8_t p, JsonObject & doc, boolean pI) {
-  Serial.printf_P(PSTR("[Program::pl_currentJson][%d]\n"), p);
+  #ifdef DEBUG
+    Serial.printf_P(PSTR("[Program::pl_currentJson][%d]\n"), p);  
+  #endif
   _Playlists[p].item_json(doc, pI);
 }

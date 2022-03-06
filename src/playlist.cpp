@@ -107,11 +107,11 @@ void Playlist_list::item_remove(uint8_t id) {
 void Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg) {
   #ifdef DEBUG
     Serial.printf_P(PSTR("\n[Playlist_list::item_toArray][START]\n"));    
-  #endif
-  Serial.printf_P(PSTR("[iP][%d]\n"), iP);   
-  Serial.printf_P(PSTR("[lbl][%s]\n"), lbl.c_str());   
-  Serial.printf_P(PSTR("[itemBase][%s]\n"), itemBase.c_str());   
-  Serial.printf_P(PSTR("[itemBaseCfg][%s]\n"), itemBaseCfg.c_str());   
+    Serial.printf_P(PSTR("[iP][%d]"), iP);   
+    Serial.printf_P(PSTR("[lbl][%s]"), lbl.c_str());   
+    Serial.printf_P(PSTR("[itemBase][%s]"), itemBase.c_str());   
+    Serial.printf_P(PSTR("[itemBaseCfg][%s]\n"), itemBaseCfg.c_str());  
+   #endif 
   bool newSav = false;
   if (iP > _items_cnt) {
     if (_items_cnt >= _items_max) {
@@ -143,15 +143,15 @@ void Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & 
           _Playlist_itemArray[i].get_id(sId);
           if (sId == newNbr) {
             newNbr = random(0,255);
-            #ifdef DEBUG
-              Serial.printf_P(PSTR("\t[new position : %d]\n"), newNbr);
-            #endif
           }  
           else find = false;
         }
       }     
     }
   }
+  #ifdef DEBUG
+    Serial.printf_P(PSTR("\t[position : %d]\n"), newNbr);
+  #endif
 
   if (newSav) _Playlist_itemArray[iP].set_id(newNbr);
   
