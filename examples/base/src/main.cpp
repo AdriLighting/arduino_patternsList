@@ -146,7 +146,6 @@ void setup() {
     _Program->pl_item_toArray(1, 255, "lbl_3", "Papie",     "iref_cfg");
     _Program->pl_item_toArray(1, 255, "lbl_3", "Axel",      "iref_cfg");
     _Program->pl_item_toArray(1, 255, "lbl_3", "Eliza",     "iref_cfg");
-    _Program->pl_item_toArray(1, 255, "lbl_3", "iref_3",    "iref_cfg");
     _Program->print(PM_PL); 
   //
   //--------------------------------------------------------------------------------------------

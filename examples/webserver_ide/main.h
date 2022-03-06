@@ -8,7 +8,7 @@
     static const char LPNAME_001[] PROGMEM = "Philippe";
     static const char LPNAME_002[] PROGMEM = "Catherine";
     static const char LPNAME_003[] PROGMEM = "Mamie Stella";
-    static const char LPNAME_004[] PROGMEM = "Papie";
+    static const char LPNAME_004[] PROGMEM = "Papi Roger";
     static const char LPNAME_005[] PROGMEM = "Mamie Christiane";
     static const char LPNAME_006[] PROGMEM = "Axel";
     static const char LPNAME_007[] PROGMEM = "Eliza";
