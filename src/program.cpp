@@ -454,7 +454,7 @@ void Program::remote_action(RA action, ...){
     case RA::RA_PLI_REM: if((String(key) != "") && (String(val) != ""))pl_item_remove((uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
     case RA::RA_PL_TOFS:
     #ifdef FSOK
-      if(String(key) != "") pl_fs((uint8_t)atoi(key)); break;  
+      if(String(key) != "") pl_fs((uint8_t)atoi(key)); 
     #endif
     break;    
 
