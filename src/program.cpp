@@ -719,7 +719,6 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
     JsonObject root = temp.to<JsonObject>();   
     pl_currentJson(_plStatu.pos, root, true);
     doc[FPSTR(REP_007)] = temp;  
-
     serializeJson(doc, f);
     f.close();  
   }
@@ -750,7 +749,7 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
     pl_currentJson(pP, root, true);
     doc[FPSTR(REP_007)] = temp;  
     temp.clear();
-    serializeJson(doc, Serial);
+    serializeJson(doc, f);
     doc.clear();
     f.close();  
     delay(2);
