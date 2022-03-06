@@ -188,6 +188,12 @@ void Playlist_item::print(){
 }
 
 void Playlist_list::item_json(JsonObject & root, boolean pItem){
+  // Serial.printf_P(PSTR("[Playlist_list::item_json][%d]\n"),pItem); 
+  // Serial.printf_P(PSTR("[cmax[%d]\n"),_items_max); 
+  // Serial.printf_P(PSTR("[cnt[%d]\n"),_items_cnt); 
+  // Serial.printf_P(PSTR("[pos[%d]\n"),_pos); 
+  // Serial.printf_P(PSTR("[lbl[%s]\n"),_lbl.c_str()); 
+  // Serial.printf_P(PSTR("[lref[%s]\n"),_listRef); 
   root[F("cmax")] = _items_max;
   root[F("cnt")]  = _items_cnt;
   root[F("pos")]  = _pos;
