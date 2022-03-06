@@ -98,9 +98,7 @@ void webserver_parsingRequest(String s){
       Serial.printf_P(PSTR("[webserver_parsingRequest][deserializeJson ERROR: %d]\nstring:\n\t%s"), error, s.c_str());  
   } else {
     String reponse;
-    yield();
     _WebserverRequest.parsingRequest(doc, reponse, "");
-    yield();
     Socketserver.sendTXT(0, reponse);
   }
 }  
@@ -195,9 +193,6 @@ void setup() {
     uint8_t iC[]      = {10,      5,        4,        3,        2       };  // nb items max
     const char * Ln[] = {"full",  "full",   "full",   "null",   "null"  };
     _Program->initialize_playlist(plC, iC, Ln);
-    _Program->pl_item_toArray(0, 255, "Philippe", "Philippe", "iref_cfg");
-    _Program->pl_item_toArray(1, 255, "Philippe", "Philippe", "iref_cfg");
-    _Program->pl_item_toArray(2, 255, "Philippe", "Philippe", "iref_cfg");
     _Program->pl_fs_restore();  
     _Program->print(PM_PL); 
 

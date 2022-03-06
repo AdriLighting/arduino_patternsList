@@ -28,5 +28,6 @@
       RA_LGET_PL,
       RA_PLI_NEW,
       RA_PLI_REM,
-      RA_PLI_REP
+      RA_PLI_REP,
+      RA_PL_TOFS
     };

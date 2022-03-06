@@ -167,7 +167,6 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
         pPtr->pl_item_new(doc, reponse);
         pPtr->pl_item_remove(doc, reponse);
         serializeJson(reponse, rep);
-        return;
       }
     }
 

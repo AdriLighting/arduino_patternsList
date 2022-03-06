@@ -90,6 +90,7 @@
     void set_fs_pl(boolean v);
     #ifdef FSOK
       void pl_fs();  
+      void pl_fs(uint8_t);  
       void pl_fs(uint8_t pP, DynamicJsonDocument & doc);  
       void pl_fs_restore(uint8_t pP);  
       void pl_fs_restore();  

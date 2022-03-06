@@ -452,6 +452,12 @@ void Program::remote_action(RA action, ...){
     case RA::RA_PLI_NEW: if(String(key) != "") pl_item_new((uint8_t)atoi(key)); break;    
     case RA::RA_PLI_REP: if((String(key) != "") && (String(val) != ""))pl_item_new((uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
     case RA::RA_PLI_REM: if((String(key) != "") && (String(val) != ""))pl_item_remove((uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
+    case RA::RA_PL_TOFS:
+    #ifdef FSOK
+      if(String(key) != "") pl_fs((uint8_t)atoi(key)); break;  
+    #endif
+    break;    
+
     default:break;
   }
 
@@ -578,7 +584,7 @@ void Program::pl_item_new(uint8_t pP, uint8_t iP) {
   reponse[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
-    pl_fs(pP, reponse);  
+    // pl_fs(pP, reponse);  
   #endif
 }
 void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
@@ -598,7 +604,7 @@ void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
   reponse[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
-    pl_fs(pP, reponse);  
+    // pl_fs(pP, reponse);  
   #endif
 }
 
@@ -625,9 +631,7 @@ void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & repon
   reponse[FPSTR(REP_007)] = temp;
   // Serial.printf("p_5\n");
   #ifdef FSOK
-    yield(); 
-    pl_fs(pP, reponse); 
-    yield(); 
+    // pl_fs(pP, reponse); 
   #endif
 }
 void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
@@ -649,9 +653,7 @@ void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & re
   reponse[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
-    yield(); 
-    pl_fs(pP, reponse);  
-    yield(); 
+    // pl_fs(pP, reponse);  
   #endif
 }
 
@@ -721,6 +723,31 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
     serializeJson(doc, f);
     f.close();  
   }
+  void Program::pl_fs(uint8_t pP){
+    if (!_fs_setup) return;
+    if (!_fs_pl)    return;
+
+    String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pP) + (String)FPSTR(FNEXT_PLAYLIST) ;
+    File f=FILESYSTEM.open(path,"w");
+    if (!f) {
+      #ifdef DEBUG
+        Serial.printf_P(PSTR("[Program::pl_fs][Error open /w]\n\t%s\n"), path.c_str());  
+      #endif
+      return;
+    }
+
+    DynamicJsonDocument doc(5000);
+    DynamicJsonDocument temp(2048);
+
+    doc.createNestedObject(FPSTR(REP_007));
+    temp.clear();
+    JsonObject root = temp.to<JsonObject>();   
+    pl_currentJson(pP, root, true);
+    doc[FPSTR(REP_007)] = temp;  
+
+    serializeJson(doc, f);
+    f.close();  
+  }  
   void Program::pl_fs(uint8_t pPos, DynamicJsonDocument & doc){
     if (!_fs_setup) return;
     if (!_fs_pl)    return;
@@ -753,14 +780,14 @@ void Program::pl_json(JsonObject & doc, boolean pL, boolean lRef) {
     _Playlists[pPos].item_df();
     _Playlists[pPos].item_restore(doc);
   } 
-void Program::pl_fs_restore() {
-  if (!_fs_setup) return;
-  if (!_fs_pl)    return;
+  void Program::pl_fs_restore() {
+    if (!_fs_setup) return;
+    if (!_fs_pl)    return;
 
-  for(uint8_t i=0; i<_plStatu.cnt; i++){
-    pl_fs_restore(i);
-  }
-}     
+    for(uint8_t i=0; i<_plStatu.cnt; i++){
+      pl_fs_restore(i);
+    }
+  }     
 #endif
 
 void Program::pl_currentJson(JsonObject & doc, boolean pI) {
