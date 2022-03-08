@@ -49,7 +49,6 @@ void setup() {
   Serial.setDebugOutput(false);
 
   #ifdef DEBUGSERIAL
-    debug_printBuffer = new char[1024];
     _serial = new SerialRead();
     _serial->cmd_array(1, 6); 
     _serial->cmd_item_add(  1,  "menu",               "a", serial_menu);
@@ -204,17 +203,15 @@ void wehnAPisReady(){
 
 
 #ifdef DEBUGSERIAL
-  //debug files
-  SerialRead * _serial;
   void serial_menu(const String & cmd, const String & value)    {_serial->menu();}
   void serial_ESPreset(const String & cmd, const String & value){ESP.restart();}   
-  void serial_freeHeap(const String & cmd, const String & value){fsprintf("freeHeap: %d\n", ESP.getFreeHeap());}  
+  void serial_freeHeap(const String & cmd, const String & value){Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap());}  
   void serial_menu_cmd(const String & cmd, const String & value){
     Serial.printf_P(PSTR("[serial_menu_cmd] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
     uint8_t p       = value.toInt();
     String  v       = "";
     int     rSize   = 0;
-    String  * arg   = LH_explode(value, ',', rSize) ;
+    String  * arg   = AP_explode(value, ',', rSize) ;
     if (rSize>0) {v = arg[1];}
 
       DynamicJsonDocument doc(1024);

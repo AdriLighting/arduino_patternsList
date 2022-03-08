@@ -7,7 +7,6 @@
 Program * _Program = nullptr;
 
 #ifdef DEBUGSERIAL
-  //debug files
   SerialRead * _serial;
   void serial_menu(const String & cmd, const String & value);
   void serial_ESPreset(const String & cmd, const String & value);
@@ -36,7 +35,6 @@ void setup() {
 
   #ifdef DEBUGSERIAL
     //debug
-    debug_printBuffer = new char[1024];
     _serial = new SerialRead();
     _serial->cmd_array(1, 7); 
     _serial->cmd_item_add(  1,  "menu",               "a", serial_menu);
@@ -114,11 +112,9 @@ void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBas
 }
 
 #ifdef DEBUGSERIAL
-  //debug files
-  SerialRead * _serial;
   void serial_menu(const String & cmd, const String & value)    {_serial->menu();}
   void serial_ESPreset(const String & cmd, const String & value){ESP.restart();}   
-  void serial_freeHeap(const String & cmd, const String & value){fsprintf("freeHeap: %d\n", ESP.getFreeHeap());}  
+  void serial_freeHeap(const String & cmd, const String & value){Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap());}  
   void serial_menu_cmd(const String & cmd, const String & value){
     Serial.printf_P(PSTR("[serial_menu_cmd] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
     uint8_t p         = value.toInt();
