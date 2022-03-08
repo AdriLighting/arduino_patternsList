@@ -4,12 +4,11 @@
   #include <ArduinoJson.h>
   #include "def.h"
 
-  extern char * debug_printBuffer;
-  void debugPrint();
+  // extern char * debug_printBuffer;
+  // void debugPrint();
+  // #define fsprintf(parm_a, ...) {sprintf_P(debug_printBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__); debugPrint();} 
 
-  #define fsprintf(parm_a, ...) {sprintf_P(debug_printBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__); debugPrint();} 
-
-  String * LH_explode(String s, char sep, int & rSize);
+  String * AP_explode(String s, char sep, int & rSize);
 
   #ifdef FSOK
   bool deserializeFile(DynamicJsonDocument& doc, const char* filepath);  

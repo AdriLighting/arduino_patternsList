@@ -104,7 +104,7 @@ void Playlist_list::item_remove(uint8_t id) {
     #endif
 }
 
-void Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg) {
+uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg) {
   #ifdef DEBUG
     Serial.printf_P(PSTR("[Playlist_list::item_toArray][START]\n"));    
     Serial.printf_P(PSTR("\t[iP][%d]"), iP);   
@@ -118,7 +118,7 @@ void Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & 
       #ifdef DEBUG
         Serial.printf_P(PSTR("\t[LIMITE MAXIMUM ATTEINTE][%d/%d]\n"),_items_cnt, _items_max );
       #endif
-      return;
+      return 0;
     }   
     if (_items_cnt < 0) _items_cnt = 0;
 
@@ -163,6 +163,8 @@ void Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & 
   #ifdef DEBUG
     Serial.printf_P(PSTR("[Playlist_list::item_toArray][DONE]\n"));
   #endif
+
+  return newNbr;
 }
 void Playlist_list::print(){
   Serial.printf_P(PSTR("[pos: %5d] [items_max: %5d] [items_cnt: %5d] [lbl: %-15s] [listRef: %-15s]\n"), 

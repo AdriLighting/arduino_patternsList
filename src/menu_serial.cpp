@@ -23,24 +23,24 @@ SerialRead::SerialRead(){
     SerialRead_ptr = this;
 }
 void SerialRead::menu(){
-    fsprintf("\n[SerialRead::menu]\n");
+    Serial.printf("\n[SerialRead::menu]\n");
     for (int i = 0; i < _cmd_1_cnt; ++i) {
-        fsprintf("[%5d][%25s][%-15s]\n", 
+        Serial.printf_P(PSTR("[%5d][%25s][%-15s]\n"), 
                     i, 
                     _cmd_1_Array[i]._name, 
                     _cmd_1_Array[i]._key
                 );
     }
-    fsprintf("\n[!]\n");
+    Serial.printf("\n[!]\n");
     for (int i = 0; i < _cmd_2_cnt; ++i) {
-        fsprintf("[%5d][%25s][%-15s]\n", 
+        Serial.printf_P(PSTR("[%5d][%25s][%-15s]\n"), 
                     i, 
                     _cmd_2_Array[i]._name, 
                     _cmd_2_Array[i]._key
                 );
     } 
-    if (_cmd_3_desc!="") { fsprintf("\n[%s][%s]\n", _cmd_3_sep, _cmd_3_desc.c_str()); } 
-    if (_cmd_4_desc!="") { fsprintf("\n[%s][%s]\n", _cmd_4_sep, _cmd_4_desc.c_str()); }                  
+    if (_cmd_3_desc!="") { Serial.printf_P(PSTR("\n[%s][%s]\n"), _cmd_3_sep, _cmd_3_desc.c_str()); } 
+    if (_cmd_4_desc!="") { Serial.printf_P(PSTR("\n[%s][%s]\n"), _cmd_4_sep, _cmd_4_desc.c_str()); }                  
 }
 void SerialRead::cmd_array(int pos, int cnt) {
     switch (pos){

@@ -27,7 +27,7 @@
         "owner": "Grellard Adrien",
         "name": "AdriLighting_millisTimer",
         "version": "https://github.com/AdriLighting/millisTimer.git"
-    }
+    } 
   ],
   
   "frameworks": "arduino",

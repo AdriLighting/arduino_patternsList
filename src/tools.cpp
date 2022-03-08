@@ -48,11 +48,11 @@ uint8_t map8(uint8_t val, uint8_t min, uint8_t max) {
 */
 
 
-char * debug_printBuffer;
+// char * debug_printBuffer;
 
-void debugPrint () {
-  Serial.print(debug_printBuffer);
-}
+// void debugPrint () {
+//   Serial.print(debug_printBuffer);
+// }
 
 
 /**
@@ -64,7 +64,7 @@ void debugPrint () {
  *
  * @return     array of split values
  */
-String * LH_explode(String s, char sep, int & rSize) {
+String * AP_explode(String s, char sep, int & rSize) {
   String  t           = s + sep;
   int     str_index   = 0;
   int     list_index  = 0;

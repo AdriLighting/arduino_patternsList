@@ -13,7 +13,7 @@ void webserverRequest_reponse::set_value(const String & v1) {_value = v1;}
 void webserverRequest_reponse::make_reponse(DynamicJsonDocument & doc){
   JsonObject obj,root;
   Program * pPtr = ProgramPtrGet();
-  DynamicJsonDocument temp(2048);
+  DynamicJsonDocument temp(3000);
   // Serial.printf_P(PSTR("[webserverRequest_reponse::make_reponse]\n\t[RA: %d][value: %s]\n"), _action, _value);
 
   switch (_action) { 
@@ -22,33 +22,38 @@ void webserverRequest_reponse::make_reponse(DynamicJsonDocument & doc){
     case RA::RA_ITEM_PREV:        
     case RA::RA_ITEM_RND:             
     case RA::RA_ITEM_NEXT:   
-      if (!doc.containsKey(FPSTR(REQ_005))){
+      // loop
+      if (!doc.containsKey(FPSTR(REQ_005))){ 
         doc.createNestedObject(FPSTR(REQ_005));}
 
       if (pPtr->_plStatu.isPlaying && pPtr->_plStatu.isSet) {
-        if (!doc[FPSTR(REQ_005)][FPSTR(REP_001)]) {
+        // loop-pl
+        if (!doc[FPSTR(REQ_005)][FPSTR(REP_001)]) { 
           temp.clear();
           root = temp.to<JsonObject>();
-          pPtr->set_json_pl(root);
+          pPtr->get_json_pl(root);
           doc[FPSTR(REQ_005)][FPSTR(REP_001)] = temp; 
         }
+        // loop-plt
         if (!doc[FPSTR(REQ_005)][FPSTR(REP_002)]) {
           temp.clear();
           root = temp.to<JsonObject>();
-          pPtr->set_json_plt(root);
+          pPtr->get_json_plt(root);
           doc[FPSTR(REQ_005)][FPSTR(REP_002)] = temp; 
         }
       } else {
+        // loop-lb
         if (!doc[FPSTR(REQ_005)][FPSTR(REP_003)]) {
           temp.clear();
           root = temp.to<JsonObject>();
-          pPtr->set_json_lb(root);
+          pPtr->get_json_lb(root);
           doc[FPSTR(REQ_005)][FPSTR(REP_003)] = temp; 
         }
+        // loop-lbt
         if (!doc[FPSTR(REQ_005)][FPSTR(REP_004)]) {
           temp.clear();
           root = temp.to<JsonObject>();
-          pPtr->set_json_lbt(root);
+          pPtr->get_json_lbt(root);
           doc[FPSTR(REQ_005)][FPSTR(REP_004)] = temp; 
         }
       }
@@ -62,50 +67,56 @@ void webserverRequest_reponse::make_reponse(DynamicJsonDocument & doc){
     case RA::RA_PLAY_STOP:        
     case RA::RA_PLAY_PAUSE:       
     case RA::RA_PLAY_TOGGLE:      
+      // loop
       if (!doc.containsKey(FPSTR(REQ_005))){
         doc.createNestedObject(FPSTR(REQ_005));}
-
+      // loop-statu
       if (!doc[FPSTR(REQ_005)][FPSTR(REP_005)]) {
         temp.clear();
         root = temp.to<JsonObject>();
-        pPtr->set_json_statu(root);
+        pPtr->get_json_statu(root);
         doc[FPSTR(REQ_005)][FPSTR(REP_005)] = temp;  
       } 
     break;
 
     case RA::RA_PLAY_PL: 
+      // loop
       if (!doc.containsKey(FPSTR(REQ_005))){
         doc.createNestedObject(FPSTR(REQ_005));}
 
       if (pPtr->_plStatu.isPlaying && pPtr->_plStatu.isSet) {
+        // loop-pl
         if (!doc[FPSTR(REQ_005)][FPSTR(REP_001)]) {
           temp.clear();
           root = temp.to<JsonObject>();
-          pPtr->set_json_pl(root);
+          pPtr->get_json_pl(root);
           doc[FPSTR(REQ_005)][FPSTR(REP_001)] = temp; 
         }
+        // loop-plt
         if (!doc[FPSTR(REQ_005)][FPSTR(REP_002)]) {
           temp.clear();
           root = temp.to<JsonObject>();
-          pPtr->set_json_plt(root);
+          pPtr->get_json_plt(root);
           doc[FPSTR(REQ_005)][FPSTR(REP_002)] = temp; 
         }
       }    
     break;
     case RA::RA_PLAY_LB:   
+      // loop
       if (!doc.containsKey(FPSTR(REQ_005))){
         doc.createNestedObject(FPSTR(REQ_005));}
-
+      // loop-lb
       if (!doc[FPSTR(REQ_005)][FPSTR(REP_003)]) {
         temp.clear();
         root = temp.to<JsonObject>();
-        pPtr->set_json_lb(root);
+        pPtr->get_json_lb(root);
         doc[FPSTR(REQ_005)][FPSTR(REP_003)] = temp; 
       }
+      // loop-lbt
       if (!doc[FPSTR(REQ_005)][FPSTR(REP_004)]) {
         temp.clear();
         root = temp.to<JsonObject>();
-        pPtr->set_json_lbt(root);
+        pPtr->get_json_lbt(root);
         doc[FPSTR(REQ_005)][FPSTR(REP_004)] = temp; 
       }       
     break;
@@ -116,11 +127,12 @@ void webserverRequest_reponse::make_reponse(DynamicJsonDocument & doc){
 
 
     case RA::RA_LGET_PL:
+      // pld
       if (!doc.containsKey(FPSTR(REP_007))){
-        doc.createNestedObject(FPSTR(REP_007));
+        doc.createNestedObject(FPSTR(REP_007)); // 
         temp.clear();
         root = temp.to<JsonObject>();   
-        pPtr->pl_currentJson(_value.toInt(), root, true);
+        pPtr->get_json_pl_items(_value.toInt(), root, true);
         doc[FPSTR(REP_007)] = temp;
       } 
     break;
@@ -128,11 +140,12 @@ void webserverRequest_reponse::make_reponse(DynamicJsonDocument & doc){
     case RA::RA_PLI_NEW:
     case RA::RA_PLI_REM:
     case RA::RA_PLI_REP:
+      // list_allpl
       if (!doc.containsKey(FPSTR(REQ_003))){
         doc.createNestedObject(FPSTR(REQ_003));
         temp.clear();
         root = temp.to<JsonObject>();   
-        pPtr->pl_json(root);
+        pPtr->get_json_allpl_items(root);
         doc[FPSTR(REQ_003)] = temp;
       } 
     break;
@@ -209,75 +222,89 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
         if (req == "") continue;
 
         // list_alllb
-      	if (req == FPSTR(REQ_001)) {var = reponse.createNestedObject(FPSTR(REQ_001));pPtr->lb_json(var);}
+      	if (req == FPSTR(REQ_001)) {
+          var = reponse.createNestedObject(FPSTR(REQ_001));
+          pPtr->get_json_lb_items(var);}
         // list_lb
-        if (req == FPSTR(REQ_002)) {var = reponse.createNestedObject(FPSTR(REQ_002));pPtr->jsonObject(var);} 
+        if (req == FPSTR(REQ_002)) {
+          var = reponse.createNestedObject(FPSTR(REQ_002));
+          pPtr->jsonObject(var);} 
         // list_allpl
-        if (req == FPSTR(REQ_003)) {var = reponse.createNestedObject(FPSTR(REQ_003));pPtr->pl_json(var);} 
+        if (req == FPSTR(REQ_003)) {
+          var = reponse.createNestedObject(FPSTR(REQ_003));
+          pPtr->get_json_allpl_items(var);} 
         // list_pl
-        if (req == FPSTR(REQ_004)) {var = reponse.createNestedObject(FPSTR(REQ_004));pPtr->pl_currentJson(var);} 
+        if (req == FPSTR(REQ_004)) {
+          var = reponse.createNestedObject(FPSTR(REQ_004));
+          pPtr->get_json_pl_items(var);} 
         // loop
-        if (req == FPSTR(REQ_005)) {var = reponse.createNestedObject(FPSTR(REQ_005));pPtr->set_json_v1(var);} 
+        if (req == FPSTR(REQ_005)) {
+          var = reponse.createNestedObject(FPSTR(REQ_005));
+          pPtr->get_json_jsInit(var);} 
         // list
         if (req == FPSTR(REQ_006)) {
           var = reponse.createNestedObject(FPSTR(REQ_006));
-          pl = var.createNestedObject(FPSTR(REP_003));
-          pPtr->lb_json(pl,false);
-          pl = var.createNestedObject(FPSTR(REP_001));
-          pPtr->pl_json(pl,false);
-        } 
+          pl = var.createNestedObject(FPSTR(REP_003)); // lb
+          pPtr->get_json_lb_items(pl,false);
+          pl = var.createNestedObject(FPSTR(REP_001)); // pl
+          pPtr->get_json_allpl_items(pl,false);} 
         // list_lbs
-        if (req == FPSTR(REQ_007)) {var = reponse.createNestedObject(FPSTR(REQ_006));pl = var.createNestedObject(FPSTR(REP_003));pPtr->lb_json(pl,false);} 
+        if (req == FPSTR(REQ_007)) {
+          var = reponse.createNestedObject(FPSTR(REQ_006));
+          pl = var.createNestedObject(FPSTR(REP_003)); // lb;
+          pPtr->get_json_lb_items(pl,false);} 
         // list_pls
-        if (req == FPSTR(REQ_008)) {var = reponse.createNestedObject(FPSTR(REQ_006));pl = var.createNestedObject(FPSTR(REP_001));pPtr->pl_json(pl,false);
-        } 
+        if (req == FPSTR(REQ_008)) {
+          var = reponse.createNestedObject(FPSTR(REQ_006));
+          pl = var.createNestedObject(FPSTR(REP_001)); // pl
+          pPtr->get_json_allpl_items(pl,false);} 
         // list_ra
         if (req == FPSTR(REQ_009)) {
           size = ARRAY_SIZE(RAALLNAMES);
           JsonArray arr2 = reponse.createNestedArray(FPSTR(REQ_009));
-          for (int j = 0; j < size; ++j) {arr2.add(FPSTR(RAALLNAMES[j]));}          
-        }  
+          for (int j = 0; j < size; ++j) {arr2.add(FPSTR(RAALLNAMES[j]));}}  
         // list_req         
         if (req == FPSTR(REQ_010)) {
           size = ARRAY_SIZE(REQALL);
           JsonArray arr2 = reponse.createNestedArray(FPSTR(REQ_010));
-          for (int j = 0; j < size; ++j) {arr2.add(FPSTR(REQALL[j]));}          
-        } 
+          for (int j = 0; j < size; ++j) {arr2.add(FPSTR(REQALL[j]));}} 
         // list_lbpl
         if (req == FPSTR(REQ_011)) {
-          var = reponse.createNestedObject(FPSTR(REQ_002));pPtr->jsonObject(var);
-          var = reponse.createNestedObject(FPSTR(REQ_004));pPtr->pl_currentJson(var);
-        }
+          var = reponse.createNestedObject(FPSTR(REQ_002)); // list_lb
+          pPtr->jsonObject(var);
+          var = reponse.createNestedObject(FPSTR(REQ_004)); // list_pl
+          pPtr->get_json_pl_items(var);}
         // js_init
         if (req == FPSTR(REQ_012)) {
-          
-          if ((pPtr->_plStatu.isPlaying && pPtr->_plStatu.isSet))
-            {var = reponse.createNestedObject(FPSTR(REQ_004));pPtr->pl_currentJson(var);}
-          else
-            {var = reponse.createNestedObject(FPSTR(REQ_002));pPtr->jsonObject(var);}
+          if ((pPtr->_plStatu.isPlaying && pPtr->_plStatu.isSet)) {
+            var = reponse.createNestedObject(FPSTR(REQ_004)); // list_pl
+            pPtr->get_json_pl_items(var);}
+          else {
+            var = reponse.createNestedObject(FPSTR(REQ_002)); // list_lb
+            pPtr->jsonObject(var);}
 
-          var = reponse.createNestedObject(FPSTR(REQ_005));pPtr->set_json_v1(var);
-          var = reponse.createNestedObject(FPSTR(REQ_006));
-            pl = var.createNestedObject(FPSTR(REP_003));
-            pPtr->lb_json(pl,false);
-            pl = var.createNestedObject(FPSTR(REP_006));
-            ProgramPtrGet()->pl_json(pl,false,true);          
-        }
+          var = reponse.createNestedObject(FPSTR(REQ_005)); // loop
+          pPtr->get_json_jsInit(var);
+          var = reponse.createNestedObject(FPSTR(REQ_006)); // list
+          pl = var.createNestedObject(FPSTR(REP_003)); // lb
+          pPtr->get_json_lb_items(pl,false);
+          pl = var.createNestedObject(FPSTR(REP_006)); // plc
+          ProgramPtrGet()->get_json_allpl_items(pl,false,true);}
         // list_plsc
-        if (req == FPSTR(REQ_013)) {var = reponse.createNestedObject(FPSTR(REQ_006));pl = var.createNestedObject(FPSTR(REP_006));pPtr->pl_json(pl,false, true);}
-        
+        if (req == FPSTR(REQ_013)) {
+          var = reponse.createNestedObject(FPSTR(REQ_006)); // list
+          pl = var.createNestedObject(FPSTR(REP_006)); // plc
+          pPtr->get_json_allpl_items(pl,false, true);}      
         // listc
         if (req == FPSTR(REQ_014)) {
-          var = reponse.createNestedObject(FPSTR(REQ_006));
-          pl = var.createNestedObject(FPSTR(REP_003));
-          pPtr->lb_json(pl,false);
-          pl = var.createNestedObject(FPSTR(REP_006));
-          pPtr->pl_json(pl,false, true);
-        } 
-
+          var = reponse.createNestedObject(FPSTR(REQ_006)); // list
+          pl = var.createNestedObject(FPSTR(REP_003)); // lb
+          pPtr->get_json_lb_items(pl,false);
+          pl = var.createNestedObject(FPSTR(REP_006)); // plc
+          pPtr->get_json_allpl_items(pl,false, true);}
       }
     }
-    if (_webserverRequest_reponse!=nullptr) {
+    if (_webserverRequest_reponse) {
       for (int j = 0; j < posReponse; ++j) {
         _webserverRequest_reponse[j].make_reponse(reponse);
       }

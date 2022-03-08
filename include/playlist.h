@@ -42,7 +42,7 @@
     void item_print();
     void item_json(JsonObject & doc, boolean pI = true);
     void item_restore(DynamicJsonDocument & doc);
-    void item_toArray(uint8_t, const String &, const String &, const String &);
+    uint8_t item_toArray(uint8_t, const String &, const String &, const String &);
     void item_remove(uint8_t remove); 
     void item_df();
 
@@ -60,6 +60,8 @@
 
     boolean get_itemIdByArrayPos(uint8_t aP, uint8_t & r); 
     boolean get_itemBaseByArrayPos(uint8_t aP, String & r); 
+
+    Playlist_item * get_array(uint8_t pos) {return &_Playlist_itemArray[pos];}
   };
 
 #endif // PLAYLIST_CPP

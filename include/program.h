@@ -60,6 +60,8 @@
     void pl_print();
     void pl_print(uint8_t);
 
+    void pl_fs_defaultFile(uint8_t pPos);
+
     void item_callback(boolean upd = true);
 
     boolean _fs_setup = false;
@@ -90,29 +92,29 @@
     void set_fs_pl(boolean v);
     #ifdef FSOK
       void pl_fs();  
+      void pl_fs(uint8_t, uint8_t);  
       void pl_fs(uint8_t);  
       void pl_fs(uint8_t pP, DynamicJsonDocument & doc);  
       void pl_fs_restore(uint8_t pP);  
       void pl_fs_restore();  
     #endif
-    void pl_json(JsonObject & doc, boolean pI = true, boolean lRef = false);
-    void pl_currentJson(uint8_t p, JsonObject & doc, boolean pI = true);
-    void pl_currentJson(JsonObject & doc, boolean pI = true);
+
+    void get_json_allpl_items(JsonObject & doc, boolean pI = true, boolean lRef = false); // array of all pl items
+    void get_json_pl_items(uint8_t p, JsonObject & doc, boolean pI = true); // array of selcted pl items
+    void get_json_pl_items(JsonObject & doc, boolean pI = true); // array of current selcted pl items
+    void get_json_lb_items(JsonObject & doc, boolean pI = true) ; 
+    void get_json_lb_items(JsonObject & doc, uint8_t p, boolean pI = true) ;
+    void get_json_jsInit(JsonObject & doc); 
+    void get_json_statu(JsonObject &);  // obj: statu
+    void get_json_pl(JsonObject &);     // obj: pl
+    void get_json_plt(JsonObject &);    // obj: plt
+    void get_json_lb(JsonObject &);     // obj: lb
+    void get_json_lbt(JsonObject &);    // obj: lbt
 
 
-    void lb_json(JsonObject & doc, boolean pI = true) ;
-    void lb_json(JsonObject & doc, uint8_t p, boolean pI = true) ;
 
     void loop(mod_pattern_loop &, String &s);
     void handle();
-
-    void set_json_v1(JsonObject & doc);
-    void set_json_statu(JsonObject &);
-    void set_json_pl(JsonObject &);
-    void set_json_plt(JsonObject &);
-    void set_json_lb(JsonObject &);
-    void set_json_lbt(JsonObject &);
-
     void set_callback(callback_function_t);
 
     void print(PRINT_MOD mod) ;

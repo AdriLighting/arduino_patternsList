@@ -96,6 +96,10 @@ function plitem_remove(){
   socket_send(JSON.stringify(json)); 
   _upd_pl_base = true;
 }
+function pl_sav(){
+  var value = document.getElementById("cmb_plld").options.selectedIndex;
+  socket_send(api_request(0, "SOKCET", [{"n":"RA_PL_TOFS","v":value}], ["", ""]));  
+}
 let playlisItemsDisptClass = class {
   constructor(v1) {
     this._degug   = true;
