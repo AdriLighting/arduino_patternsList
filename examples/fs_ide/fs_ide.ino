@@ -135,7 +135,7 @@ void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBas
     String  v         = "";
     String  v2        = "";
     int     rSize     = 0;
-    String  * arg     = LH_explode(value, ',', rSize) ;
+    String  * arg     = AP_explode(value, ',', rSize) ;
     if (rSize>0) {v   = arg[1];}
     if (rSize>1) {v2  = arg[2];}
 
