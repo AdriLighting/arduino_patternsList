@@ -160,9 +160,9 @@ void setup() {
   delay((5000));
 
   _DeviceWifi = new WifiConnect(
-    "arduinopatternlist",
-    "freebox_123_EXT",
-    "phcaadax",
+    "hostname",
+    "ssid",
+    "ssidpsk",
     "adsap1234",
     "adsota1234");
 

@@ -8,9 +8,6 @@
   #endif
 #endif
 
-#include <littlefs_helper.h>
-
-
 #include "../include/Stringsort.h"
 #include "LList/LList.h"
 #include "../include/webserverRequest.h"
@@ -699,6 +696,8 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
 
 #ifdef FSOK
   void Program::pl_fs(uint8_t pPos, uint8_t iP){
+
+    /*
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pPos) + (String)FPSTR(FNEXT_PLAYLIST) ;
     
     if(!LittleFS.exists(path)) return;
@@ -766,7 +765,8 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     delay(1);
 
     uint32_t tDif = millis() - tNow;
-    Serial.printf("[duration: %d]\n", tDif);    
+    Serial.printf("[duration: %d]\n", tDif);   
+    */ 
   }
 
   void Program::pl_fs(){
@@ -889,6 +889,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
   }
 
   void Program::pl_fs_defaultFile(uint8_t pPos){
+    /*
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pPos) + (String)FPSTR(FNEXT_PLAYLIST) ;
     char buffer[80];
     sprintf(buffer, "%s", path.c_str());  
@@ -950,6 +951,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     delete _LH_file;
 
     delay(2);
+    */
   }
   void Program::pl_fs_restore(uint8_t pPos){
     if (!_fs_setup) return;
