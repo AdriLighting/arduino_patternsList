@@ -9,57 +9,17 @@
 Program * _Program = nullptr;
 
 #ifdef DEBUGSERIAL
-  //debug files
   SerialRead * _serial;
-  void serial_menu(const String & cmd, const String & value)    {_serial->menu();}
-  void serial_ESPreset(const String & cmd, const String & value){ESP.restart();}   
-  void serial_freeHeap(const String & cmd, const String & value){fsprintf("freeHeap: %d\n", ESP.getFreeHeap());}  
-  void serial_menu_cmd(const String & cmd, const String & value){
-    Serial.printf_P(PSTR("[serial_menu_cmd] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
-    uint8_t p       = value.toInt();
-    String  v       = "";
-    String  v2      = "";
-    int     rSize   = 0;
-    String  * arg   = LH_explode(value, ',', rSize) ;
-    if (rSize>0) {v = arg[1];}
-    if (rSize>1) {v2  = arg[2];}
-
-      DynamicJsonDocument doc(1024);
-      JsonArray           arr;
-      JsonObject          var;
-      String              reponse;
-
-      doc[F("op")]    = 0;
-      doc[F("type")]  = "ESP";
-
-      arr = doc.createNestedArray(F("set"));  
-      var = arr.createNestedObject();
-      var[F("n")] = FPSTR(RAALLNAMES[p]);
-      var[F("v")] = v;
-
-      // arr = doc.createNestedArray(F("get"));  
-      // arr.add("loop");
-
-      _WebserverRequest.parsingRequest(doc, reponse, v2);
-      Serial.printf_P(PSTR("[serial_menu_cmd->reponse]\n%S\n"),reponse.c_str());
-
-		// RA action = RAARR[p];
-		// _Program->remote_action(action, v.c_str(), "", NULL);    
-  }  
-  void serial_menu_p_3(const String & cmd, const String & value){_Program->print(PM_LB); _Program->print(PM_PL); } 
-  void serial_menu_p_1(const String & cmd, const String & value){_Program->print(PM_LOOP); } 
-  void serial_menu_p_2(const String & cmd, const String & value){
-    uint8_t cnt = ARRAY_SIZE(RAALLNAMES);
-    for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);} // debug Serial
-  } 
+  void serial_menu(const String & cmd, const String & value);
+  void serial_ESPreset(const String & cmd, const String & value);
+  void serial_freeHeap(const String & cmd, const String & value);
+  void serial_menu_cmd(const String & cmd, const String & value);
+  void serial_menu_p_3(const String & cmd, const String & value);
+  void serial_menu_p_1(const String & cmd, const String & value);
+  void serial_menu_p_2(const String & cmd, const String & value);
 #endif
+void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver);
 
-void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
-
-  Serial.printf_P(PSTR("[user_callback]\n\t[%d] %s\n"), itemBasePos, itemBaseName.c_str());
-  ProgramPtrGet()->print(PM_LLI);
-
-}
 
 void setup() {
   Serial.begin(115200);
@@ -71,31 +31,11 @@ void setup() {
 
   Serial.printf_P(PSTR("\t[freeheap: %d]\n"), ESP.getFreeHeap());
 
-  #ifdef DEBUGSERIAL
-    Serial.println(F("[DEBUGSERIAL][OK]"));  
-  #else
-    Serial.println(F("[DEBUGSERIAL][NO]"));  
-  #endif
-  #ifdef USE_SPIFFS
-    Serial.println(F("[USE_SPIFFS][OK]"));  
-  #else
-    Serial.println(F("[USE_SPIFFS][NO]"));  
-  #endif
-  #ifdef USE_LITTLEFS
-    Serial.println(F("[USE_LITTLEFS][OK]"));  
-  #else
-    Serial.println(F("[USE_LITTLEFS][NO]"));  
-  #endif  
-  #ifdef FSOK
-    Serial.println(F("[FSOK][OK]"));  
-  #else
-    Serial.println(F("[FSOK][NO]"));  
-  #endif
+  define_print();
 
   Serial.setDebugOutput(false);
 
   #ifdef DEBUGSERIAL
-    //debug
     debug_printBuffer = new char[1024];
     _serial = new SerialRead();
     _serial->cmd_array(1, 6); 
@@ -163,12 +103,60 @@ void setup() {
 
 
 void loop() {
-
   #ifdef DEBUGSERIAL
     _serial->loop();  
   #endif
-
   ProgramPtrGet()->handle();
 }
 
+void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
+  Serial.printf_P(PSTR("[user_callback]\n\t[%d] %s\n"), itemBasePos, itemBaseName.c_str());
+  ProgramPtrGet()->print(PM_LLI);
+}
+
+#ifdef DEBUGSERIAL
+  //debug files
+  SerialRead * _serial;
+  void serial_menu(const String & cmd, const String & value)    {_serial->menu();}
+  void serial_ESPreset(const String & cmd, const String & value){ESP.restart();}   
+  void serial_freeHeap(const String & cmd, const String & value){fsprintf("freeHeap: %d\n", ESP.getFreeHeap());}  
+  void serial_menu_cmd(const String & cmd, const String & value){
+    Serial.printf_P(PSTR("[serial_menu_cmd] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
+    uint8_t p       = value.toInt();
+    String  v       = "";
+    String  v2      = "";
+    int     rSize   = 0;
+    String  * arg   = LH_explode(value, ',', rSize) ;
+    if (rSize>0) {v = arg[1];}
+    if (rSize>1) {v2  = arg[2];}
+
+      DynamicJsonDocument doc(1024);
+      JsonArray           arr;
+      JsonObject          var;
+      String              reponse;
+
+      doc[F("op")]    = 0;
+      doc[F("type")]  = "ESP";
+
+      arr = doc.createNestedArray(F("set"));  
+      var = arr.createNestedObject();
+      var[F("n")] = FPSTR(RAALLNAMES[p]);
+      var[F("v")] = v;
+
+      // arr = doc.createNestedArray(F("get"));  
+      // arr.add("loop");
+
+      _WebserverRequest.parsingRequest(doc, reponse, v2);
+      Serial.printf_P(PSTR("[serial_menu_cmd->reponse]\n%S\n"),reponse.c_str());
+
+    // RA action = RAARR[p];
+    // _Program->remote_action(action, v.c_str(), "", NULL);    
+  }  
+  void serial_menu_p_3(const String & cmd, const String & value){_Program->print(PM_LB); _Program->print(PM_PL); } 
+  void serial_menu_p_1(const String & cmd, const String & value){_Program->print(PM_LOOP); } 
+  void serial_menu_p_2(const String & cmd, const String & value){
+    uint8_t cnt = ARRAY_SIZE(RAALLNAMES);
+    for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);} // debug Serial
+  } 
+#endif
 

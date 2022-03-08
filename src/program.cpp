@@ -960,7 +960,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     DynamicJsonDocument doc(2048);
     char buffer[80];
     sprintf(buffer, "%s", path.c_str());    
-    if (!deserializeFile(doc, buffer)) {
+    if (!AP_deserializeFile(doc, buffer)) {
       #ifdef DEBUG
         Serial.printf_P(PSTR("[Program::pl_fs_restore][Error open /r]\n\t%s\n"), path.c_str());     
       #endif

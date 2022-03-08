@@ -1,9 +1,9 @@
 #ifndef DEF_H
   #define DEF_H
   #ifndef AP_DEFAULT
-    #ifndef DEBUGSERIAL
-      #define DEBUGSERIAL
-    #endif
+    // #ifndef DEBUGSERIAL
+    //   #define DEBUGSERIAL
+    // #endif
     #ifndef FSOK
       #define FSOK
       #ifndef USE_LITTLEFS

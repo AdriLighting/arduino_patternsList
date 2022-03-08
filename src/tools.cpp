@@ -1,6 +1,7 @@
 #include "../include/tools.h"
 
 #include <Arduino.h>
+
 #ifdef FSOK
   #if defined USE_SPIFFS
     #include <FS.h>
@@ -8,6 +9,42 @@
     #include <LittleFS.h> 
   #endif
 #endif
+
+
+#ifdef DEBUG_AP
+  char * ap_debugBuffer = nullptr;
+  void AP_debugPrint(const String & msg, const String & file, const String & line, const String & func) {
+    Serial.printf_P(PSTR("[%s:%S] %s\n"), file.c_str() , line.c_str() , func.c_str());
+    if (msg!="") Serial.printf_P(PSTR("%s"), msg.c_str() ); 
+  }
+#endif
+void define_print(){
+  #ifdef DEBUGSERIAL
+    Serial.println(F("[DEBUGSERIAL][OK]"));  
+  #else
+    Serial.println(F("[DEBUGSERIAL][NO]"));  
+  #endif
+  #ifdef USE_SPIFFS
+    Serial.println(F("[USE_SPIFFS][OK]"));  
+  #else
+    Serial.println(F("[USE_SPIFFS][NO]"));  
+  #endif
+  #ifdef USE_LITTLEFS
+    Serial.println(F("[USE_LITTLEFS][OK]"));  
+  #else
+    Serial.println(F("[USE_LITTLEFS][NO]"));  
+  #endif  
+  #ifdef FSOK
+    Serial.println(F("[FSOK][OK]"));  
+  #else
+    Serial.println(F("[FSOK][NO]"));  
+  #endif
+  #ifdef DEBUG_AP
+    Serial.println(F("[DEBUG_AP][OK]"));  
+  #else
+    Serial.println(F("[DEBUG_AP][NO]"));  
+  #endif  
+}
 
 String ch_toString(const char * c){
   return String((const __FlashStringHelper*) c);
@@ -121,7 +158,7 @@ void on_timeD(String & result) {
 
 
 #ifdef FSOK
-bool deserializeFile(DynamicJsonDocument& doc, const char* filepath){
+bool AP_deserializeFile(DynamicJsonDocument& doc, const char* filepath){
     if (!filepath || !*filepath)
         return false;
 
