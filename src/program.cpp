@@ -803,7 +803,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
       Serial.printf_P(PSTR("[Program::pl_fs][%d]\n"), pP);   
     #endif
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pP) + (String)FPSTR(FNEXT_PLAYLIST) ;
-    File f=LittleFS.open(path,"w");
+    File f=FILESYSTEM.open(path,"w");
     if (!f) {
       #ifdef DEBUG
         Serial.printf_P(PSTR("[Program::pl_fs][Error open /w]\n\t%s\n"), path.c_str());  
