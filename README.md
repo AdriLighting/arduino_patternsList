@@ -47,6 +47,45 @@ Grellard Adrien
 
 <hr>
 
+---
+
+<br>
+
+## Dropdowns
+
+To create a dropdown containing **text**:
+
+<details>
+  
+```html
+      HTTP, JS, UDP, SOCKET 
+        JSON SYNTAX
+          op    object  fonction avec laquelle traiter le parsing + execution des commandes
+                0 = ?
+                1 = playlist items management
+          type  object  type de format (nom de commande avc String,int ETC...)
+          cli   object  porvenance: http server, websocket server, udp/multi
+          set   array   setter
+                [
+                  n object  id commande
+                  v object  valeur commoand si besoin
+                ] , 
+                [**]
+          get   array   getter
+                [  id commande ] , 
+                [**]  
+```
+</details>
+
+<br>
+
+Use:
+
+
+---
+
+<br>
+
 #### CLIENT->SERVER 
 aaa
 
