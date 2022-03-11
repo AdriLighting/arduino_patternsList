@@ -60,10 +60,6 @@
     void pl_print();
     void pl_print(uint8_t);
 
-    void pl_fs_defaultFile(uint8_t pPos);
-
-    void item_callback(boolean upd = true);
-
     boolean _fs_setup = false;
     boolean _fs_pl    = false;
 
@@ -92,7 +88,6 @@
     void set_fs_pl(boolean v);
     #ifdef FSOK
       void pl_fs();  
-      void pl_fs(uint8_t, uint8_t);  
       void pl_fs(uint8_t);  
       void pl_fs(uint8_t pP, DynamicJsonDocument & doc);  
       void pl_fs_restore(uint8_t pP);  
@@ -113,7 +108,6 @@
 
 
 
-    void loop(mod_pattern_loop &, String &s);
     void handle();
     void set_callback(callback_function_t);
 

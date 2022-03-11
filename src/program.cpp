@@ -340,46 +340,6 @@ void Program::set_itemPos(const uint16_t & p){
 }
 
 
-void Program::loop(mod_pattern_loop & mod, String & v1){
-  if ( !isPlaying() ) {
-    return;
-  } 
-  uint32_t    del;
-  boolean     delMin;
-  get_delay(del);
-  get_delayMin(delMin);
-  if (_timer->loop(del*(delMin ? 60000 : 1000))) {
-    String name;
-    set_itemNext();
-    get_itemBase(name);
-    item_callback(true);
-    mod = mpl_next;
-    v1  = name;     
-  }
-}
-void Program::item_callback(boolean upd){ 
-  String name;
-  get_itemBase(name);
-  uint16_t pB = 0;
-  get_itemPosBase(pB);
-  if (_plStatu.isPlaying) {
-
-  } 
-  else {  
-
-  } 
-
-  #ifdef DEBUG
-    String heap;
-    String time;
-    on_timeD(time);
-    _HeapStatu.update();
-    _HeapStatu.print(heap);
-    Serial.printf_P(PSTR("[item_callback]\n\t%s\n\t%-15s%s\n"), name.c_str(), time.c_str(), heap.c_str());
-    print(PM_LLI);  
-  #endif
-}
-
 void Program::handle(){
   if ( !isPlaying() ) {
     return;
@@ -404,9 +364,9 @@ void Program::handle(){
 void Program::set_callback(callback_function_t f)  {_callback = std::move(f);}
 
 void Program::remote_action(RA action, ...){
-#ifdef DEBUG
-  Serial.printf_P(PSTR("RA %-4d[%-20s]: "), action, RAALLNAMES[action]);  
-#endif
+  #ifdef DEBUG
+    Serial.printf_P(PSTR("RA %-4d[%-20s]: "), action, RAALLNAMES[action]);  
+  #endif
   char *key = NULL, *val = NULL, *key_val = NULL;
   va_list prm;
   va_start(prm, action);
@@ -695,80 +655,6 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
 }
 
 #ifdef FSOK
-  void Program::pl_fs(uint8_t pPos, uint8_t iP){
-
-    /*
-    String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pPos) + (String)FPSTR(FNEXT_PLAYLIST) ;
-    
-    if(!LittleFS.exists(path)) return;
-    uint32_t tNow = millis();
-
-    char buffer[80];
-    sprintf(buffer, "%s", path.c_str());  
-
-    File f_2;
-    LH_file * _LH_file = new LH_file(f_2, buffer);
-    DynamicJsonDocument jFs(2048);
-    JsonObject jFs_1 ;
-
-    String line = "";
-
-    const char * sPLref = "";
-    uint8_t sPos = 0;
-    String sLbl = "";
-    uint16_t sIcmax = 0;
-    uint16_t sIc = 0;
-
-    _Playlists[pPos].get_listRef(sPLref);
-    _Playlists[pPos].get_pos(sPos);
-    _Playlists[pPos].get_lbl(sLbl);
-    _Playlists[pPos].get_items_max(sIcmax);
-    _Playlists[pPos].get_items_cnt(sIc);
-
-
-    jFs_1  = jFs.to<JsonObject>();  
-    jFs_1[F("cmax")]  = sIcmax;
-    jFs_1[F("cnt")]   = sIc;
-    jFs_1[F("pos")]   = sPos;
-    jFs_1[F("lbl")]   = sLbl;  
-    jFs_1[F("lref")]  = sPLref; 
-
-    serializeJson(jFs, line);
-    _LH_file->replaceLine(line, 1);
-    delay(1);
-
-    uint8_t aId;
-    String aLbl, aIb, aIbCfg;
-
-    uint8_t linePos = iP + 2;
-    Serial.printf("linepos: %d", linePos);
-
-      _Playlists[pPos].get_array(iP)->get_id(aId);
-      _Playlists[pPos].get_array(iP)->get_lbl(aLbl);
-      _Playlists[pPos].get_array(iP)->get_itemBase(aIb);
-      _Playlists[pPos].get_array(iP)->get_itemBaseCfg(aIbCfg);
-
-      jFs.clear();
-      jFs_1  = jFs.to<JsonObject>();  
-      jFs_1[F("id")]    = aId;
-      jFs_1[F("lbl")]   = aLbl;
-      jFs_1[F("ib")]    = aIb;
-      jFs_1[F("ibcfg")] = aIbCfg;     
-
-      line = "";
-      serializeJson(jFs, line);
-      _LH_file->replaceLine(line, linePos);
-
-
-    delete _LH_file;
-
-    delay(1);
-
-    uint32_t tDif = millis() - tNow;
-    Serial.printf("[duration: %d]\n", tDif);   
-    */ 
-  }
-
   void Program::pl_fs(){
     if (!_fs_setup) return;
     if (!_fs_pl)    return;
@@ -820,45 +706,6 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     get_json_pl_items(pP, root, true);
     doc[FPSTR(REP_007)] = temp;  
 
-    // if(LittleFS.exists(path)) LittleFS.remove(path);
-
-    // char buffer[80];
-    // sprintf(buffer, "%s", path.c_str());  
-
-    // File f_2;
-    
-    // LH_file * _LH_file = new LH_file(f_2, buffer);
-    // DynamicJsonDocument jFs(2048);
-    // JsonObject jFs_1 ;
-    // String line = "";
-    
-    // jFs_1  = jFs.to<JsonObject>();  
-    // jFs_1[F("cmax")]  = doc[FPSTR(REP_007)][F("cmax")];
-    // jFs_1[F("cnt")]   = doc[FPSTR(REP_007)][F("cnt")];
-    // jFs_1[F("pos")]   = doc[FPSTR(REP_007)][F("pos")];
-    // jFs_1[F("lbl")]   = doc[FPSTR(REP_007)][F("lbl")];  
-    // jFs_1[F("lref")]  = doc[FPSTR(REP_007)][F("lref")];  
-    // serializeJson(jFs, line);
-    // _LH_file->newLine(line);
-
-    // JsonArray arr = doc[FPSTR(REP_007)][F("items")].as<JsonArray>();
-    // for (size_t i = 0; i < arr.size(); i++) {
-    //   JsonObject item = arr[i];
-
-    //   jFs.clear();
-    //   jFs_1  = jFs.to<JsonObject>();  
-    //   jFs_1[F("id")]    = item[F("id")];
-    //   jFs_1[F("lbl")]   = item[F("lbl")];
-    //   jFs_1[F("ib")]    = item[F("ib")];
-    //   jFs_1[F("ibcfg")] = item[F("ibcfg")];     
-
-    //   line = "";
-    //   serializeJson(jFs, line);
-    //   _LH_file->newLine(line);
-
-    // }
-    // delete _LH_file;
-
     temp.clear();
     serializeJson(doc, f);
     doc.clear();
@@ -880,79 +727,18 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
       #endif
       return;
     }
-    uint32_t tNow = millis();    
+    #ifdef DEBUG
+      uint32_t tNow = millis();  
+    #endif    
     serializeJson(doc, f);
     f.close();  
     delay(1);  
-    uint32_t tDif = millis() - tNow;
-    Serial.printf("[duration: %d]\n", tDif);    
+    #ifdef DEBUG
+      uint32_t tDif = millis() - tNow;
+      Serial.printf("[duration: %d]\n", tDif);   
+    #endif   
   }
 
-  void Program::pl_fs_defaultFile(uint8_t pPos){
-    /*
-    String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pPos) + (String)FPSTR(FNEXT_PLAYLIST) ;
-    char buffer[80];
-    sprintf(buffer, "%s", path.c_str());  
-
-    File f_2;
-    LH_file * _LH_file = new LH_file(f_2, buffer);
-    DynamicJsonDocument jFs(2048);
-    JsonObject jFs_1 ;
-
-    String line = "";
-
-    const char * sPLref = "";
-    uint8_t sPos = 0;
-    String sLbl = "";
-    uint16_t sIcmax = 0;
-    uint16_t sIc = 0;
-
-    _Playlists[pPos].get_listRef(sPLref);
-    _Playlists[pPos].get_pos(sPos);
-    _Playlists[pPos].get_lbl(sLbl);
-    _Playlists[pPos].get_items_max(sIcmax);
-    _Playlists[pPos].get_items_cnt(sIc);
-
-
-    jFs_1  = jFs.to<JsonObject>();  
-    jFs_1[F("cmax")]  = sIcmax;
-    jFs_1[F("cnt")]   = sIc;
-    jFs_1[F("pos")]   = sPos;
-    jFs_1[F("lbl")]   = sLbl;  
-    jFs_1[F("lref")]  = sPLref; 
-
-    serializeJson(jFs, line);
-    _LH_file->newLine(line);
-    delay(2);
-
-    uint8_t aId;
-    String aLbl, aIb, aIbCfg;
-    for (uint8_t i = 0; i < sIcmax; i++) {
-
-      _Playlists[pPos].get_array(i)->get_id(aId);
-      _Playlists[pPos].get_array(i)->get_lbl(aLbl);
-      _Playlists[pPos].get_array(i)->get_itemBase(aIb);
-      _Playlists[pPos].get_array(i)->get_itemBaseCfg(aIbCfg);
-
-      jFs.clear();
-      jFs_1  = jFs.to<JsonObject>();  
-      jFs_1[F("id")]    = aId;
-      jFs_1[F("lbl")]   = aLbl;
-      jFs_1[F("ib")]    = aIb;
-      jFs_1[F("ibcfg")] = aIbCfg;     
-
-      line = "";
-      serializeJson(jFs, line);
-      _LH_file->newLine(line);
-      delay(2);
-
-    }
-
-    delete _LH_file;
-
-    delay(2);
-    */
-  }
   void Program::pl_fs_restore(uint8_t pPos){
     if (!_fs_setup) return;
 
@@ -968,18 +754,6 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     }  
     _Playlists[pPos].item_df();
     _Playlists[pPos].item_restore(doc);
-
-    // if(!LittleFS.exists(path))  {
-    //   #ifdef DEBUG
-    //     Serial.printf_P(PSTR("[Program::pl_fs_restore][Error not file exist]\n\t%s\n"), path.c_str());     
-    //   #endif   
-
-    //   pl_fs_defaultFile(pPos); 
-    // }
-
-    // SPIFFS_fileRead(path);
-
-    // delay(2);
   } 
   void Program::pl_fs_restore() {
     if (!_fs_setup) return;

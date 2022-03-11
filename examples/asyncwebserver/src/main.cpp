@@ -147,6 +147,9 @@ void setup() {
 }
 
 void loop() {
+  #ifdef DEBUGSERIAL
+    _serial->loop();  
+  #endif  
   _TaskScheduler->loop();
 }
 

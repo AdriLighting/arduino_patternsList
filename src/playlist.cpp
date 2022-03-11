@@ -42,17 +42,15 @@ void Playlist_list::item_restore(DynamicJsonDocument & doc) {
     for (size_t i = 0; i < arr.size(); i++) {
         JsonObject item = arr[i];
         if (i >= _items_max) {
-            #ifdef DEBUG
-                Serial.printf_P(PSTR("\t[LIMITE MAXIMUM ATTEINTE]\n")); 
-             #endif     
-            break;
+          #ifdef DEBUG
+            Serial.printf_P(PSTR("\t[LIMITE MAXIMUM ATTEINTE]\n")); 
+          #endif     
+          break;
         } else {
-
           _Playlist_itemArray[i].set_id(item[F("id")].as<uint8_t>());
           _Playlist_itemArray[i].set_lbl(item[F("lbl")].as<String>());
           _Playlist_itemArray[i].set_itemBase(item[F("ib")].as<String>());
           _Playlist_itemArray[i].set_itemBaseCfg(item[F("ibcfg")].as<String>());
-
         }       
     }
     _items_cnt = arr.size();
@@ -60,7 +58,7 @@ void Playlist_list::item_restore(DynamicJsonDocument & doc) {
 }
 void Playlist_list::item_remove(uint8_t id) {
     #ifdef DEBUG
-        Serial.printf_P(PSTR("[Playlist_list::item_remove][START]\n"));
+      Serial.printf_P(PSTR("[Playlist_list::item_remove][START]\n"));
     #endif
 
     Playlist_item * temp = new Playlist_item[_items_max];
@@ -100,7 +98,7 @@ void Playlist_list::item_remove(uint8_t id) {
     // item_restore();
 
     #ifdef DEBUG
-        Serial.printf_P(PSTR("[Playlist_list::item_remove][DONE]\n"));
+      Serial.printf_P(PSTR("[Playlist_list::item_remove][DONE]\n"));
     #endif
 }
 
