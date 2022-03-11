@@ -21,3 +21,33 @@ ESP8266
 Grellard Adrien  
 - ![AdriLighting_millisTimer](https://github.com/AdriLighting/millisTimer.git) 
 
+## API REST
+
+#### REQUETTE    
+<details>  
+  <pre>     
+      HTTP, JS, UDP, SOCKET 
+        JSON SYNTAX
+          op    object  fonction avec laquelle traiter le parsing + execution des commandes
+                0 = ?
+                1 = playlist items management
+          type  object  type de format (nom de commande avc String,int ETC...)
+          cli   object  porvenance: http server, websocket server, udp/multi
+          set   array   setter
+                [
+                  n object  id commande
+                  v object  valeur commoand si besoin
+                ] , 
+                [**]
+          get   array   getter
+                [  id commande ] , 
+                [**]  
+  <\pre>    
+<\details>  
+
+<hr>
+
+#### CLIENT->SERVER 
+aaa
+
+   
