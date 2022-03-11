@@ -6,7 +6,7 @@
 
 #include <Wificonnect.h>
 #include <ESP8266WiFi.h>  
-extern WifiConnect * _DeviceWifi;	
+extern WifiConnect * _DeviceWifi; 
 #ifdef FSOK
   #if defined USE_SPIFFS
     #include <FS.h>
@@ -22,15 +22,15 @@ namespace {
       sprintf(buf,"%d.%d.%d.%d",a[0],a[1],a[2],a[3]);
       return String(buf);
   }
-	IPAddress get_localIP() {
-	  IPAddress localIP;
-	  localIP = WiFi.localIP();
-	  if (localIP[0] != 0) {
-	    return localIP;
-	  }
+  IPAddress get_localIP() {
+    IPAddress localIP;
+    localIP = WiFi.localIP();
+    if (localIP[0] != 0) {
+      return localIP;
+    }
 
-	  return INADDR_NONE;
-	}	
+    return INADDR_NONE;
+  } 
 
 }
 
@@ -38,7 +38,7 @@ void serverSystem::sys_firmWareJson(JsonObject & root){
   // String s_1 = String(ARDUINO_BOARD);
   // String s_2 = WiFi.macAddress();
   // s_2.replace(":", "");
-  root[FPSTR(SYS_firmware_mac)]       = WiFi.macAddress();	
+  root[FPSTR(SYS_firmware_mac)]       = WiFi.macAddress();  
   root[FPSTR(SYS_firmware_eboard)]    = String(ARDUINO_BOARD);
   root[FPSTR(SYS_firmware_board)]     = FPSTR(ALS_BOARD_T     [LAMPBOARD]);
   root[FPSTR(SYS_firmware_framework)] = FPSTR(ALS_FRAMEWORK_T [LAMPFRAMEWORK]);
@@ -51,7 +51,7 @@ void serverSystem::sys_firmWareJson(JsonObject & root){
 void serverSystem::sys_json(JsonObject & root){
 #ifdef FSOK
   FSInfo fs_info;
-  FILESYSTEM.info(fs_info);	
+  FILESYSTEM.info(fs_info); 
 #endif
   String upTime;
   on_timeD(upTime);
@@ -60,28 +60,28 @@ void serverSystem::sys_json(JsonObject & root){
 #ifdef FSOK
   root[FPSTR(SYS_fstotal)]    = fs_info.totalBytes;
   root[FPSTR(SYS_fsused)]     = fs_info.usedBytes;
-  root[FPSTR(SYS_fsfree)]     = (fs_info.totalBytes-fs_info.usedBytes);	
+  root[FPSTR(SYS_fsfree)]     = (fs_info.totalBytes-fs_info.usedBytes); 
 #endif
   root[FPSTR(SYS_uptime)]     = upTime;
   root[FPSTR(SYS_heapfrag)]   = ESP.getHeapFragmentation();  
 }
 void serverSystem::sys_networkJson(JsonObject & root){
-	String ip = ip2string(get_localIP());
-	String getVal;
-	root[FPSTR(SYS_network_currentIp)]    = ip;
+  String ip = ip2string(get_localIP());
+  String getVal;
+  root[FPSTR(SYS_network_currentIp)]    = ip;
   _DeviceWifi->get_hostName(getVal);
-	root[FPSTR(SYS_network_hostName)]     = getVal;
-	root[FPSTR(SYS_network_apIP)]         = "192.168.4.1";
-	_DeviceWifi->get_apSSID(getVal);
-	root[FPSTR(SYS_network_apHostName)]   = getVal;
-	_DeviceWifi->get_apPsk(getVal);
-	root[FPSTR(SYS_network_apPsk)]        = getVal;
-	_DeviceWifi->get_staPsk(getVal);
-	root[FPSTR(SYS_network_staPsk)]       = getVal;;
-	_DeviceWifi->get_staSSID(getVal);
-	root[FPSTR(SYS_network_SSID)]         = getVal;
-	root[FPSTR(SYS_network_sta)]          = WiFi.status();
-}	
+  root[FPSTR(SYS_network_hostName)]     = getVal;
+  root[FPSTR(SYS_network_apIP)]         = "192.168.4.1";
+  _DeviceWifi->get_apSSID(getVal);
+  root[FPSTR(SYS_network_apHostName)]   = getVal;
+  _DeviceWifi->get_apPsk(getVal);
+  root[FPSTR(SYS_network_apPsk)]        = getVal;
+  _DeviceWifi->get_staPsk(getVal);
+  root[FPSTR(SYS_network_staPsk)]       = getVal;;
+  _DeviceWifi->get_staSSID(getVal);
+  root[FPSTR(SYS_network_SSID)]         = getVal;
+  root[FPSTR(SYS_network_sta)]          = WiFi.status();
+} 
 void serverSystem::sys_toString( String & out){
   DynamicJsonDocument doc(1024);
   JsonObject root = doc.to<JsonObject>();
@@ -97,12 +97,12 @@ void serverSystem::sys_networkToString(String & out){
   JsonObject json = oOjbect.createNestedObject("network"); 
   sys_networkJson(json);
   serializeJson(doc, out);
-}	
+} 
 void serverSystem::sys_fullToString(String & out){
   DynamicJsonDocument doc(1024);
   JsonObject root = doc.to<JsonObject>();
   JsonObject oOjbect = root.createNestedObject("device");
-  sys_networkJson(oOjbect);	
+  sys_networkJson(oOjbect); 
   sys_json(oOjbect);
   serializeJson(doc, out);
 }
