@@ -5,8 +5,8 @@ AUTHOR
 
 */
 
-#ifndef resizeBuff_h
-#define resizeBuff_h
+#ifndef RESIZEBUFF_H
+#define RESIZEBUFF_H
 
 #include "Arduino.h"
 
