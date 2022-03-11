@@ -16,7 +16,7 @@ Program * _Program = nullptr;
   void serial_menu_p_1(const String & cmd, const String & value);
   void serial_menu_p_2(const String & cmd, const String & value);
 #endif
-_Program_handleCallback(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver);
+void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver);
 
 
 void setup() {

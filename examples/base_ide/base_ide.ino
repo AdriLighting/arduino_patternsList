@@ -1,8 +1,6 @@
-
 #include "main.h"
 
 #include <arduinoPatternList.h>
-
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
@@ -13,7 +11,7 @@ Program * _Program = nullptr;
   void serial_menu(const String & cmd, const String & value);
   void serial_ESPreset(const String & cmd, const String & value);
   void serial_freeHeap(const String & cmd, const String & value);
-  void serial_menu_cmd(const String & cmd, const String & value);
+  void serial_menu_cmd(const String & cmd, const String & value);  
   void serial_menu_p_3(const String & cmd, const String & value);
   void serial_menu_p_1(const String & cmd, const String & value);
   void serial_menu_p_2(const String & cmd, const String & value);
@@ -108,9 +106,12 @@ void loop() {
   ProgramPtrGet()->handle();
 }
 
+
 void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
+
   Serial.printf_P(PSTR("[user_callback]\n\t[%d] %s\n"), itemBasePos, itemBaseName.c_str());
   ProgramPtrGet()->print(PM_LLI);
+
 }
 
 #ifdef DEBUGSERIAL
@@ -156,4 +157,3 @@ void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBas
     for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);} // debug Serial
   } 
 #endif
-

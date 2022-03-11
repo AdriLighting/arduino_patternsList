@@ -1,11 +1,11 @@
 ## Lirairies  
 ---
 Jim Lee - leftCoast  
-- ![lists](https://github.com/leftCoast/LC_baseTools) `https://drive.google.com/file/d/1lT-wj2V2yDMdxxD3QI82Enb6GBCkEgv-/view?usp=sharing`  
-- ![resizeBuff](https://github.com/leftCoast/LC_baseTools) `https://drive.google.com/file/d/1kAhTUemvxnZG_V7tRndZjkLcULPDAXVh/view?usp=sharing`  
+- ![lists](https://github.com/leftCoast/LC_baseTools)  
+- ![resizeBuff](https://github.com/leftCoast/LC_baseTools)  
 ---
 ivanseidel    
-- ![LList](https://github.com/DmytroKorniienko/FireLamp_JeeUI/blob/master/include/LList.h) `https://drive.google.com/file/d/1BZLGuW0Qv7570ETxc4MnCrJ27n74m-89/view?usp=sharing`  
+- ![LList](https://github.com/DmytroKorniienko/FireLamp_JeeUI/blob/master/include/LList.h)  
 ---
 Benoit Blanchon  
 - ![ArduinoJson](https://github.com/bblanchon/ArduinoJson) 
