@@ -23,31 +23,6 @@ Grellard Adrien
 
 ## API REST
 
-#### REQUETTE    
-<details>  
-  <pre>     
-      HTTP, JS, UDP, SOCKET 
-        JSON SYNTAX
-          op    object  fonction avec laquelle traiter le parsing + execution des commandes
-                0 = ?
-                1 = playlist items management
-          type  object  type de format (nom de commande avc String,int ETC...)
-          cli   object  porvenance: http server, websocket server, udp/multi
-          set   array   setter
-                [
-                  n object  id commande
-                  v object  valeur commoand si besoin
-                ] , 
-                [**]
-          get   array   getter
-                [  id commande ] , 
-                [**]  
-  <\pre>    
-<\details>  
-
-<hr>
-
----
 
 <br>
 
@@ -75,18 +50,21 @@ To create a dropdown containing **text**:
                 [  id commande ] , 
                 [**]  
 ```
+  
 </details>
 
 <br>
 
 Use:
 
-
+```html
+<details>
+<summary>Example</summary>
+This is a dropdown with text!
+</details>
+```
 ---
 
 <br>
-
-#### CLIENT->SERVER 
-aaa
 
    
