@@ -44,8 +44,8 @@
 
 ```c++
 Program::Program (uint8_t nbLb , boolean fs );
--nbLb   nb of basic list
--fs     filesystem management
+- nbLb    nb of basic list
+- fs      filesystem management
 ```
 ><b>MAIN INSATNCE</b>
 ```c++
@@ -246,15 +246,15 @@ extern WebserverRequest _WebserverRequest;
 ```
 ```c++
 void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & r, const String & upd);
--doc  query
--r    reponse json in String format
--upd  parmaeter for send a reponse query
+- doc   query
+- r     reponse json in String format
+- upd   parmaeter for send a reponse query
 ```
 ><b>function to use to process a user request formulated with a query in json format </b>
 ```c++
 // examples: request received from HTT_POST method
 
--with ESP8266WebServer library from framework-arduinoespressif8266
+- with ESP8266WebServer library from framework-arduinoespressif8266
 server.on("/api", HTTP_POST, std::bind(&espwebServer::handleJson, this));
 void espwebServer::handleJson() {
   if (server.method() == HTTP_POST) {
@@ -273,7 +273,7 @@ void espwebServer::handleJson() {
   }  
 }
 
--with ESPAsyncWebServer
+- with ESPAsyncWebServer
 web_server.on(requestName, HTTP_POST, [](AsyncWebServerRequest * request){}, NULL, [=](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
   String _httpCallbackData     = "";
   for (size_t i = 0; i < len; i++) {_httpCallbackData += (char) data[i];} 
