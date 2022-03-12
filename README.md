@@ -35,7 +35,7 @@
 <details>
 <summary>MAIN INSATNCE</summary>
 
-```html
+```c++
 MAIN INSATNCE  
   Program (uint8_t nbLb , boolean fs );
   nbLb  nb of basic list
@@ -44,11 +44,12 @@ EX:
   boolean fs = FILESYSTEM.begin();
   _Program = new Program(2, fs);
 ```
+<hr>
 </details>
 <details>
 <summary>basic lists</summary>
 
-```html
+```c++
 initialization of basic lists 
   void initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
   p       position of basic list array  
@@ -69,11 +70,12 @@ EX:
   _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_AB);
 
 ```
+<hr>
 </details>
 <details>
 <summary>PLAYLIST</summary>
 
-```html
+```c++
 the items of the playlists correspond to the items of the basic list attach to this playlist 
 initialization
   void initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
@@ -86,6 +88,7 @@ initialization
     const char * Ln[] = {"full",  "full",   "full",   "null",   "null"  };
     _Program->initialize_playlist(plC, iC, Ln);  
 ```
+<hr>
 </details>
 
 <hr>
@@ -124,7 +127,7 @@ curl --location --request POST 'http://192.168.0.157/api' \
 --header 'Content-Type: application/json' \
 --data-raw '{"op":0,"type":"HTTP_POST","set":[{"n":"","v":""}],"get":["loop","",""]} 
 ```
-  
+<hr>  
 </details>  
 <details>
 <summary>JAVASCRIPT - JSON</summary>
@@ -155,7 +158,7 @@ function api_request(op, type, oS, oG){
 }
 console.log(api_request(0, "SOKCET", [{"n":"s1", "v":1},{"n":"s2", "v":2}],["g1", "g2"])
 ```
-  
+<hr>  
 </details> 
 <details>
 <summary>JAVASCRIPT - XHR</summary>
@@ -186,7 +189,7 @@ xhr.setRequestHeader("Content-Type", "application/json");
 
 xhr.send(data);
 ```
-  
+<hr>  
 </details>
 </details>
 
@@ -263,10 +266,8 @@ RA_PLI_REP:         arg1, arg2
 RA_PLI_REM:         arg1, arg2  
   list_allpl    
 RA_PL_TOFS:         arg1: position of playlist list array
-
-
-  
 ```
+<hr>
 </details>
 
 ### GETTER  
@@ -285,6 +286,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
                     items array
                           value(s)
 ```
+<hr>
 </details>
 <details>
 <summary>list_lb</summary>
@@ -294,6 +296,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
             cmax  object (réelle = -1)
             items array 
 ```
+<hr>
 </details>
 
 #### BASE-LIST WITHOUT ITEMS 
@@ -310,6 +313,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
                     n     object 
                     cmax  object 
 ```
+<hr>
 </details>
 
 #### PLAYLIST WITH ITEMS 
@@ -330,6 +334,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
                       ib    object   
                       ibcfg object  
 ```
+<hr>
 </details>
 <details>
 <summary>list_allpl</summary>
@@ -349,6 +354,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
                             ib    object   
                             ibcfg object 
 ```
+<hr>
 </details>
 
 #### PLAYLIST WITHOUT ITEMS 
@@ -368,6 +374,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
                     lbl   object 
                     lref  object
 ```
+<hr>
 </details>
 <details>
 <summary>list_plsc</summary>
@@ -384,6 +391,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
                     lbl   object 
                     lref  object 
 ```
+<hr>
 </details>
 
 #### PLAYING STATU
@@ -422,6 +430,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
               min       object uint8_t (réelle)
               max       object uint8_t (réelle) 
 ```
+<hr>
 </details>
 
 #### DIVERS
@@ -432,6 +441,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
     list_ra   array
               value(s)
 ```
+<hr>
 </details>
 
 <details>
