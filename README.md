@@ -1,7 +1,9 @@
 # arduino_patternsList
 
 
-- [functioning](#FUNCTIONING )
+- [setup](#SETUP )
+- [mangement](#USER MANAGEMENT)
+- [APIREST](#API REST)
 
 ---
 ## Lirairies
