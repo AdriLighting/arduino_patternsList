@@ -1,4 +1,8 @@
 # arduino_patternsList
+
+
+- [functioning](#FUNCTIONING )
+
 ---
 ## Lirairies
 
@@ -28,7 +32,7 @@
 
 <hr>
 
-## FONCTIONNEMENT
+## FUNCTIONING 
 
 ### SETUP
 
@@ -36,7 +40,7 @@
 <summary>main insatnce</summary>
 
 ```c++
-MAIN INSATNCE  
+> MAIN INSATNCE  
   Program::Program (uint8_t nbLb , boolean fs );
   nbLb  nb of basic list
   fs    filesystem management
@@ -46,47 +50,79 @@ EX:
 ```
 <hr>
 </details>
+
 <details>
 <summary>basic lists</summary>
+<br>
+initialization  
 
 ```c++
-initialization of basic lists 
-  void Program::initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
-  - position of basic list array  
-  - id of list
-  - size of items array
-  - static const char* const items[] PROGMEM
-EX: 
-  _Program->initialize_lb(0, "full",  ARRAY_SIZE(LPALLNAMES)          , LPALLNAMES);
-  _Program->initialize_lb(1, "cat",   ARRAY_SIZE(LPALLNAMES_CAT)      , LPALLNAMES_CAT);
+void Program::initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
+- position of basic list array  
+- id of list
+- size of items array
+- static const char* const items[] PROGMEM
+```  
+```c++
+// examples: 
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))  
+static const char LPNAME_001[] PROGMEM = "toto";
+static const char LPNAME_002[] PROGMEM = "tata";
+static const char LPNAME_003[] PROGMEM = "tonton";
+static const char LPNAME_004[] PROGMEM = "felix";
+static const char LPNAME_005[] PROGMEM = "mimine";
+static const char LPNAME_006[] PROGMEM = "the cat";
+static const char* const LPALLNAMES[] PROGMEM = {
+  LPNAME_001, LPNAME_002, LPNAME_003
+};  
+static const char* const LPALLNAMES_CAT[] PROGMEM = {
+  LPNAME_004, LPNAME_005, LPNAME_006
+};  
+_Program->initialize_lb(0, "full",  ARRAY_SIZE(LPALLNAMES)          , LPALLNAMES);
+_Program->initialize_lb(1, "cat",   ARRAY_SIZE(LPALLNAMES_CAT)      , LPALLNAMES_CAT);  
+```  
 
-loading one of the basic list     
-  void Program::initialize(const uint16_t & , const char* const* arr, const char  * const &, SORT_TYPE t = ST_BASE); 
-  - size of items array
-  - static const char* const items[] PROGMEM
-  - id of basic list
-  - classification type 
-EX:
-  _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_AB);
+loading one of the basic list   
+
+```c++ 
+void Program::initialize(const uint16_t & , const char* const* arr, const char  * const &, SORT_TYPE t = ST_BASE); 
+- size of items array
+- static const char* const items[] PROGMEM
+- id of basic list
+- classification type
 
 ```
+```c++ 
+// examples: 
+_Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_AB);   
+```
+
 <hr>
 </details>
+
 <details>
 <summary>playlist</summary>
 
+<br>
+
+><b>the items of the playlists correspond to the items of the basic list attach to this playlist </b>
+
+<br>
+
+initialization  
+
 ```c++
-the items of the playlists correspond to the items of the basic list attach to this playlist 
-initialization
-  void Program::initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
-  - nb of playlist
-  - playlist item size
-  - id of basic list
-  EX:
-    uint8_t plC       = 5;
-    uint8_t iC[]      = {20,      20,        20,      0,        0       };  // nb items max
-    const char * Ln[] = {"full",  "full",   "full",   "null",   "null"  };
-    _Program->initialize_playlist(plC, iC, Ln);  
+void Program::initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
+- nb of playlist
+- playlist item size
+- id of basic list
+```
+```c++
+// examples: 
+uint8_t plC       = 5;
+uint8_t iC[]      = {20,      20,        20,      0,        0       };  // nb items max
+const char * Ln[] = {"full",  "full",   "full",   "null",   "null"  };
+_Program->initialize_playlist(plC, iC, Ln);  
 ```
 <hr>
 </details>
@@ -104,72 +140,91 @@ void Program::pl_fs_restore();    // load items save playlists
 
 ### USER MANAGEMENT
 
+
+ 
+
 <details>
-<summary>action</summary>
+<summary>global command</summary>
+
+<br>
 
 ```c++
 void Program::remote_action(RA action,  const char * const & v1 = "",  const char * const & v2 = "");  
-  EX: 
-    _Program->remote_action(RA::RA_ITEM,              "0");
-    _Program->remote_action(RA::RA_ITEM_NEXT,         );
-    _Program->remote_action(RA::RA_ITEM_PREV,         );
-    _Program->remote_action(RA::RA_ITEM_RND,          );
+```
 
-    _Program->remote_action(RA::RA_PLAY_START,        );
-    _Program->remote_action(RA::RA_PLAY_STOP,         );
-    _Program->remote_action(RA::RA_PLAY_PAUSE,        );
-    _Program->remote_action(RA::RA_PLAY_TOGGLE,       );
-    _Program->remote_action(RA::RA_PLAY_DELAY,        "10");
-    _Program->remote_action(RA::RA_PLAY_DELAYMIN,     );
-    _Program->remote_action(RA::RA_PLAY_DELAYMINON,   );
-    _Program->remote_action(RA::RA_PLAY_DELAYMINOFF,  );
-    _Program->remote_action(RA::RA_PLAY_RND,          );
+><b>function used for control general list, items, etc...</b>
 
-    _Program->remote_action(RA::RA_PLAY_PL,           );
-    _Program->remote_action(RA::RA_PLAY_LB,           );
-    _Program->remote_action(RA::RA_PLAY_LT,           );
 
-    _Program->remote_action(RA::RA_LSET_PL,           "");
-    _Program->remote_action(RA::RA_PLI_NEW,           "");
-    _Program->remote_action(RA::RA_PLI_REP,           "", "");
-    _Program->remote_action(RA::RA_PLI_REM,           "", "");
-    _Program->remote_action(RA::RA_PL_TOFS,           "");
+```c++
+// examples: 
+_Program->remote_action(RA::RA_ITEM,              "0");
+_Program->remote_action(RA::RA_ITEM_NEXT,         );
+_Program->remote_action(RA::RA_ITEM_PREV,         );
+_Program->remote_action(RA::RA_ITEM_RND,          );
+
+_Program->remote_action(RA::RA_PLAY_START,        );
+_Program->remote_action(RA::RA_PLAY_STOP,         );
+_Program->remote_action(RA::RA_PLAY_PAUSE,        );
+_Program->remote_action(RA::RA_PLAY_TOGGLE,       );
+_Program->remote_action(RA::RA_PLAY_DELAY,        "10");
+_Program->remote_action(RA::RA_PLAY_DELAYMIN,     );
+_Program->remote_action(RA::RA_PLAY_DELAYMINON,   );
+_Program->remote_action(RA::RA_PLAY_DELAYMINOFF,  );
+_Program->remote_action(RA::RA_PLAY_RND,          );
+
+_Program->remote_action(RA::RA_PLAY_PL,           );
+_Program->remote_action(RA::RA_PLAY_LB,           );
+_Program->remote_action(RA::RA_PLAY_LT,           );
+
+_Program->remote_action(RA::RA_LSET_PL,           "0");
+_Program->remote_action(RA::RA_PLI_NEW,           "0");
+_Program->remote_action(RA::RA_PLI_REP,           "0", "0");
+_Program->remote_action(RA::RA_PLI_REM,           "0", "0");
+_Program->remote_action(RA::RA_PL_TOFS,           "0");
 
 
 ```
 <hr>
 </details>
 </details>
+
 <details>
-<summary>user callback</summary>
+<summary>items roation</summary>
+
+<br>
 
 ```c++
 typedef std::function<void(const String & v1, const uint16_t & v2, boolean upd)> callback_function_t;
-void Program::set_callback(callback_function_t); 
-  EX:
-    void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
+void Program::set_callback(callback_function_t);
+```
 
-      String heap, time;
-      on_timeD(time);
-      _HeapStatu.update();_HeapStatu.print(heap);
-      Serial.printf_P(PSTR("[user_callback]\n\t[%d] %s\n\t%-15s%s\n"), itemBasePos, itemBaseName.c_str(), time.c_str(), heap.c_str());
-      ProgramPtrGet()->print(PM_LLI);
+><b>callback function used for the rotation of items list</b>
 
-      if (!updWebserver) return; 
-       
-      String                    rep;
-      DynamicJsonDocument       reponse(2048);
-      webserverRequest_reponse  * _webserverRequest_reponse = new webserverRequest_reponse[1];
+```c++
+// examples: 
+void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
 
-      _webserverRequest_reponse[0].set_ra(RA::RA_ITEM_NEXT);
-      _webserverRequest_reponse[0].make_reponse(reponse);
-      serializeJson(reponse, rep); 
+  String heap, time;
+  on_timeD(time);
+  _HeapStatu.update();_HeapStatu.print(heap);
+  Serial.printf_P(PSTR("[user_callback]\n\t[%d] %s\n\t%-15s%s\n"), itemBasePos, itemBaseName.c_str(), time.c_str(), heap.c_str());
+  ProgramPtrGet()->print(PM_LLI);
 
-      delete[] _webserverRequest_reponse; 
-      _Webserver.socket_send(rep);   
-    }
+  if (!updWebserver) return; 
+   
+  String                    rep;
+  DynamicJsonDocument       reponse(2048);
+  webserverRequest_reponse  * _webserverRequest_reponse = new webserverRequest_reponse[1];
 
-    _Program->set_callback(_Program_cb);
+  _webserverRequest_reponse[0].set_ra(RA::RA_ITEM_NEXT);
+  _webserverRequest_reponse[0].make_reponse(reponse);
+  serializeJson(reponse, rep); 
+
+  delete[] _webserverRequest_reponse; 
+  _Webserver.socket_send(rep);   
+}
+
+_Program->set_callback(_Program_cb);
 
 ```
 <hr>
@@ -183,7 +238,7 @@ void Program::set_callback(callback_function_t);
 ### REQUEST
 
 <details>
-<summary>request</summary>
+<summary>request syntax</summary>
 
 ```html
 HTTP_POST, UDP, SOCKET 
@@ -203,7 +258,7 @@ HTTP_POST, UDP, SOCKET
           [  id commande ] , 
           [**]  
 ```
-
+</details>
 <details>
 <summary>curl</summary>
   
@@ -275,7 +330,6 @@ xhr.setRequestHeader("Content-Type", "application/json");
 xhr.send(data);
 ```
 <hr>  
-</details>
 </details>
 
 
