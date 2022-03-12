@@ -2,8 +2,9 @@
 
 
 - [setup](#SETUP )
-- [mangement](#USER MANAGEMENT)
-- [APIREST](#API REST)
+- [mangement](#USER_MANAGEMENT)
+- [request](#REQUEST_MANAGEMENT)
+- [api](#API_REST)
 
 ---
 ## Lirairies
@@ -149,7 +150,7 @@ _Program->pl_fs_restore();
 <hr>
 </details>
 
-### USER MANAGEMENT
+### USER_MANAGEMENT
 
 <details>
 <summary>global command</summary>
@@ -230,7 +231,7 @@ _Program->set_callback(_Program_cb);
 <hr>
 </details>
 
-### REQUEST MANAGEMENT
+### REQUEST_MANAGEMENT
 
 <details>
 <summary>parsing</summary>
@@ -294,7 +295,7 @@ web_server.on(requestName, HTTP_POST, [](AsyncWebServerRequest * request){}, NUL
 
 <hr>
 
-## API REST
+## API_REST
 
 ### REQUEST
 
