@@ -198,7 +198,7 @@ typedef std::function<void(const String & v1, const uint16_t & v2, boolean upd)>
 void Program::set_callback(callback_function_t);
 ```
 
-><b>callback function used for the rotation of items list</b>
+><b>callback function used when an item is loaded</b>
 
 ```c++
 // examples: 
