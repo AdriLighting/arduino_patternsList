@@ -12,7 +12,7 @@
 #include "../include/webserverRequest.h"
 
 
-// #define DEBUG
+#define DEBUG
 
 LList<ListSortItems*> ListSortItemsPtr; 
 void ListSortItems_sort(SORT_TYPE _effSort) {
@@ -362,21 +362,22 @@ void Program::handle(){
 }
 void Program::set_callback(callback_function_t f)  {_callback = std::move(f);}
 
-void Program::remote_action(RA action, ...){
+void Program::remote_action(RA action, const char * const & key, const char * const & val){
   #ifdef DEBUG
     Serial.printf_P(PSTR("RA %-4d[%-20s]: "), action, RAALLNAMES[action]);  
   #endif
-  char *key = NULL, *val = NULL, *key_val = NULL;
-  va_list prm;
-  va_start(prm, action);
-  while ((key_val = (char *)va_arg(prm, char *)) && (val = (char *)va_arg(prm, char *))) {
-     key = key_val;
-  }
-  va_end(prm);
+  // char *key = NULL, *val = NULL, *key_val = NULL;
+  // va_list prm;
+  // va_start(prm, action);
+  // while ((key_val = (char *)va_arg(prm, char *)) && (val = (char *)va_arg(prm, char *))) {
+  //    key = key_val;
+  //    Serial.printf_P(PSTR("%s = %s\n"), key, val);
+  // }
+  // va_end(prm);
   #ifdef DEBUG
     Serial.println("");  
     if(String(key) != "") Serial.printf_P( PSTR("\t[key: %s]\n"), key);  
-    if(String(val) != "") Serial.printf_P( PSTR("\t[val: %s]\n"), val);     
+    if(String(val) != "") Serial.printf_P( PSTR("\t[val: %s]\n"), val);  
   #endif
 
   const char * pN;
@@ -409,13 +410,13 @@ void Program::remote_action(RA action, ...){
     break;
     case RA::RA_LGET_PL:
     break;
-    case RA::RA_PLI_NEW: if(String(key) != "") pl_item_new((uint8_t)atoi(key)); break;    
-    case RA::RA_PLI_REP: if((String(key) != "") && (String(val) != ""))pl_item_new((uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
-    case RA::RA_PLI_REM: if((String(key) != "") && (String(val) != ""))pl_item_remove((uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
+    case RA::RA_PLI_NEW: if (String(key) != "") pl_item_new((uint8_t)atoi(key)); break;    
+    case RA::RA_PLI_REP: if ((String(key) != "") && (String(val) != "")) pl_item_new(     (uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
+    case RA::RA_PLI_REM: if ((String(key) != "") && (String(val) != "")) pl_item_remove(  (uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
     case RA::RA_PL_TOFS:
-    #ifdef FSOK
-      if(String(key) != "") pl_fs((uint8_t)atoi(key)); 
-    #endif
+      #ifdef FSOK
+        if(String(key) != "") pl_fs((uint8_t)atoi(key)); 
+      #endif
     break;    
 
     default:break;
@@ -614,7 +615,7 @@ void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & re
 }
 
 void Program::pl_item_toArray(uint8_t pP, uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg) {
-  uint8_t pos = _Playlists[pP].item_toArray(iP,lbl,itemBase,itemBaseCfg);
+  _Playlists[pP].item_toArray(iP,lbl,itemBase,itemBaseCfg);
   // pl_fs( pP,  pos);
 }
 boolean Program::pl_item_removeitemIdByArrayPos(uint8_t pP, uint8_t aP) {

@@ -115,7 +115,7 @@
 
     void print(PRINT_MOD mod) ;
 
-    void remote_action(RA action, ...);
+    void remote_action(RA action,  const char * const & v1 = "",  const char * const & v2 = "");
 
     // boolean get_pl_itemIdByArrayPos(uint8_t aP); 
   };

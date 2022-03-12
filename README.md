@@ -33,11 +33,11 @@
 ### SETUP
 
 <details>
-<summary>MAIN INSATNCE</summary>
+<summary>main insatnce</summary>
 
 ```c++
 MAIN INSATNCE  
-  Program (uint8_t nbLb , boolean fs );
+  Program::Program (uint8_t nbLb , boolean fs );
   nbLb  nb of basic list
   fs    filesystem management
 EX:
@@ -51,21 +51,21 @@ EX:
 
 ```c++
 initialization of basic lists 
-  void initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
-  p       position of basic list array  
-  name    id of list
-  items   size of items array
-  arr     static const char* const items[] PROGMEM
+  void Program::initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
+  - position of basic list array  
+  - id of list
+  - size of items array
+  - static const char* const items[] PROGMEM
 EX: 
   _Program->initialize_lb(0, "full",  ARRAY_SIZE(LPALLNAMES)          , LPALLNAMES);
   _Program->initialize_lb(1, "cat",   ARRAY_SIZE(LPALLNAMES_CAT)      , LPALLNAMES_CAT);
 
 loading one of the basic list     
-  void initialize(const uint16_t & , const char* const* arr, const char  * const &, SORT_TYPE t = ST_BASE); 
-          size of items array
-          static const char* const items[] PROGMEM
-          id of basic list
-          classification type 
+  void Program::initialize(const uint16_t & , const char* const* arr, const char  * const &, SORT_TYPE t = ST_BASE); 
+  - size of items array
+  - static const char* const items[] PROGMEM
+  - id of basic list
+  - classification type 
 EX:
   _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_AB);
 
@@ -73,15 +73,15 @@ EX:
 <hr>
 </details>
 <details>
-<summary>PLAYLIST</summary>
+<summary>playlist</summary>
 
 ```c++
 the items of the playlists correspond to the items of the basic list attach to this playlist 
 initialization
-  void initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
-          nb of playlist
-          playlist item size
-          id of basic list
+  void Program::initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
+  - nb of playlist
+  - playlist item size
+  - id of basic list
   EX:
     uint8_t plC       = 5;
     uint8_t iC[]      = {20,      20,        20,      0,        0       };  // nb items max
@@ -91,6 +91,91 @@ initialization
 <hr>
 </details>
 
+<details>
+<summary>filesystem</summary>
+
+```c++
+void Program::pl_fs_restore();    // load items save playlists 
+  EX:
+    _Program->pl_fs_restore(); 
+```
+<hr>
+</details>
+
+### USER MANAGEMENT
+
+<details>
+<summary>action</summary>
+
+```c++
+void Program::remote_action(RA action,  const char * const & v1 = "",  const char * const & v2 = "");  
+  EX: 
+    _Program->remote_action(RA::RA_ITEM,              "0");
+    _Program->remote_action(RA::RA_ITEM_NEXT,         );
+    _Program->remote_action(RA::RA_ITEM_PREV,         );
+    _Program->remote_action(RA::RA_ITEM_RND,          );
+
+    _Program->remote_action(RA::RA_PLAY_START,        );
+    _Program->remote_action(RA::RA_PLAY_STOP,         );
+    _Program->remote_action(RA::RA_PLAY_PAUSE,        );
+    _Program->remote_action(RA::RA_PLAY_TOGGLE,       );
+    _Program->remote_action(RA::RA_PLAY_DELAY,        "10");
+    _Program->remote_action(RA::RA_PLAY_DELAYMIN,     );
+    _Program->remote_action(RA::RA_PLAY_DELAYMINON,   );
+    _Program->remote_action(RA::RA_PLAY_DELAYMINOFF,  );
+    _Program->remote_action(RA::RA_PLAY_RND,          );
+
+    _Program->remote_action(RA::RA_PLAY_PL,           );
+    _Program->remote_action(RA::RA_PLAY_LB,           );
+    _Program->remote_action(RA::RA_PLAY_LT,           );
+
+    _Program->remote_action(RA::RA_LSET_PL,           "");
+    _Program->remote_action(RA::RA_PLI_NEW,           "");
+    _Program->remote_action(RA::RA_PLI_REP,           "", "");
+    _Program->remote_action(RA::RA_PLI_REM,           "", "");
+    _Program->remote_action(RA::RA_PL_TOFS,           "");
+
+
+```
+<hr>
+</details>
+</details>
+<details>
+<summary>user callback</summary>
+
+```c++
+typedef std::function<void(const String & v1, const uint16_t & v2, boolean upd)> callback_function_t;
+void Program::set_callback(callback_function_t); 
+  EX:
+    void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
+
+      String heap, time;
+      on_timeD(time);
+      _HeapStatu.update();_HeapStatu.print(heap);
+      Serial.printf_P(PSTR("[user_callback]\n\t[%d] %s\n\t%-15s%s\n"), itemBasePos, itemBaseName.c_str(), time.c_str(), heap.c_str());
+      ProgramPtrGet()->print(PM_LLI);
+
+      if (!updWebserver) return; 
+       
+      String                    rep;
+      DynamicJsonDocument       reponse(2048);
+      webserverRequest_reponse  * _webserverRequest_reponse = new webserverRequest_reponse[1];
+
+      _webserverRequest_reponse[0].set_ra(RA::RA_ITEM_NEXT);
+      _webserverRequest_reponse[0].make_reponse(reponse);
+      serializeJson(reponse, rep); 
+
+      delete[] _webserverRequest_reponse; 
+      _Webserver.socket_send(rep);   
+    }
+
+    _Program->set_callback(_Program_cb);
+
+```
+<hr>
+</details>
+
+
 <hr>
 
 ## API REST
@@ -98,7 +183,7 @@ initialization
 ### REQUEST
 
 <details>
-<summary>REQUEST</summary>
+<summary>request</summary>
 
 ```html
 HTTP_POST, UDP, SOCKET 
@@ -120,7 +205,7 @@ HTTP_POST, UDP, SOCKET
 ```
 
 <details>
-<summary>CURL</summary>
+<summary>curl</summary>
   
 ```html
 curl --location --request POST 'http://192.168.0.157/api' \
@@ -130,7 +215,7 @@ curl --location --request POST 'http://192.168.0.157/api' \
 <hr>  
 </details>  
 <details>
-<summary>JAVASCRIPT - JSON</summary>
+<summary>javascript - json</summary>
   
 ```javascript
 function api_request(op, type, oS, oG){
@@ -161,7 +246,7 @@ console.log(api_request(0, "SOKCET", [{"n":"s1", "v":1},{"n":"s2", "v":2}],["g1"
 <hr>  
 </details> 
 <details>
-<summary>JAVASCRIPT - XHR</summary>
+<summary>javascript - xhr</summary>
   
 ```javascript
 var data = JSON.stringify({
@@ -197,7 +282,7 @@ xhr.send(data);
 ### SETTER  
 
 <details>
-<summary>ID WITH REPONSE</summary>
+<summary>id with reponse</summary>
 
 ```html
 RA_ITEM:             arg1: position of items list array
