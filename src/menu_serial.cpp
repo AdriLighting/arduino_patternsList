@@ -156,7 +156,6 @@ void SerialRead::read(String a){
             if (a.indexOf(_cmd_3_sep)>=0) {
                  splitText(a, _cmd_3_sep, cmd,  value) ; 
                 _cmd_3(cmd, value);
-                next = false;  
                 return;
             }   
         }   
@@ -164,7 +163,6 @@ void SerialRead::read(String a){
             if (a.indexOf(_cmd_4_sep)>=0) {
                  splitText(a, _cmd_4_sep, cmd,  value) ; 
                 _cmd_4(cmd, value);
-                next = false;  
                 return;
             }                            
         } 
@@ -172,9 +170,10 @@ void SerialRead::read(String a){
             for (int i = 0; i < _cmd_1_cnt; ++i) {
                 if (a.indexOf(_cmd_1_Array[i]._key)>=0 ) {
                     _cmd_1_Array[i]._function("", "");
+                    break;
                 }
             }                        
-        }        
+        }       
         
     // }       
 }
