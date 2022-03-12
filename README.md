@@ -40,13 +40,20 @@
 <summary>main insatnce</summary>
 
 ```c++
-> MAIN INSATNCE  
-  Program::Program (uint8_t nbLb , boolean fs );
-  nbLb  nb of basic list
-  fs    filesystem management
-EX:
-  boolean fs = FILESYSTEM.begin();
-  _Program = new Program(2, fs);
+Program::Program (uint8_t nbLb , boolean fs );
+-nbLb   nb of basic list
+-fs     filesystem management
+```
+><b>MAIN INSATNCE</b>
+```c++
+// examples:
+Program * _Program = nullptr;
+boolean fs = FILESYSTEM.begin();
+_Program = new Program(2, fs);
+
+// examples:
+Program * _Program = nullptr;
+_Program = new Program(2, false);
 ```
 <hr>
 </details>
@@ -81,7 +88,7 @@ static const char* const LPALLNAMES_CAT[] PROGMEM = {
 _Program->initialize_lb(0, "full",  ARRAY_SIZE(LPALLNAMES)          , LPALLNAMES);
 _Program->initialize_lb(1, "cat",   ARRAY_SIZE(LPALLNAMES_CAT)      , LPALLNAMES_CAT);  
 ```  
-
+<br>
 loading one of the basic list   
 
 ```c++ 
@@ -106,7 +113,6 @@ _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_A
 <br>
 
 ><b>the items of the playlists correspond to the items of the basic list attach to this playlist </b>
-
 <br>
 
 initialization  
@@ -131,29 +137,26 @@ _Program->initialize_playlist(plC, iC, Ln);
 <summary>filesystem</summary>
 
 ```c++
-void Program::pl_fs_restore();    // load items save playlists 
-  EX:
-    _Program->pl_fs_restore(); 
+void Program::pl_fs_restore();  
+```
+><b>load saved playlists items from spiff memory</b>
+```c++
+// examples: 
+_Program->pl_fs_restore(); 
 ```
 <hr>
 </details>
 
 ### USER MANAGEMENT
 
-
- 
-
 <details>
 <summary>global command</summary>
-
 <br>
 
 ```c++
 void Program::remote_action(RA action,  const char * const & v1 = "",  const char * const & v2 = "");  
 ```
-
 ><b>function used for control general list, items, etc...</b>
-
 
 ```c++
 // examples: 
@@ -181,8 +184,6 @@ _Program->remote_action(RA::RA_PLI_NEW,           "0");
 _Program->remote_action(RA::RA_PLI_REP,           "0", "0");
 _Program->remote_action(RA::RA_PLI_REM,           "0", "0");
 _Program->remote_action(RA::RA_PL_TOFS,           "0");
-
-
 ```
 <hr>
 </details>
@@ -190,16 +191,13 @@ _Program->remote_action(RA::RA_PL_TOFS,           "0");
 
 <details>
 <summary>items roation</summary>
-
 <br>
 
 ```c++
 typedef std::function<void(const String & v1, const uint16_t & v2, boolean upd)> callback_function_t;
 void Program::set_callback(callback_function_t);
 ```
-
 ><b>callback function used when an item is loaded</b>
-
 ```c++
 // examples: 
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
@@ -230,6 +228,67 @@ _Program->set_callback(_Program_cb);
 <hr>
 </details>
 
+### REQUEST MANAGEMENT
+
+<details>
+<summary>parsing</summary>
+<br>
+
+```c++
+class WebserverRequest;
+```
+><b>a static instance is already instanced</b>
+```c++
+extern WebserverRequest _WebserverRequest;
+```
+```c++
+void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & r, const String & upd);
+-doc  query
+-r    reponse json in String format
+-upd  parmaeter for send a reponse query
+```
+><b>function to use to process a user request formulated with a query in json format </b>
+```c++
+// examples: request received from HTT_POST method
+
+-with ESP8266WebServer library from framework-arduinoespressif8266
+server.on("/api", HTTP_POST, std::bind(&espwebServer::handleJson, this));
+void espwebServer::handleJson() {
+  if (server.method() == HTTP_POST) {
+    String json;
+    for (uint8_t i = 0; i < server.args(); i++) {json +=  server.arg(i) + "\n";}        
+    DynamicJsonDocument doc(2048);  
+    DeserializationError error = deserializeJson(doc, json);
+    if (error) {
+      server.send(200, "text/plain", "");
+    } else {
+      String reponse;
+      _WebserverRequest.parsingRequest(doc, reponse, "");
+      server.send(200, "application/json", reponse);
+    } 
+    
+  }  
+}
+
+-with ESPAsyncWebServer
+web_server.on(requestName, HTTP_POST, [](AsyncWebServerRequest * request){}, NULL, [=](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {
+  String _httpCallbackData     = "";
+  for (size_t i = 0; i < len; i++) {_httpCallbackData += (char) data[i];} 
+
+  // the rest of the parsing process must be executed asynchronously, but for example I put it here      
+  DynamicJsonDocument doc(2048);  
+  DeserializationError error = deserializeJson(doc, json);
+  if (error) {
+    request->send(200, "text/plain", "");
+  } else {
+    String reponse;
+    _WebserverRequest.parsingRequest(doc, reponse, "");
+    request->send(200, "application/json", reponse);
+  } 
+});
+```
+<hr>
+</details>
 
 <hr>
 
