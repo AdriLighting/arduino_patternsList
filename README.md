@@ -14,7 +14,7 @@
 
 #### Jim Lee - leftCoast  
 - ![lists](https://github.com/leftCoast/LC_baseTools) 
-  -   `https://drive.google.com/file/d/1lT-wj2V2yDMdxxD3QI82Enb6GBCkEgv-/view?usp=sharing`  
+  - `https://drive.google.com/file/d/1lT-wj2V2yDMdxxD3QI82Enb6GBCkEgv-/view?usp=sharing`  
 - ![resizeBuff](https://github.com/leftCoast/LC_baseTools) 
   - `https://drive.google.com/file/d/1kAhTUemvxnZG_V7tRndZjkLcULPDAXVh/view?usp=sharing`  
 ---
@@ -29,13 +29,15 @@
 - ![framework-arduinoespressif8266 3.30002.0 (3.0.2) ](https://github.com/esp8266/Arduino) 
 ---
 #### Grellard Adrien  
-- ![AdriLighting_millisTimer](https://github.com/AdriLighting/millisTimer.git) 
+- ![millisTimer](https://github.com/AdriLighting/millisTimer.git) 
 
 </details>
 
 <hr>
 
 ## FUNCTIONING 
+
+### preprocessor
 
 ### SETUP
 
@@ -47,7 +49,7 @@ Program::Program (uint8_t nbLb , boolean fs );
 - nbLb    nb of basic list
 - fs      filesystem management
 ```
-><b>MAIN INSATNCE</b>
+``MAIN INSATNCE``
 ```c++
 // examples:
 Program * _Program = nullptr;
@@ -325,9 +327,9 @@ HTTP_POST, UDP, SOCKET
 <summary>curl</summary>
   
 ```html
-curl --location --request POST 'http://192.168.0.157/api' \
---header 'Content-Type: application/json' \
---data-raw '{"op":0,"type":"HTTP_POST","set":[{"n":"","v":""}],"get":["loop","",""]} 
+curl  --location --request POST 'http://192.168.0.157/api'  \
+      --header 'Content-Type: application/json'             \
+      --data-raw '{"op":0,"type":"HTTP_POST","set":[{"n":"RA_PLAY_DELAY","v":"35"}],"get":["loop","list_pl",""]}'
 ```
 <hr>  
 </details>  
@@ -358,7 +360,7 @@ function api_request(op, type, oS, oG){
   
   return JSON.stringify(json) ;;
 }
-console.log(api_request(0, "SOKCET", [{"n":"s1", "v":1},{"n":"s2", "v":2}],["g1", "g2"])
+console.log(api_request(0, "SOKCET", [{"n":"RA_PLAY_DELAY", "v":10},{"n":"RA_PLAY_START", "v":""}],["loop", "list_pl"])
 ```
 <hr>  
 </details> 
@@ -492,6 +494,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <details>
 <summary>list_lb</summary>
 
+`basic list items`
 ```html
   list_lb   object
             cmax  object (réelle = -1)

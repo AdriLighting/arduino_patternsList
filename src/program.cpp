@@ -12,7 +12,12 @@
 #include "../include/webserverRequest.h"
 
 
-#define DEBUG
+// #define DEBUG
+#ifndef DEBUG
+  #ifdef PROGRAM_DEBUG
+    #define DEBUG
+  #endif
+#endif
 
 LList<ListSortItems*> ListSortItemsPtr; 
 void ListSortItems_sort(SORT_TYPE _effSort) {
@@ -193,6 +198,7 @@ void Program::print(PRINT_MOD mod){
     default:
     break;
   }  
+  yield();
 }
 
 void Program::get_json_statu(JsonObject & obj){

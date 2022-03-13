@@ -3,7 +3,11 @@
 #include "../include/constants.h"
 
 // #define DEBUG
-
+#ifndef DEBUG
+  #ifdef PLAYLIST_DEBUG
+    #define DEBUG
+  #endif
+#endif
 
 void Playlist_list::set_listRef     (const char  * const & v1)  {_listRef = v1;}
 void Playlist_list::set_pos         (uint8_t v1)                {_pos = v1;}
@@ -178,7 +182,7 @@ void Playlist_list::item_print(){
   for (int i = 0; i < _items_cnt; ++i) _Playlist_itemArray[i].print();
 }
 void Playlist_item::print(){
-  Serial.printf_P(PSTR("\t[pos: %5d] [lbl: %-15s] [itemBase: %-15s] [itemBaseCfg: %-15s]\n"), 
+  Serial.printf_P(PSTR("\t[pos: %5d] [lbl: %-25s] [itemBase: %-25s] [itemBaseCfg: %-25s]\n"), 
     _id,
     _lbl.c_str(),
     _itemBase.c_str(),

@@ -187,7 +187,6 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
     // if (doc.containsKey(F("type"))) Serial.printf("type: %s\n",   doc[F("type")].as<String>().c_str());   
 
 
-
     if (doc.containsKey(F("set"))) {
       arr                       = doc[F("set")].as<JsonArray>();
       sizeReponse               = arr.size();
@@ -213,7 +212,6 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
       }
     }
 
-
     // GETTER
     if (doc.containsKey(F("get"))) {
       arr = doc[F("get")].as<JsonArray>();
@@ -222,60 +220,60 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
         if (req == "") continue;
 
         // list_alllb
-      	if (req == FPSTR(REQ_001)) {
+        if (req == FPSTR(REQ_001)) {
           var = reponse.createNestedObject(FPSTR(REQ_001));
           pPtr->get_json_lb_items(var);}
         // list_lb
-        if (req == FPSTR(REQ_002)) {
+        else if (req == FPSTR(REQ_002)) {
           var = reponse.createNestedObject(FPSTR(REQ_002));
           pPtr->jsonObject(var);} 
         // list_allpl
-        if (req == FPSTR(REQ_003)) {
+        else if (req == FPSTR(REQ_003)) {
           var = reponse.createNestedObject(FPSTR(REQ_003));
           pPtr->get_json_allpl_items(var);} 
         // list_pl
-        if (req == FPSTR(REQ_004)) {
+        else if (req == FPSTR(REQ_004)) {
           var = reponse.createNestedObject(FPSTR(REQ_004));
           pPtr->get_json_pl_items(var);} 
         // loop
-        if (req == FPSTR(REQ_005)) {
+        else if (req == FPSTR(REQ_005)) {
           var = reponse.createNestedObject(FPSTR(REQ_005));
           pPtr->get_json_jsInit(var);} 
         // list
-        if (req == FPSTR(REQ_006)) {
+        else if (req == FPSTR(REQ_006)) {
           var = reponse.createNestedObject(FPSTR(REQ_006));
           pl = var.createNestedObject(FPSTR(REP_003)); // lb
           pPtr->get_json_lb_items(pl,false);
           pl = var.createNestedObject(FPSTR(REP_001)); // pl
           pPtr->get_json_allpl_items(pl,false);} 
         // list_lbs
-        if (req == FPSTR(REQ_007)) {
+        else if (req == FPSTR(REQ_007)) {
           var = reponse.createNestedObject(FPSTR(REQ_006));
           pl = var.createNestedObject(FPSTR(REP_003)); // lb;
           pPtr->get_json_lb_items(pl,false);} 
         // list_pls
-        if (req == FPSTR(REQ_008)) {
+        else if (req == FPSTR(REQ_008)) {
           var = reponse.createNestedObject(FPSTR(REQ_006));
           pl = var.createNestedObject(FPSTR(REP_001)); // pl
           pPtr->get_json_allpl_items(pl,false);} 
         // list_ra
-        if (req == FPSTR(REQ_009)) {
+        else if (req == FPSTR(REQ_009)) {
           size = ARRAY_SIZE(RAALLNAMES);
           JsonArray arr2 = reponse.createNestedArray(FPSTR(REQ_009));
           for (int j = 0; j < size; ++j) {arr2.add(FPSTR(RAALLNAMES[j]));}}  
         // list_req         
-        if (req == FPSTR(REQ_010)) {
+        else if (req == FPSTR(REQ_010)) {
           size = ARRAY_SIZE(REQALL);
           JsonArray arr2 = reponse.createNestedArray(FPSTR(REQ_010));
           for (int j = 0; j < size; ++j) {arr2.add(FPSTR(REQALL[j]));}} 
         // list_lbpl
-        if (req == FPSTR(REQ_011)) {
+        else if (req == FPSTR(REQ_011)) {
           var = reponse.createNestedObject(FPSTR(REQ_002)); // list_lb
           pPtr->jsonObject(var);
           var = reponse.createNestedObject(FPSTR(REQ_004)); // list_pl
           pPtr->get_json_pl_items(var);}
         // js_init
-        if (req == FPSTR(REQ_012)) {
+        else if (req == FPSTR(REQ_012)) {
           if ((pPtr->_plStatu.isPlaying && pPtr->_plStatu.isSet)) {
             var = reponse.createNestedObject(FPSTR(REQ_004)); // list_pl
             pPtr->get_json_pl_items(var);}
@@ -291,12 +289,12 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
           pl = var.createNestedObject(FPSTR(REP_006)); // plc
           ProgramPtrGet()->get_json_allpl_items(pl,false,true);}
         // list_plsc
-        if (req == FPSTR(REQ_013)) {
+        else if (req == FPSTR(REQ_013)) {
           var = reponse.createNestedObject(FPSTR(REQ_006)); // list
           pl = var.createNestedObject(FPSTR(REP_006)); // plc
           pPtr->get_json_allpl_items(pl,false, true);}      
         // listc
-        if (req == FPSTR(REQ_014)) {
+        else if (req == FPSTR(REQ_014)) {
           var = reponse.createNestedObject(FPSTR(REQ_006)); // list
           pl = var.createNestedObject(FPSTR(REP_003)); // lb
           pPtr->get_json_lb_items(pl,false);
@@ -311,9 +309,7 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
       delete[] _webserverRequest_reponse;
       yield(); 
     }
-    
     serializeJson(reponse, rep);
-
 }
 
 /*

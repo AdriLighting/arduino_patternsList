@@ -1,5 +1,12 @@
 #include "../include/patterns.h"
 
+// #define DEBUG
+#ifndef DEBUG
+  #ifdef BASICLIST_DEBUG
+    #define DEBUG
+  #endif
+#endif
+
 Listbase * ListbasePtr = nullptr;
 Listbase * ListbasePtrGet(){return ListbasePtr;}
 Listbase::Listbase(){   
