@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+     <meta charset=UTF-8>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ArduinoPaterrn - Demo</title>
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="www/asset/css/style_2.css" />
+    <link rel="stylesheet" href="www/asset/css/style_1.css" />
+  </head>
+
+  <body>
+    <nav class="navbar-dark fixed-top navbar_pad card-no" style="background-color: #CCCCCC;" >
+      <div class="container-fluid" id="">
+        <a class="btn menu-btn" id="menu-btn" ><i class="bx " style="color: #000;">Menu</i></a>
+      </div>
+    </nav>
+    <div class="side-navbar active-nav d-flex justify-content-between flex-wrap flex-column card" id="sidebar" style="padding-top: 65px; border-radius: 0px;">
+      <ul class="nav flex-column" id="nav_accordion">
+        <li><a class="nav-link" href="#" onclick="showGrp(3)">Acueuill</a></li>
+        <hr style="margin-top: 0px; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px "></hr> 
+        <li><a class="nav-link" href="#" onclick="showGrp(0)">Panel</a></li>
+        <hr style="margin-top: 0px; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px "></hr>
+        <li><a class="nav-link" href="#" onclick="showGrp(1)">Playlist</a></li>
+      </ul>
+    </div>
+    <div class="my-container active-cont" style="padding-top: 65px; padding-left: 10px; padding-right: 10px; ">
+      <div id = "grp_homme">
+        <div class="container mt-3 mb-4 bg-light p-2 rounded card">
+          <h5 class="text-dark text-center mb-0"><i>Arduino patternList library</i></h5>  
+        </div>
+      </div>
+      <div id = "grp_liste" style="display: none;">
+        <div id = "grp_lb" class="container mt-3 mb-4 bg-light p-1 rounded card">
+          <div class="row justify-content-center">
+            <div class="col">
+              <h5 class="text-dark text-center">Statu</h5>
+              <div class="table-responsive"> 
+                <table class="table text-center" id="table_lb">
+                  <thead><tr><th>name</th><th>pos</th><th>cnt</th><th>iname</th><th>icnt</th><th>icmax</th><th>pos</th></tr></thead>
+                  <tbody><tr></tr></tbody>
+                </table>
+              </div> 
+            </div>
+          </div>
+        </div>  
+        <div id = "grp_pl" class="container mt-3 mb-4 bg-light p-1 rounded card">
+          <div class="row justify-content-center">
+            <div class="col">
+              <h5 class="text-dark text-center">Statu</h5>
+              <div class="table-responsive"> 
+                <table class="table text-center" id="table_plDisp">
+                  <thead><tr><th>ib</th><th>pos</th></tr></thead>
+                  <tbody><tr></tr></tbody>
+                </table>
+              </div> 
+            </div>
+          </div>
+        </div>  
+        <div class="container mt-4 mb-4 bg-light p-2 rounded card" >
+          <div class="row justify-content-center">
+            <div class="col">
+              <h5 class="text-dark text-center">Elements</h5>
+              <div class="form-group"><select id="cmb_lb" class="form-select"></select></div>
+            </div>
+          </div>
+        </div>
+        <div class="container mt-4 mb-4 bg-light p-1 rounded card">
+          <div class="row justify-content-center">
+            <div class="col">
+              <h5 class="text-dark text-center">Rotation</h5>
+              <div class="table-responsive"> 
+                <table class="table text-center" id="table_ap">
+                  <thead><tr><th>play</th><th>pause</th><th>rnd</th><th>delay</th><th>delaymin</th></tr></thead>
+                  <tbody><tr></tr></tbody>
+                </table>
+              </div> 
+            </div>
+          </div>
+        </div>
+        <div class="container mt-4 mb-4 bg-light p-2 rounded card">
+          <div class="row justify-content-center">
+            <div class="col">
+              <h5 class="text-dark text-center">Navigation</h5>
+              <div class="table-responsive ap"></div>
+              <div id="pl_statu" class="row justify-content-center">
+                <div class="col">
+                  <h5 class="text-dark text-center">Playlist</h5>
+                  <div class="table-responsive"> 
+                    <table class="table text-center" id="table_pl">
+                      <thead><tr><th>set</th><th>play</th><th>pos</th><th>cnt</th></tr></thead>
+                      <tbody><tr></tr></tbody>
+                    </table>
+                  </div> 
+                </div>
+              </div>
+              <div class="row" style="margin-left: 5px;">
+                <div class="col-sm-3">
+                  <h5 class="text-dark">Selection playlist</h5>
+                  <div class="form-group"><select id="cmb_pll" class="form-select"></select></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id = "grp_playlist" style="display: none;">
+        <div class="container mt-3 mb-4 bg-light p-2 rounded card">
+          <div class="row">     
+            <div class="col-sm-3">
+              <h5 class="text-dark">Playlist</h5>
+              <div class="form-group"><select id="cmb_plld" class="form-select"></select></div>
+            </div>
+            <div class="col">
+              <h5 class="text-dark">Items</h5> 
+              <select id="cmb_pli" class="form-select"></select>
+            </div>
+          </div>
+          <div class="row mt-3">    
+            <div class="col">
+              <h5 class="text-dark text-center">Item a ajouter</h5>
+              <div class="form-group"><select id="cmb_plAddItem" class="form-select"></select></div>
+            </div>
+            <div class="col">
+              <h5 class="text-dark text-center">Modification</h5>
+                <div class="btn-group ">
+                  <button type="button" class="btn btn-primary" onclick="plitem_new()"      style="margin-right:3px">Ajouter</button>
+                  <button type="button" class="btn btn-primary" onclick="plitem_replace()"  style="margin-right:3px">Remplacer</button>
+                  <button type="button" class="btn btn-primary" onclick="plitem_remove()"   style="margin-right:3px">Supprimer</button>
+                  <button type="button" class="btn btn-primary" onclick="pl_sav()"          style="margin-right:3px">Sauvegarder</button>
+                </div>
+              <h5 class="text-dark mt-1">Label</h5>
+              <input id="inp_plLabel" type="text" class="form-control" placeholder="">
+            </div>
+          </div>         
+        </div>
+      </div>
+    </div> <!-- activ cnt -->
+    <script src="www/asset/js/bootstrap.bundle.min.js"></script>
+    <script src="www/asset/js/jquery-3.4.1.min.js"></script>
+    <script src="www/asset/js/renderjson.js"></script>
+    <script src="www/asset/js/tools.js"></script>
+    <script src="www/asset/js/playlist.js"></script>
+    <script src="www/asset/js/lb.js"></script>
+    <script src="www/asset/js/program.js"></script>
+    <script src="www/asset/js/socket.js"></script>
+    <script src="www/asset/js/main.js"></script>
+<!--     <script type="text/javascript">
+    </script> -->
+  </body>
+</html>

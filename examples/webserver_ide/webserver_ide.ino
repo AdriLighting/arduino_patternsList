@@ -1,3 +1,4 @@
+
 #include "main.h"
 
 #include <Arduino.h>
@@ -67,8 +68,8 @@ void setup() {
 
     _DeviceWifi = new WifiConnect(
         "arduinopattern",
-        "SSID",
-        "SSIDPASS",
+        "freebox_123_EXT",
+        "phcaadax",
         "adsap1234",
         "adsota1234");
     _DeviceWifi->setFunc_STAinitServer(std::bind(wehnSTAisReady));
