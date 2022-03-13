@@ -49,7 +49,7 @@ Program::Program (uint8_t nbLb , boolean fs );
 - nbLb    nb of basic list
 - fs      filesystem management
 ```
-``MAIN INSATNCE``
+**`MAIN INSATNCE`**
 ```c++
 // examples:
 Program * _Program = nullptr;
