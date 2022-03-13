@@ -1,5 +1,5 @@
-#ifndef SOCKETSERVER_H
-#define SOCKETSERVER_H
+#ifndef _SOCKETSERVER_H
+#define _SOCKETSERVER_H
 
 
   #if defined(ESP8266)

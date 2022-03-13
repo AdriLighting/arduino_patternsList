@@ -1,19 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7B926AC5-65F3-4A61-8620-68FAADFD0972}</ProjectGuid>
-    <RootNamespace>
-    </RootNamespace>
+    <ProjectGuid>{C5F80730-F44F-4478-BDAE-6634EFC2CA88}</ProjectGuid>
+    <RootNamespace>asyncwebserver_ide</RootNamespace>
     <ProjectName>asyncwebserver_ide</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -28,23 +27,27 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>
-    </PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>
-    </PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>
-    </PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -65,6 +68,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\asyncwebserver_ide;$(ProjectDir)..\..\..\wificonnect\src;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\libraries\ESP8266WiFi\src;$(ProjectDir)..\..\src;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\libraries\LittleFS\src;$(ProjectDir)..\..\..\ArduinoJson\src;$(ProjectDir)..\..\..\LList\src;$(ProjectDir)..\..\..\millisTimer\src;$(ProjectDir)..\..\..\ESPAsyncTCP-master\src;$(ProjectDir)..\..\..\ESPAsyncWebServer\src;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\libraries\Hash\src;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\libraries\ESP8266mDNS\src;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\libraries\DNSServer\src;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\libraries\ArduinoOTA;$(ProjectDir)..\..\..\resizeBuff\src;$(ProjectDir)..\..\..\lists\src;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\cores\esp8266;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\cores\esp8266\avr;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\cores\esp8266\libb64;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\cores\esp8266\spiffs;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\cores\esp8266\umm_malloc;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\variants\d1_mini;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\tools\sdk\include;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\tools\sdk\lwip2\include;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\tools\sdk\libc\xtensa-lx106-elf\include;$(ProjectDir)..\..\..\..\..\..\DOCUME~1\Arduino\LIBRAR~1\ARDUIN~2\examples\ASYNCW~2;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\3.0.4-gcc10.3-1757bed\xtensa-lx106-elf\include\c++\4.8.2;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\3.0.4-gcc10.3-1757bed\xtensa-lx106-elf\include\c++\4.8.2\xtensa-lx106-elf;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\3.0.4-gcc10.3-1757bed\xtensa-lx106-elf\include;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\tools\xtensa-lx106-elf-gcc\3.0.4-gcc10.3-1757bed\lib\gcc\xtensa-lx106-elf\4.8.2\include;$(ProjectDir)..\..\..\..\..\..\AppData\Local\arduino15\packages\esp8266\hardware\esp8266\3.0.2\tools\sdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>$(ProjectDir)__vm\.asyncwebserver_ide.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
+      <PreprocessorDefinitions>__ESP8266_esp8266__;__ESP8266_ESP8266__;_VMDEBUG=1;__ets__;ICACHE_FLASH;_GNU_SOURCE;MMU_IRAM_SIZE=0x8000;MMU_ICACHE_SIZE=0x8000;NONOSDK22x_190703=1;F_CPU=160000000L;LWIP_OPEN_SRC;TCP_MSS=536;LWIP_FEATURES=1;LWIP_IPV6=0;ARDUINO=108019;ARDUINO_ESP8266_WEMOS_D1MINI;ARDUINO_ARCH_ESP8266;FLASHMODE_DIO;ESP8266;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -79,45 +96,31 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ForcedIncludeFiles>$(ProjectDir)__vm\.asyncwebserver_ide.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>__ESP8266_esp8266__;__ESP8266_ESP8266__;__ets__;ICACHE_FLASH;_GNU_SOURCE;MMU_IRAM_SIZE=0x8000;MMU_ICACHE_SIZE=0x8000;NONOSDK22x_190703=1;F_CPU=160000000L;LWIP_OPEN_SRC;TCP_MSS=536;LWIP_FEATURES=1;LWIP_IPV6=0;ARDUINO=108019;ARDUINO_ESP8266_WEMOS_D1MINI;ARDUINO_ARCH_ESP8266;FLASHMODE_DIO;ESP8266;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectCapability Include="VisualMicro" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="asyncwebserver_ide.ino" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="main.h">
-      <FileType>CppCode</FileType>
-    </ClInclude>
-    <ClInclude Include="TaskScheduler.h">
-      <FileType>CppCode</FileType>
-    </ClInclude>
-    <ClInclude Include="Webserver.h">
-      <FileType>CppCode</FileType>
-    </ClInclude>
-    <ClInclude Include="__vm\.asyncwebserver_ide.vsarduino.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="TaskScheduler.cpp" />
-    <ClCompile Include="Webserver.cpp" />
   </ItemGroup>
   <PropertyGroup>
     <DebuggerFlavor>VisualMicroDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="asyncwebserver_ide.ino">
+      <FileType>CppCode</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\arduino folders read me.txt">
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="apwebserver.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="TaskScheduler.h" />
+    <ClInclude Include="__vm\.asyncwebserver_ide.vsarduino.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="apwebserver.cpp" />
+    <ClCompile Include="TaskScheduler.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
