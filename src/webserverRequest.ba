@@ -161,7 +161,7 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
 
     // need to determine size befor
     // DynamicJsonDocument       temp(3000);    
-    DynamicJsonDocument       reponse(5000);
+    DynamicJsonDocument       reponse(3000);
     webserverRequest_reponse  * _webserverRequest_reponse = nullptr;
 
     // cli
@@ -283,14 +283,13 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
             var = reponse.createNestedObject(FPSTR(REQ_002)); // list_lb
             pPtr->jsonObject(var);}
 
-          // var = reponse.createNestedObject(FPSTR(REQ_005)); // loop
-          // pPtr->get_json_jsInit(var);
-          // var = reponse.createNestedObject(FPSTR(REQ_006)); // list
-          // pl = var.createNestedObject(FPSTR(REP_003)); // lb
-          // pPtr->get_json_lb_items(pl,false);
-          // pl = var.createNestedObject(FPSTR(REP_006)); // plc
-          // pPtr->get_json_allpl_items(pl,false,true);
-          }
+          var = reponse.createNestedObject(FPSTR(REQ_005)); // loop
+          pPtr->get_json_jsInit(var);
+          var = reponse.createNestedObject(FPSTR(REQ_006)); // list
+          pl = var.createNestedObject(FPSTR(REP_003)); // lb
+          pPtr->get_json_lb_items(pl,false);
+          pl = var.createNestedObject(FPSTR(REP_006)); // plc
+          ProgramPtrGet()->get_json_allpl_items(pl,false,true);}
         // list_plsc
         else if (req == FPSTR(REQ_013)) {
           var = reponse.createNestedObject(FPSTR(REQ_006)); // list

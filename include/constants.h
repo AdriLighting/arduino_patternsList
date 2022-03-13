@@ -133,10 +133,12 @@
 
   static const char REQ_014[] PROGMEM = "listc";        // DEMO WEBSERVER
 
+  static const char REQ_015[] PROGMEM = "loop_select";        
+
   static const char* const REQALL[] PROGMEM = {
   REQ_001, REQ_002, REQ_003, REQ_004, REQ_005,
   REQ_006, REQ_007, REQ_008, REQ_009, REQ_010,
-  REQ_011, REQ_012, REQ_013, REQ_014
+  REQ_011, REQ_012, REQ_013, REQ_014, REQ_015
   };  
   // typedef enum _requette_type {
   //     REQ_LB,      

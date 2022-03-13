@@ -480,6 +480,12 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <details>
 <summary>list_alllb</summary>
 
+<br>
+
+`get all items of all basic list`
+```json
+{"op":0,"type":"HTTP_POST","set":[],"get":["list_alllb"]}
+```
 ```html
   list_alllb  object
               cmax  object (réelle = -1)
@@ -494,7 +500,12 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <details>
 <summary>list_lb</summary>
 
-`basic list items`
+<br>
+
+`get all items of the current basic list`
+```json
+{"op":0,"type":"HTTP_POST","set":[],"get":["list_lb"]}
+```
 ```html
   list_lb   object
             cmax  object (réelle = -1)
@@ -508,6 +519,12 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <details>
 <summary>list_lbs</summary>
 
+<br>
+
+`get all basic list name and size`
+```json
+{"op":0,"type":"HTTP_POST","set":[],"get":["list_lbs"]}
+```
 ```html
   list_lbs
     list  object
@@ -525,6 +542,12 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <details>
 <summary>list_pl</summary>
 
+<br>
+
+`get all items of all basic list`
+```
+curl  --location --request POST 'http://192.168.0.157/api' --header 'Content-Type: application/json' \
+      --data-raw '{"op":0,"type":"HTTP_POST","set":[],"get":["list_alllb"]}'
 ```html
   list_pl   object
                 cmax  object (réelle = -1)
