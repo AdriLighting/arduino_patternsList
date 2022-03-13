@@ -117,7 +117,8 @@ _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_A
 
 <br>
 
-><b>the items of the playlists correspond to the items of the basic list attach to this playlist </b>
+**`the items of the playlists correspond to the items of the basic list attach to this playlist`**
+
 <br>
 
 initialization  
@@ -144,7 +145,7 @@ _Program->initialize_playlist(plC, iC, Ln);
 ```c++
 void Program::pl_fs_restore();  
 ```
-><b>load saved playlists items from spiff memory</b>
+**`load saved playlists items from spiff memory`**
 ```c++
 // examples: 
 _Program->pl_fs_restore(); 
@@ -161,8 +162,7 @@ _Program->pl_fs_restore();
 ```c++
 void Program::remote_action(RA action,  const char * const & v1 = "",  const char * const & v2 = "");  
 ```
-><b>function used for control general list, items, etc...</b>
-
+**`function used for control general list, items, etc...`**
 ```c++
 // examples: 
 _Program->remote_action(RA::RA_ITEM,              "0");
@@ -202,7 +202,7 @@ _Program->remote_action(RA::RA_PL_TOFS,           "0");
 typedef std::function<void(const String & v1, const uint16_t & v2, boolean upd)> callback_function_t;
 void Program::set_callback(callback_function_t);
 ```
-><b>callback function used when an item is loaded</b>
+**`callback function used when an item is loaded`**
 ```c++
 // examples: 
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
@@ -242,7 +242,7 @@ _Program->set_callback(_Program_cb);
 ```c++
 class WebserverRequest;
 ```
-><b>a static instance is already instanced</b>
+**`a static instance is already instanced`**
 ```c++
 extern WebserverRequest _WebserverRequest;
 ```
@@ -252,7 +252,7 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & r, con
 - r     reponse json in String format
 - upd   parmaeter for send a reponse query
 ```
-><b>function to use to process a user request formulated with a query in json format </b>
+**`function to use to process a user request formulated with a query in json format`**
 ```c++
 // examples: request received from HTT_POST method
 
