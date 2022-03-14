@@ -368,8 +368,6 @@ web_server.on(requestName, HTTP_POST, [](AsyncWebServerRequest * request){}, NUL
 <hr>
 </details>
 
-<hr>
-
 ### REQUEST
 
 <details>
@@ -557,157 +555,192 @@ RA_PL_TOFS:         arg1: position of playlist list array
 
 #### GETTER  
 
+<details>
+<summary>id</summary>
+
 ##### BASIC-LIST WITH ITEMS 
+
+
+`get all items of all basic list`  
 
 <details>
 <summary>list_alllb</summary>
 
-<br>
-
-`get all items of all basic list`
 ```json
-{"op":0,"type":"HTTP_POST","set":[],"get":["list_alllb"]}
+{"op":0,"cli":"HTTP_POST","set":[],"get":["list_alllb"]}
 ```
 ```html
   list_alllb  object
-              cmax  object (réelle = -1)
+              cmax  object          nb of list
               items array
-                    n     object
-                    cmax  object (réelle = -1)
+                    n     object    list name
+                    cmax  object    nb of maximum items
                     items array
-                          value(s)
+                          value(s)  item names
 ```
 <hr>
 </details>
-<details>
-<summary>list_lb</summary>
 
 <br>
 
 `get all items of the current basic list`
+
+<details>
+<summary>list_lb</summary>
+
 ```json
-{"op":0,"type":"HTTP_POST","set":[],"get":["list_lb"]}
+{"op":0,"cli":"HTTP_POST","set":[],"get":["list_lb"]}
 ```
 ```html
   list_lb   object
-            cmax  object (réelle = -1)
-            items array 
+            cmax  object          nb of maximum items
+            items array           item names
 ```
 <hr>
 </details>
 
+
+
 ##### BASIC-LIST WITHOUT ITEMS 
+
+
+`get all basic list name and size`
 
 <details>
 <summary>list_lbs</summary>
 
-<br>
-
-`get all basic list name and size`
 ```json
-{"op":0,"type":"HTTP_POST","set":[],"get":["list_lbs"]}
+{"op":0,"cli":"HTTP_POST","set":[],"get":["list_lbs"]}
 ```
 ```html
   list_lbs
     list  object
           lb  object
-              cmax  object (réelle = -1)
+              cmax  object                        nb of list
               items array
-                    n     object 
-                    cmax  object 
+                    n     object                  list name
+                    cmax  object                  nb of maximum items
 ```
 <hr>
 </details>
 
+<hr>
+
 ##### PLAYLIST WITH ITEMS 
+
+`get all items object of current playlist`
 
 <details>
 <summary>list_pl</summary>
 
-<br>
-
-`get all items of all basic list`
-```
-curl  --location --request POST 'http://192.168.0.157/api' --header 'Content-Type: application/json' \
-      --data-raw '{"op":0,"type":"HTTP_POST","set":[],"get":["list_alllb"]}'
+```json
+{"op":0,"cli":"HTTP_POST","set":[],"get":["list_pl"]}      
+```    
 ```html
   list_pl   object
-                cmax  object (réelle = -1)
-                cnt   object (réelle = -1)  
-                pos   object   
-                lbl   object   
-                lref  object   
-                items array  
-                      id    object
-                      lbl   object   
-                      ib    object   
-                      ibcfg object  
+                cmax  object                      maximum item size
+                cnt   object                      current item size
+                pos   object                      list array position
+                lbl   object                      label of the lsit
+                lref  object                      basiclist reference
+                items array       
+                      id    object                unique id of the item
+                      lbl   object                label
+                      ib    object                basiclist item
+                      ibcfg object                extra
 ```
 <hr>
 </details>
+
+<br>
+
+`get all items object of all playlist`
+
 <details>
 <summary>list_allpl</summary>
 
+```json
+{"op":0,"cli":"HTTP_POST","set":[],"get":["list_allpl"]}      
+```   
 ```html
-  list_allpl    object
-                cmax  object (réelle = -1)
+  list_allpl    object 
                 items array
-                      cmax  object (réelle = -1)
-                      cnt   object (réelle = -1)  
-                      pos   object   
-                      lbl   object   
-                      lref  object   
-                      items array  
-                            id    object
-                            lbl   object   
-                            ib    object   
-                            ibcfg object 
+                      cmax  object                maximum item size
+                      cnt   object                current item size
+                      pos   object                list array position
+                      lbl   object                label of the lsit
+                      lref  object                basiclist reference
+                      items array       
+                            id    object          unique id of the item
+                            lbl   object          label
+                            ib    object          basiclist 
 ```
 <hr>
 </details>
 
 ##### PLAYLIST WITHOUT ITEMS 
 
+`get all playlist`
+
+
 <details>
 <summary>list_pls</summary>
 
+```json
+{"op":0,"cli":"HTTP_POST","set":[],"get":["list_pls"]}      
+```   
 ```html
   list_pls
     list  object
-          pl  object || 
-              cmax  object (réelle = -1)
+          pl  object
+              cmax  object                      playlist size                                
               items array
-                    cmax  object 
-                    cnt   object 
-                    pos   object 
-                    lbl   object 
-                    lref  object
+                    cmax  object                maximum item size
+                    cnt   object                current item size
+                    pos   object                list array position
+                    lbl   object                label of the lsit
+                    lref  object                basiclist reference
 ```
 <hr>
 </details>
+
+<br>
+
+`get all playlist by basiclist reference`
+
 <details>
 <summary>list_plsc</summary>
 
+```json
+{"op":0,"cli":"HTTP_POST","set":[],"get":["list_plsc"]}      
+```   
 ```html
   list_plsc
     list  object
           plc object (return uniquement les playlist de ref)
-              cmax  object (réelle = -1)
-              items array  
-                    cmax  object 
-                    cnt   object 
-                    pos   object 
-                    lbl   object 
-                    lref  object 
+              cmax  object                      playlist size                                
+              items array
+                    cmax  object                maximum item size
+                    cnt   object                current item size
+                    pos   object                list array position
+                    lbl   object                label of the lsit
+                    lref  object                basiclist reference
 ```
 <hr>
 </details>
 
-##### PLAYING STATU
+<hr>
+
+##### STATU
+
+`currents statu of player, basiclist, playlist`
 
 <details>
 <summary>loop</summary>
 
+```json
+{"op":0,"cli":"HTTP_POST","set":[],"get":["statu"]}      
+```  
 ```html
   loop  obejct  autoplay/loop
         statu object   
@@ -741,11 +774,18 @@ curl  --location --request POST 'http://192.168.0.157/api' --header 'Content-Typ
 ```
 <hr>
 </details>
+</details>
 
 ##### DIVERS
+
+`list of avaible setter`
+
 <details>
 <summary>list_ra</summary>
 
+```json
+{"op":0,"cli":"HTTP_POST","set":[],"get":["list_ra"]}      
+```  
 ```html
     list_ra   array
               value(s)
@@ -753,9 +793,17 @@ curl  --location --request POST 'http://192.168.0.157/api' --header 'Content-Typ
 <hr>
 </details>
 
+
+<br>
+
+`list of avaible getter`
+
 <details>
 <summary>list_req</summary>
 
+```json
+{"op":0,"cli":"HTTP_POST","set":[],"get":["list_req"]}      
+```  
 ```html
     list_req  array
               value(s)
