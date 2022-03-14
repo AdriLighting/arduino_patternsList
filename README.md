@@ -13,14 +13,11 @@
 <summary>Lirairies</summary>
 
 #### Jim Lee - leftCoast  
-- ![lists](https://github.com/leftCoast/LC_baseTools) 
-  - [download zip](https://drive.google.com/file/d/1lT-wj2V2yDMdxxD3QI82Enb6GBCkEgv-/view?usp=sharing/){:target="_blank" rel="noopener"}
-- ![resizeBuff](https://github.com/leftCoast/LC_baseTools) 
-  - [download zip](https://drive.google.com/file/d/1kAhTUemvxnZG_V7tRndZjkLcULPDAXVh/view?usp=sharing/){:target="_blank" rel="noopener"}
+- ![lists](https://github.com/leftCoast/LC_baseTools) - [download archive](https://drive.google.com/file/d/1lT-wj2V2yDMdxxD3QI82Enb6GBCkEgv-/view?usp=sharing/)
+- ![resizeBuff](https://github.com/leftCoast/LC_baseTools) - [download archive](https://drive.google.com/file/d/1kAhTUemvxnZG_V7tRndZjkLcULPDAXVh/view?usp=sharing/)
 ---
 #### ivanseidel    
-- ![LList](https://github.com/DmytroKorniienko/FireLamp_JeeUI/blob/master/include/LList.h) 
-  - [download zip](https://drive.google.com/file/d/1BZLGuW0Qv7570ETxc4MnCrJ27n74m-89/view?usp=sharing/){:target="_blank" rel="noopener"}
+- ![LList](https://github.com/DmytroKorniienko/FireLamp_JeeUI/blob/master/include/LList.h) - [download archive](https://drive.google.com/file/d/1BZLGuW0Qv7570ETxc4MnCrJ27n74m-89/view?usp=sharing/)
 ---
 #### Benoit Blanchon  
 - ![ArduinoJson](https://github.com/bblanchon/ArduinoJson) 
