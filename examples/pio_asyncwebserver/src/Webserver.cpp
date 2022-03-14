@@ -13,8 +13,8 @@
 
 #include <functional>
 
-#define WEBSERVER_DEBUG
-#if defined(WEBSERVER_DEBUG)
+#define DEBUG_WEBSERVER
+#if defined(DEBUG_WEBSERVER)
   #define LOG(func, ...) Serial.func(__VA_ARGS__)
 #else
   #define LOG(func, ...) ;

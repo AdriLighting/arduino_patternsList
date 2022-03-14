@@ -160,8 +160,8 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
     Program * pPtr = ProgramPtrGet();
 
     // need to determine size befor
-    // DynamicJsonDocument       temp(3000);    
-    DynamicJsonDocument       reponse(5000);
+    DynamicJsonDocument       temp(2048);    
+    DynamicJsonDocument       reponse(2048);
     webserverRequest_reponse  * _webserverRequest_reponse = nullptr;
 
     // cli
@@ -304,60 +304,60 @@ void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & rep, c
           pl = var.createNestedObject(FPSTR(REP_006)); // plc
           pPtr->get_json_allpl_items(pl,false, true);}
 
-        // if (item) {
-        //   Serial.printf("loop_select: %s\n", item[F("loop_select")].as<String>().c_str());
-        //   if (item[F("loop_select")]) {
-        //     JsonArray arr_2 = item[F("loop_select")].as<JsonArray>();
-        //     if (arr_2.size() == 0) continue;
-        //     if (!reponse.containsKey(FPSTR(REQ_005))) reponse.createNestedObject(FPSTR(REQ_005)); // loop
-        //     for (size_t j = 0; j < arr_2.size(); j++) {
-        //       String req_2 = arr_2[j].as<String>();  
-        //       Serial.printf("%d : %s\n", j, req_2.c_str());
-        //       if (!reponse[FPSTR(REQ_005)][FPSTR(REP_005)]){
-        //         if (req_2 == FPSTR(REP_005)) {
-        //           temp.clear();
-        //           root = temp.to<JsonObject>();                    
-        //           pPtr->get_json_statu(root);
-        //           reponse[FPSTR(REQ_005)][FPSTR(REP_005)] = temp; 
-        //         }
-        //       }
-        //       if (!reponse[FPSTR(REQ_005)][FPSTR(REP_001)]){
-        //         if (req_2 == FPSTR(REP_001)) {
-        //           temp.clear();
-        //           root = temp.to<JsonObject>();
-        //           pPtr->get_json_pl(root);
-        //           reponse[FPSTR(REQ_005)][FPSTR(REP_001)] = temp; 
-        //         }
-        //       }
-        //       if (!reponse[FPSTR(REQ_005)][FPSTR(REP_002)]){
-        //         if (req_2 == FPSTR(REP_002)) {
-        //           temp.clear();
-        //           root = temp.to<JsonObject>();
-        //           pPtr->get_json_plt(root);
-        //           reponse[FPSTR(REQ_005)][FPSTR(REP_002)] = temp; 
-        //         }
-        //       }
-        //       if (!reponse[FPSTR(REQ_005)][FPSTR(REP_003)]){
-        //         if (req_2 == FPSTR(REP_003)) {
-        //           temp.clear();
-        //           root = temp.to<JsonObject>();
-        //           pPtr->get_json_lb(root);
-        //           reponse[FPSTR(REQ_005)][FPSTR(REP_003)] = temp; 
-        //         }
-        //       }
-        //       if (!reponse[FPSTR(REQ_005)][FPSTR(REP_004)]){
-        //         if (req_2 == FPSTR(REP_004)) {
-        //           temp.clear();
-        //           root = temp.to<JsonObject>();                  
-        //           pPtr->get_json_lbt(root);
-        //           reponse[FPSTR(REQ_005)][FPSTR(REP_004)] = temp; 
-        //         }
-        //       }
+        if (item) {
+          // Serial.printf("loop_select: %s\n", item[F("loop_select")].as<String>().c_str());
+          if (item[F("loop_select")]) {
+            JsonArray arr_2 = item[F("loop_select")].as<JsonArray>();
+            if (arr_2.size() == 0) continue;
+            if (!reponse.containsKey(FPSTR(REQ_005))) reponse.createNestedObject(FPSTR(REQ_005)); // loop
+            for (size_t j = 0; j < arr_2.size(); j++) {
+              String req_2 = arr_2[j].as<String>();  
+              // Serial.printf("%d : %s\n", j, req_2.c_str());
+              if (!reponse[FPSTR(REQ_005)][FPSTR(REP_005)]){
+                if (req_2 == FPSTR(REP_005)) {
+                  temp.clear();
+                  root = temp.to<JsonObject>();                    
+                  pPtr->get_json_statu(root);
+                  reponse[FPSTR(REQ_005)][FPSTR(REP_005)] = temp; 
+                }
+              }
+              if (!reponse[FPSTR(REQ_005)][FPSTR(REP_001)]){
+                if (req_2 == FPSTR(REP_001)) {
+                  temp.clear();
+                  root = temp.to<JsonObject>();
+                  pPtr->get_json_pl(root);
+                  reponse[FPSTR(REQ_005)][FPSTR(REP_001)] = temp; 
+                }
+              }
+              if (!reponse[FPSTR(REQ_005)][FPSTR(REP_002)]){
+                if (req_2 == FPSTR(REP_002)) {
+                  temp.clear();
+                  root = temp.to<JsonObject>();
+                  pPtr->get_json_plt(root);
+                  reponse[FPSTR(REQ_005)][FPSTR(REP_002)] = temp; 
+                }
+              }
+              if (!reponse[FPSTR(REQ_005)][FPSTR(REP_003)]){
+                if (req_2 == FPSTR(REP_003)) {
+                  temp.clear();
+                  root = temp.to<JsonObject>();
+                  pPtr->get_json_lb(root);
+                  reponse[FPSTR(REQ_005)][FPSTR(REP_003)] = temp; 
+                }
+              }
+              if (!reponse[FPSTR(REQ_005)][FPSTR(REP_004)]){
+                if (req_2 == FPSTR(REP_004)) {
+                  temp.clear();
+                  root = temp.to<JsonObject>();                  
+                  pPtr->get_json_lbt(root);
+                  reponse[FPSTR(REQ_005)][FPSTR(REP_004)] = temp; 
+                }
+              }
 
-        //     }
-        //   }
-        // }   
-      } //>>>for
+            }
+          }
+        } //>>> array in object value loop_select from getter item array | "get":["list",{"loop_select":["statu"]}]}
+      } //>>> GETTER for
     }
     if (_webserverRequest_reponse) {
       for (int j = 0; j < posReponse; ++j) {

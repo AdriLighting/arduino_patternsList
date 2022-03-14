@@ -13,8 +13,8 @@
 
 #include <functional>
 
-// #define WEBSERVER_DEBUG
-#if defined(WEBSERVER_DEBUG)
+// #define DEBUG_WEBSERVER
+#if defined(DEBUG_WEBSERVER)
   #define LOG(func, ...) Serial.func(__VA_ARGS__)
 #else
   #define LOG(func, ...) ;
@@ -54,7 +54,7 @@ void Webserver_request::get_contentType(const char * & v1)  {v1 = WSTP_ARR[_repF
 
 
 Webserver::Webserver() {
-  #if defined(WEBSERVER_DEBUG)
+  #if defined(DEBUG_WEBSERVER)
   _socketTrace  = true;
   _httpTrace    = true;  
   #else
@@ -118,7 +118,7 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
     String msg = "";
     if(info->final && info->index == 0 && info->len == len){
       //the whole message is in a single frame and we got all of it's data
-      #ifdef WEBSERVER_DEBUG
+      #ifdef DEBUG_WEBSERVER
         char time[12];
         _timeStamp(micros(), time);  
       #endif      
@@ -191,7 +191,7 @@ void Webserver::socket_send(const String & message) {
     _socketClient->text(message);
 
     if (_socketTrace) {  
-      #ifdef WEBSERVER_DEBUG
+      #ifdef DEBUG_WEBSERVER
         char time[12];
         _timeStamp(micros(), time);  
         LOG(printf_P, PSTR("ws >>>[%s][%u][%s] message[%d]: %s\n"), _socketServer->url(), _socketClient->id(), time, message.length(), message.c_str());
@@ -211,7 +211,7 @@ void Webserver::http_send(AsyncWebServerRequest * request, const int & code, ENU
 
   request->send(code, FPSTR(WSTP_ARR[ct]), data); 
 
-  #ifdef WEBSERVER_DEBUG
+  #ifdef DEBUG_WEBSERVER
     char time[12];
     _timeStamp(micros(), time);  
     LOG(printf_P, PSTR("http >>>[%s][%s][%s] %s-message[%d]: %s\n"), 
@@ -272,7 +272,7 @@ void Webserver::setup(){
           _httpCallbackData     = "";
           for (size_t i = 0; i < len; i++) {_httpCallbackData += (char) data[i];}
           _httpCallbackData.replace("\r\n", "");
-          #ifdef WEBSERVER_DEBUG
+          #ifdef DEBUG_WEBSERVER
             char time[12];
             _timeStamp(micros(), time);  
             LOG(printf_P, PSTR("http <<<[%s][%s][%s][%s] %s-message[%d]: %s\n"), 
@@ -289,7 +289,7 @@ void Webserver::setup(){
     else if (method== HTTP_GET) {
       web_server.on(requestName, HTTP_GET, [=](AsyncWebServerRequest *request){
         if (_requestArray[i]._callback) {
-          #ifdef WEBSERVER_DEBUG
+          #ifdef DEBUG_WEBSERVER
             char time[12];
             _timeStamp(micros(), time);
             LOG(printf_P, PSTR("http <<<M[%s][%s][%s][%s] %s\n"), 

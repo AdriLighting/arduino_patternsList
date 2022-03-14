@@ -2,7 +2,7 @@
 
 // #define DEBUG
 #ifndef DEBUG
-  #ifdef BASICLIST_DEBUG
+  #ifdef DEBUG_BASICLIST
     #define DEBUG
   #endif
 #endif

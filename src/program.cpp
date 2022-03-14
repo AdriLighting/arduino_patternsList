@@ -16,7 +16,7 @@
 
 // #define DEBUG
 #ifndef DEBUG
-  #ifdef PROGRAM_DEBUG
+  #ifdef DEBUG_PROGRAM
     #define DEBUG
   #endif
 #endif

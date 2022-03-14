@@ -4,7 +4,7 @@
 
 // #define DEBUG
 #ifndef DEBUG
-  #ifdef PLAYLIST_DEBUG
+  #ifdef DEBUG_PLAYLIST
     #define DEBUG
   #endif
 #endif

@@ -3,7 +3,7 @@
 
 - [setup](#SETUP )
 - [mangement](#USER_MANAGEMENT)
-- [request](#REQUEST_MANAGEMENT)
+- [request](#REQUEST_FUNCTION)
 - [api](#API_REST)
 
 ---
@@ -37,7 +37,44 @@
 
 ## FUNCTIONING 
 
-### preprocessor
+### PREPROCESSOR
+
+<details>
+<summary>define</summary>
+
+<br>
+use the define via the options of your IDE or from the target files    
+<br>
+<br>
+
+if AP_DEFAULT isnt defined we set default define (see include/def.h)
+````c++
+#define AP_DEFAULT        // include/def.h
+```` 
+if FSOK is defined the filesystem can be used  
+define USE_SPIFFS for SPIFFS or define USE_LITTLEFS for LittleFS  
+````c++
+#define FSOK              // include/def.h
+#define USE_LITTLEFS      // include/def.h   
+#define USE_SPIFFS        // include/def.h
+````
+keyboard for serial monitor  
+````c++
+#define DEBUGSERIAL       // include/def.h
+````
+serial print trace macro  
+````c++
+#define DEBUG_AP          // include/def.h
+````
+serial print per file  
+````c++
+#define DEBUG_BASICLIST   // src/patterns.cpp  
+#define DEBUG_PROGRAM     // src/program.cpp
+#define DEBUG_PLAYLIST    // src/playlist.cpp
+#define DEBUG_TASK        // TaskScheduler.cpp
+#define DEBUG_WEBSERVER   // apwebserver.cpp
+````
+</details>
 
 ### SETUP
 
@@ -153,6 +190,22 @@ _Program->pl_fs_restore();
 <hr>
 </details>
 
+<details>
+<summary>program handle</summary>
+
+```c++
+void Program::handle();  
+```
+**`can be used in ur main loop`**
+```c++
+// examples: 
+void loop() {
+  _Program->handle();
+}
+```
+<hr>
+</details>
+
 ### USER_MANAGEMENT
 
 <details>
@@ -233,7 +286,11 @@ _Program->set_callback(_Program_cb);
 <hr>
 </details>
 
-### REQUEST_MANAGEMENT
+<hr>
+
+## API_REST
+
+### REQUEST_FUNCTION
 
 <details>
 <summary>parsing</summary>
@@ -297,8 +354,6 @@ web_server.on(requestName, HTTP_POST, [](AsyncWebServerRequest * request){}, NUL
 
 <hr>
 
-## API_REST
-
 ### REQUEST
 
 <details>
@@ -307,20 +362,31 @@ web_server.on(requestName, HTTP_POST, [](AsyncWebServerRequest * request){}, NUL
 ```html
 HTTP_POST, UDP, SOCKET 
   JSON SYNTAX
-    op    object    fonction avec laquelle traiter le parsing + execution des commandes
+
+    op    object    fonction avec laquelle traiter le parsing + execution des commandes 
           0 = ?
           1 = playlist items management
-    type  object    type de format (nom de commande avc String,int ETC...)
-    cli   object    porvenance: http server, websocket server, udp/multi
+
+    type  object    (optional?) type de format (nom de commande avc String,int ETC...)  
+
+    cli   object    (optional?) porvenance: http server, websocket server, udp/multi
+
     set   array     setter
           [
-            n object    id commande
-            v object    valeur commoand si besoin
-          ] , 
-          [**]
-    get   array   getter
-          [  id commande ] , 
-          [**]  
+            {"id setter ":"value of setter"},
+          ] 
+
+    get   array   simple
+          [  "id commande", "..." ] 
+
+    get   array   advanced
+          [  "", {"":["",""]}] 
+
+// example:
+{"op":0,"cli":"","set":[{"n":"1","v":"1"}, {"n":"2","v":"2"}],"get":["list",{"loop_select":["statu", "lb"]}]}          
+  {"op":0,"cli":"HTTP_POST","set":[],"get":["loop"]}   
+  {"op":0,"cli":"SOKCET","set":[{"n":"RA_ITEM_NEXT","v":""}],"get":[]}       
+  {"op":0,"cli":"SOKCET","set":[{"n":"RA_PLAY_DELAY","v":"35"}],"get":[]}       
 ```
 </details>
 <details>
@@ -397,7 +463,7 @@ xhr.send(data);
 </details>
 
 
-### SETTER  
+#### SETTER  
 
 <details>
 <summary>id with reponse</summary>
@@ -473,9 +539,9 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <hr>
 </details>
 
-### GETTER  
+#### GETTER  
 
-#### BASE-LIST WITH ITEMS 
+##### BASIC-LIST WITH ITEMS 
 
 <details>
 <summary>list_alllb</summary>
@@ -514,7 +580,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <hr>
 </details>
 
-#### BASE-LIST WITHOUT ITEMS 
+##### BASIC-LIST WITHOUT ITEMS 
 
 <details>
 <summary>list_lbs</summary>
@@ -537,7 +603,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <hr>
 </details>
 
-#### PLAYLIST WITH ITEMS 
+##### PLAYLIST WITH ITEMS 
 
 <details>
 <summary>list_pl</summary>
@@ -584,7 +650,7 @@ curl  --location --request POST 'http://192.168.0.157/api' --header 'Content-Typ
 <hr>
 </details>
 
-#### PLAYLIST WITHOUT ITEMS 
+##### PLAYLIST WITHOUT ITEMS 
 
 <details>
 <summary>list_pls</summary>
@@ -621,7 +687,7 @@ curl  --location --request POST 'http://192.168.0.157/api' --header 'Content-Typ
 <hr>
 </details>
 
-#### PLAYING STATU
+##### PLAYING STATU
 
 <details>
 <summary>loop</summary>
@@ -660,7 +726,7 @@ curl  --location --request POST 'http://192.168.0.157/api' --header 'Content-Typ
 <hr>
 </details>
 
-#### DIVERS
+##### DIVERS
 <details>
 <summary>list_ra</summary>
 

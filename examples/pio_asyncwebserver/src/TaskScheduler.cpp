@@ -17,8 +17,8 @@ uint8_t Task_unique_id = 0;
   static uint32_t _task_micros() {return micros();}
 #endif  //  _TASK_EXTERNAL_TIME
 
-#define TASK_DEBUG
-#if defined(TASK_DEBUG)
+#define DEBUG_TASK
+#if defined(DEBUG_TASK)
   #define LOG(func, ...) Serial.func(__VA_ARGS__)
 #else
   #define LOG(func, ...) ;
