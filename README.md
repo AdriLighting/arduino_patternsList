@@ -15,6 +15,7 @@
 #### Jim Lee - leftCoast  
 - ![lists](https://github.com/leftCoast/LC_baseTools) 
   - `https://drive.google.com/file/d/1lT-wj2V2yDMdxxD3QI82Enb6GBCkEgv-/view?usp=sharing`  
+  |[Click here](https://drive.google.com/file/d/1lT-wj2V2yDMdxxD3QI82Enb6GBCkEgv-/view?usp=sharing/)|
 - ![resizeBuff](https://github.com/leftCoast/LC_baseTools) 
   - `https://drive.google.com/file/d/1kAhTUemvxnZG_V7tRndZjkLcULPDAXVh/view?usp=sharing`  
 ---
