@@ -9,6 +9,13 @@ public:
 
 	WebserverRequest();
 	~WebserverRequest();
+	/**
+	 * @brief      function to use to process a user request formulated with a query in json format
+	 *
+	 * @param      doc   query
+	 * @param      r     reponse json in String format
+	 * @param[in]  upd   parmaeter for send a reponse query
+	 */
 	void parsingRequest(DynamicJsonDocument & doc, String & r, const String & upd);
 };
 class webserverRequest_reponse

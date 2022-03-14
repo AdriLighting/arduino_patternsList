@@ -1,3 +1,6 @@
+
+
+
 #include "main.h"
 
 #include <Arduino.h>
@@ -120,22 +123,15 @@ void setup() {
 
 	_TaskScheduler = new TaskScheduler(5);
 	_TaskScheduler->get_task(0)->set_callback([]() {ProgramPtrGet()->handle(); });
-	_TaskScheduler->get_task(0)->set_taskDelay(ETD::ETD_TIMER, true, 100000);
-	_TaskScheduler->get_task(0)->set_iteration_max(-1);
-	_TaskScheduler->get_task(0)->setup(true);
-	_TaskScheduler->get_task(0)->set_enabled(true);
-
 	_TaskScheduler->get_task(1)->set_callback([]() {_DeviceWifi->handleConnection(); });
-	_TaskScheduler->get_task(1)->set_taskDelay(ETD::ETD_TIMER, true, 100000);
-	_TaskScheduler->get_task(1)->set_iteration_max(-1);
-	_TaskScheduler->get_task(1)->setup(true);
-	_TaskScheduler->get_task(1)->set_enabled(true);
-
 	_TaskScheduler->get_task(2)->set_callback([]() {if (_DeviceWifi->WIFIsetupIsReady())_Webserver.handle(); });
-	_TaskScheduler->get_task(2)->set_taskDelay(ETD::ETD_TIMER, true, 100000);
-	_TaskScheduler->get_task(2)->set_iteration_max(-1);
-	_TaskScheduler->get_task(2)->setup(true);
-	_TaskScheduler->get_task(2)->set_enabled(true);
+	for (int i = 0; i < 3; ++i)
+	{
+		_TaskScheduler->get_task(i)->set_taskDelay(ETD::ETD_TIMER, true, 100000);
+		_TaskScheduler->get_task(i)->set_iteration_max(-1);
+		_TaskScheduler->get_task(i)->setup(true);
+		_TaskScheduler->get_task(i)->set_enabled(true);
+	}
 
 	String heap, time;
 	on_timeD(time); _HeapStatu_2.setupHeap_v2(); _HeapStatu_2.update(); _HeapStatu_2.print(heap);
@@ -197,14 +193,13 @@ void _Program_cb(const String itemBaseName, const uint16_t& itemBasePos, boolean
 
 	String                    rep;
 	DynamicJsonDocument       reponse(2048);
-	webserverRequest_reponse* _webserverRequest_reponse = new webserverRequest_reponse[1];
-
-	_webserverRequest_reponse[0].set_ra(RA::RA_ITEM_NEXT);
-	_webserverRequest_reponse[0].make_reponse(reponse);
+	webserverRequest_reponse* _reponse = new webserverRequest_reponse();
+	_reponse->set_ra(RA::RA_ITEM_NEXT);
+	_reponse->make_reponse(reponse);
+	delete _reponse;
 	serializeJson(reponse, rep);
-
-	delete[] _webserverRequest_reponse;
 	_Webserver.socket_send(rep);
+
 }
 
 #ifdef DEBUGSERIAL
