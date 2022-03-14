@@ -66,6 +66,12 @@
     boolean _fs_pl    = false;
 
   public:
+    /**
+     * @brief      Constructs a new instance.
+     *
+     * @param[in]  nbLb  nb of basic list
+     * @param[in]  fs    enabled filesystem management
+     */
     Program (uint8_t nbLb , boolean fs );
     ~Program ();
 

@@ -79,9 +79,13 @@ serial print per file
 <summary>main insatnce</summary>
 
 ```c++
+/**
+ * @brief      Constructs a new instance.
+ *
+ * @param[in]  nbLb  nb of basic list
+ * @param[in]  fs    enabled filesystem management
+ */
 Program::Program (uint8_t nbLb , boolean fs );
-- nbLb    nb of basic list
-- fs      filesystem management
 ```
 **`MAIN INSATNCE`**
 ```c++
@@ -103,11 +107,15 @@ _Program = new Program(2, false);
 initialization  
 
 ```c++
+/**
+ * @brief      setup basiclist.
+ *
+ * @param[in]  p      position of basic list array  
+ * @param[in]  name   id of list
+ * @param[in]  items  size of items array
+ * @param      arr    static const char* const items[] PROGMEM
+ */
 void Program::initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
-- position of basic list array  
-- id of list
-- size of items array
-- static const char* const items[] PROGMEM
 ```  
 ```c++
 // examples: 
@@ -131,12 +139,15 @@ _Program->initialize_lb(1, "cat",   ARRAY_SIZE(LPALLNAMES_CAT)      , LPALLNAMES
 loading one of the basic list   
 
 ```c++ 
+/**
+ * @brief      loading one of the basic list   
+ *
+ * @param[in]  <unnamed>  size of items array
+ * @param      arr        static const char* const items[] PROGMEM
+ * @param      <unnamed>  id of basic list
+ * @param[in]  t          classification type
+ */
 void Program::initialize(const uint16_t & , const char* const* arr, const char  * const &, SORT_TYPE t = ST_BASE); 
-- size of items array
-- static const char* const items[] PROGMEM
-- id of basic list
-- classification type
-
 ```
 ```c++ 
 // examples: 
@@ -158,10 +169,14 @@ _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_A
 initialization  
 
 ```c++
+/**
+ * @brief      Initializes the playlist.
+ *
+ * @param[in]  <unnamed>  nb of playlist
+ * @param      <unnamed>  playlist item size
+ * @param      <unnamed>  id of basic list
+ */
 void Program::initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
-- nb of playlist
-- playlist item size
-- id of basic list
 ```
 ```c++
 // examples: 
@@ -301,10 +316,14 @@ class WebserverRequest;
 extern WebserverRequest _WebserverRequest;
 ```
 ```c++
+/**
+ * @brief      function to use to process a user request formulated with a query in json format
+ *
+ * @param      doc   query
+ * @param      r     reponse json in String format
+ * @param[in]  upd   parmaeter for send a reponse query
+ */
 void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & r, const String & upd);
-- doc   query
-- r     reponse json in String format
-- upd   parmaeter for send a reponse query
 ```
 **`function to use to process a user request formulated with a query in json format`**
 ```c++
