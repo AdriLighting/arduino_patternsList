@@ -406,11 +406,11 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
         // list_alllb
         if (req == FPSTR(REQ_001)) {
           var = reply.createNestedObject(FPSTR(REQ_001));
-          pPtr->get_json_lb_items(var);} // n: cmax: items:[]
+          pPtr->get_json_lb_items(var);} // n: cmax: items:[n: cmax: items:[]]
         // list_lb
         else if (req == FPSTR(REQ_002)) {
           var = reply.createNestedObject(FPSTR(REQ_002));
-          pPtr->jsonObject(var);} 
+          pPtr->jsonObject(var);} // n: cmax: items:[]
         // list_allpl
         else if (req == FPSTR(REQ_003)) {
           var = reply.createNestedObject(FPSTR(REQ_003));
@@ -434,14 +434,14 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
         else if (req == FPSTR(REQ_006)) {
           var = reply.createNestedObject(FPSTR(REQ_006));
           pl = var.createNestedObject(FPSTR(REP_003)); // lb
-          pPtr->get_json_lb_items(pl,false); // n: cmax: items:[]
+          pPtr->get_json_lb_items(pl,false); // cmax: items:[]
           pl = var.createNestedObject(FPSTR(REP_001)); // pl
           pPtr->get_json_allpl_items(pl,false);} // items:[ cmax: cnt: pos: lbl: lref:  ]
         // list_lbs
         else if (req == FPSTR(REQ_007)) {
           var = reply.createNestedObject(FPSTR(REQ_006));
           pl = var.createNestedObject(FPSTR(REP_003)); // lb;
-          pPtr->get_json_lb_items(pl,false);} // n: cmax: items:[]
+          pPtr->get_json_lb_items(pl,false);} //cmax: items:[]
         // list_pls
         else if (req == FPSTR(REQ_008)) {
           var = reply.createNestedObject(FPSTR(REQ_006));
