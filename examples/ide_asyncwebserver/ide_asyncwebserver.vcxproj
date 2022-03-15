@@ -115,12 +115,16 @@
   <ItemGroup>
     <ClInclude Include="apwebserver.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="TaskScheduler.h" />
     <ClInclude Include="__vm\.ide_asyncwebserver.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="apwebserver.cpp" />
     <ClCompile Include="TaskScheduler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="ide_asyncwebserver.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

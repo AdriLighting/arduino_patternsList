@@ -116,7 +116,7 @@ void setup() {
   //--------------------------------------------------------------------------------------------
 
 
-  // SETUP PROGRAMM LOOP -----------------------------------------------------------------------
+// SETUP PROGRAMM LOOP -----------------------------------------------------------------------
   _Program->remote_action(RA::RA_LSET_PL, "0");
   _Program->remote_action(RA::RA_PLAY_LB);
   _Program->remote_action(RA::RA_PLAY_DELAY, "10");
@@ -130,8 +130,7 @@ void setup() {
   _TaskScheduler->get_task(0)->set_callback([]() {ProgramPtrGet()->handle(); });
   _TaskScheduler->get_task(1)->set_callback([]() {_DeviceWifi->handleConnection(); });
   _TaskScheduler->get_task(2)->set_callback([]() {if (_DeviceWifi->WIFIsetupIsReady())_Webserver.handle(); });
-  for (int i = 0; i < 3; ++i)
-  {
+  for (int i = 0; i < 3; ++i) {
     _TaskScheduler->get_task(i)->set_taskDelay(ETD::ETD_TIMER, true, 100000);
     _TaskScheduler->get_task(i)->set_iteration_max(-1);
     _TaskScheduler->get_task(i)->setup(true);
