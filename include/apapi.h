@@ -59,6 +59,7 @@ public:
 	void initialize(uint8_t cmax);
 	void set_request(uint8_t, const char 	* const &, _wsur_cb_f);
 	void getter(const String &, DynamicJsonDocument &);
+	void set_json_id(JsonArray &);
 };
 extern AP_userApi _AP_userApi;
 

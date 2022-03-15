@@ -12,6 +12,8 @@
 #include "../include/program.h"
 #include "../include/tools.h"
 
+AP_userApi  _AP_userApi;
+AP_Api      _AP_Api;
 
 AP_userApiItem::AP_userApiItem() {}
 
@@ -149,7 +151,25 @@ void AP_userApi::set_request(uint8_t p, const char * const & id, _wsur_cb_f f)  
   _array[p].set_replyCallback(f);
   _array[p].set_mod(WSURM::WSURM_GETTER);
 }
-
+/**
+ * @fn          void AP_userApi::set_json_id(JsonArray & doc)
+ *
+ * @brief       
+ * @details     
+ *
+ * @author      Adrien Grellard
+ * @date        15/03/2022
+ *
+ * @param[out]  doc       
+ */
+void AP_userApi::set_json_id(JsonArray & doc)  {
+  String cReq;
+  for (int i = 0; i < _arrayCntMax; ++i) {
+    if (!_array[i].isEnabled()) continue;
+    _array[i].get_id(cReq);
+    doc.add(cReq);
+  }
+}
 
 
 AP_Api::AP_Api() {}
@@ -433,20 +453,20 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
         // list
         else if (req == FPSTR(REQ_006)) {
           var = reply.createNestedObject(FPSTR(REQ_006));
-          pl = var.createNestedObject(FPSTR(REP_003)); // lb
-          pPtr->get_json_lb_items(pl,false); // cmax: items:[]
-          pl = var.createNestedObject(FPSTR(REP_001)); // pl
-          pPtr->get_json_allpl_items(pl,false);} // items:[ cmax: cnt: pos: lbl: lref:  ]
+          pl = var.createNestedObject(FPSTR(REP_003));      // lb
+          pPtr->get_json_lb_items(pl,false);                // cmax: items:[]
+          pl = var.createNestedObject(FPSTR(REP_001));      // pl
+          pPtr->get_json_allpl_items(pl,false);}            // items:[ cmax: cnt: pos: lbl: lref:  ]
         // list_lbs
         else if (req == FPSTR(REQ_007)) {
-          var = reply.createNestedObject(FPSTR(REQ_006));
-          pl = var.createNestedObject(FPSTR(REP_003)); // lb;
-          pPtr->get_json_lb_items(pl,false);} //cmax: items:[]
+          var = reply.createNestedObject(FPSTR(REQ_006));   // list
+          pl = var.createNestedObject(FPSTR(REP_003));      // lb;
+          pPtr->get_json_lb_items(pl,false);}               //cmax: items:[]
         // list_pls
         else if (req == FPSTR(REQ_008)) {
-          var = reply.createNestedObject(FPSTR(REQ_006));
-          pl = var.createNestedObject(FPSTR(REP_001)); // pl
-          pPtr->get_json_allpl_items(pl,false);} // items:[ cmax: cnt: pos: lbl: lref:  ]
+          var = reply.createNestedObject(FPSTR(REQ_006));   // list
+          pl = var.createNestedObject(FPSTR(REP_001));      // pl
+          pPtr->get_json_allpl_items(pl,false);}            // items:[ cmax: cnt: pos: lbl: lref:  ]
         // list_ra
         else if (req == FPSTR(REQ_009)) {
           size = ARRAY_SIZE(RAALLNAMES);
@@ -456,34 +476,37 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
         else if (req == FPSTR(REQ_010)) {
           size = ARRAY_SIZE(REQALL);
           JsonArray arr2 = reply.createNestedArray(FPSTR(REQ_010));
-          for (int j = 0; j < size; ++j) {arr2.add(FPSTR(REQALL[j]));}} 
+          for (int j = 0; j < size; ++j) {arr2.add(FPSTR(REQALL[j]));}
+          _AP_userApi.set_json_id(arr2);} 
+          
+
         // list_lbpl
         else if (req == FPSTR(REQ_011)) {
-          var = reply.createNestedObject(FPSTR(REQ_002)); // list_lb
-          pPtr->jsonObject(var);
-          var = reply.createNestedObject(FPSTR(REQ_004)); // list_pl
-          pPtr->get_json_pl_items(var);}
+          var = reply.createNestedObject(FPSTR(REQ_002));   // list_lb
+          pPtr->jsonObject(var);                            // cmax: items:[]
+          var = reply.createNestedObject(FPSTR(REQ_004));   // list_pl
+          pPtr->get_json_pl_items(var);}                    // cmax: cnt: pos: lbl: lref: items:[id: lbl: ib: ibcfg:]
         // js_init
         else if (req == FPSTR(REQ_012)) {
           if ((pPtr->_plStatu.isPlaying && pPtr->_plStatu.isSet)) {
-            var = reply.createNestedObject(FPSTR(REQ_004)); // list_pl
-            pPtr->get_json_pl_items(var);}
+            var = reply.createNestedObject(FPSTR(REQ_004));   // list_pl
+            pPtr->get_json_pl_items(var);}                    // cmax: cnt: pos: lbl: lref: items:[id: lbl: ib: ibcfg:]
           else {
-            var = reply.createNestedObject(FPSTR(REQ_002)); // list_lb
-            pPtr->jsonObject(var);}
+            var = reply.createNestedObject(FPSTR(REQ_002));   // list_lb
+            pPtr->jsonObject(var);}                           // cmax: items:[]
         }
         // list_plsc
         else if (req == FPSTR(REQ_013)) {
-          var = reply.createNestedObject(FPSTR(REQ_006)); // list
-          pl = var.createNestedObject(FPSTR(REP_006)); // plc
-          pPtr->get_json_allpl_items(pl,false, true);}      
+          var = reply.createNestedObject(FPSTR(REQ_006));   // list
+          pl = var.createNestedObject(FPSTR(REP_006));      // plc
+          pPtr->get_json_allpl_items(pl,false, true);}      // items:[ cmax: cnt: pos: lbl: lref:  ]    
         // listc
         else if (req == FPSTR(REQ_014)) {
-          var = reply.createNestedObject(FPSTR(REQ_006)); // list
-          pl = var.createNestedObject(FPSTR(REP_003)); // lb
-          pPtr->get_json_lb_items(pl,false);
-          pl = var.createNestedObject(FPSTR(REP_006)); // plc
-          pPtr->get_json_allpl_items(pl,false, true);}
+          var = reply.createNestedObject(FPSTR(REQ_006));   // list
+          pl = var.createNestedObject(FPSTR(REP_003));      // lb
+          pPtr->get_json_lb_items(pl,false);                //cmax: items:[]
+          pl = var.createNestedObject(FPSTR(REP_006));      // plc
+          pPtr->get_json_allpl_items(pl,false, true);}      // items:[ cmax: cnt: pos: lbl: lref:  ] 
           
         if (item) {
           // Serial.printf("loop_select: %s\n", item[F("loop_select")].as<String>().c_str());
@@ -504,8 +527,8 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
                 if (req_2 == FPSTR(REP_005)) {
                   temp.clear();
                   root = temp.to<JsonObject>();                    
-                  pPtr->get_json_statu(root);
-                  reply[FPSTR(REQ_005)][FPSTR(REP_005)] = temp; 
+                  pPtr->get_json_statu(root);                  
+                  reply[FPSTR(REQ_005)][FPSTR(REP_005)] = temp; // loop:{statu:{play: pause: rnd: delay: delaymin: rt:}}
                 }
               }
               // pl
@@ -514,7 +537,7 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
                   temp.clear();
                   root = temp.to<JsonObject>();
                   pPtr->get_json_pl(root);
-                  reply[FPSTR(REQ_005)][FPSTR(REP_001)] = temp; 
+                  reply[FPSTR(REQ_005)][FPSTR(REP_001)] = temp; // loop:{pl:{set: play: pos: cnt: ib:}} 
                 }
               }
               // plt
@@ -523,7 +546,7 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
                   temp.clear();
                   root = temp.to<JsonObject>();
                   pPtr->get_json_plt(root);
-                  reply[FPSTR(REQ_005)][FPSTR(REP_002)] = temp; 
+                  reply[FPSTR(REQ_005)][FPSTR(REP_002)] = temp; // loop:{plt:{pos: min: max:}} 
                 }
               }
               // lb
@@ -532,7 +555,7 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
                   temp.clear();
                   root = temp.to<JsonObject>();
                   pPtr->get_json_lb(root);
-                  reply[FPSTR(REQ_005)][FPSTR(REP_003)] = temp; 
+                  reply[FPSTR(REQ_005)][FPSTR(REP_003)] = temp; // loop:{lb:{name: pos: cnt: iname: icnt: icmax: }}  
                 }
               }
               // lbt
@@ -541,7 +564,7 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
                   temp.clear();
                   root = temp.to<JsonObject>();                  
                   pPtr->get_json_lbt(root);
-                  reply[FPSTR(REQ_005)][FPSTR(REP_004)] = temp; 
+                  reply[FPSTR(REQ_005)][FPSTR(REP_004)] = temp; // loop:{lbt:{pos: min: max:}} 
                 }
               }
             }
@@ -550,9 +573,12 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
             String  gGet = item[FPSTR(APPTT_001)][FPSTR(APPTT_002)].as<String>();
             if (gGet == FPSTR(REQ_016)) {
               if (!reply.containsKey(FPSTR(REP_007))){
-                reply.createNestedObject(FPSTR(REP_007)); // 
+                reply.createNestedObject(FPSTR(REP_007)); // pld
                 temp.clear();
                 root = temp.to<JsonObject>();   
+                /*
+                  cmax: cnt: pos: lbl: lref: items:[id: lbl: ib: ibcfg:]
+                */
                 pPtr->get_json_pl_items(item[FPSTR(APPTT_001)][FPSTR(APPTT_003)].as<int>(), root, true);
                 reply[FPSTR(REP_007)] = temp;
               }               
@@ -573,5 +599,3 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
     serializeJson(reply, rep);
 }
 
-AP_userApi  _AP_userApi;
-AP_Api      _AP_Api;

@@ -139,8 +139,8 @@
 
   static const char REQ_014[] PROGMEM = "listc";        // DEMO WEBSERVER
 
-  static const char REQ_015[] PROGMEM = "loop_select";        
-  static const char REQ_016[] PROGMEM = "list_pld";
+  static const char REQ_015[] PROGMEM = "loop_select";  // "get":[{"loop_select":["statu", "pl"]}]      
+  static const char REQ_016[] PROGMEM = "list_pld";     // "get":[{"gv":{"n":"list_pld","v":"0"}}]
 
   static const char* const REQALL[] PROGMEM = {
   REQ_001, REQ_002, REQ_003, REQ_004, REQ_005,

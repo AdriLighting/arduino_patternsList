@@ -732,6 +732,33 @@ RA_PL_TOFS:         arg1: position of playlist list array
                             id    object          unique id of the item
                             lbl   object          label
                             ib    object          basiclist 
+                            ibcfg object          extra 
+```
+<hr>
+</details>
+
+<br>
+
+`get all items object of slected playlist`
+
+<details>
+<summary>list_pld</summary>
+
+```json
+{"op":0,"type":"HTTP_POST","set":[],"get":[{"gv":{"n":"list_pld","v":"0"}}]}      
+```   
+```html
+  list_pld      object 
+                cmax  object                maximum item size
+                cnt   object                current item size
+                pos   object                list array position
+                lbl   object                label of the lsit
+                lref  object                basiclist reference
+                items array       
+                      id    object          unique id of the item
+                      lbl   object          label
+                      ib    object          basiclist 
+                      ibcfg object          extra 
 ```
 <hr>
 </details>
@@ -739,7 +766,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
 ##### PLAYLIST WITHOUT ITEMS 
 
 `get all playlist`
-
 
 <details>
 <summary>list_pls</summary>
@@ -761,6 +787,8 @@ RA_PL_TOFS:         arg1: position of playlist list array
 ```
 <hr>
 </details>
+
+<br>
 
 `get all playlist by basiclist reference`
 
@@ -794,6 +822,9 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <details>
 <summary>loop</summary>
 
+```json
+{"op":0,"cli":"HTTP_POST","set":[],"get":[{"loop_select":["statu"]}]}      
+```  
 ```json
 {"op":0,"cli":"HTTP_POST","set":[],"get":["statu"]}      
 ```  
@@ -830,6 +861,7 @@ RA_PL_TOFS:         arg1: position of playlist list array
 ```
 <hr>
 </details>
+
 </details>
 
 ##### DIVERS
@@ -848,6 +880,8 @@ RA_PL_TOFS:         arg1: position of playlist list array
 ```
 <hr>
 </details>
+
+<br>
 
 `list of avaible getter`
 
