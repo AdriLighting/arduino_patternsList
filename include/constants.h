@@ -32,6 +32,13 @@
       uint8_t pos;
   } LB_flag;
 
+  static const char APPPTT_001   [] PROGMEM = "gv";
+  static const char APPPTT_002   [] PROGMEM = "n";
+  static const char APPPTT_003   [] PROGMEM = "v";
+  static const char APPPTT_004   [] PROGMEM = "op";
+  static const char APPPTT_005   [] PROGMEM = "set";
+  static const char APPPTT_006   [] PROGMEM = "get";
+
 
   static const char FOPATH_PLAYLIST   [] PROGMEM = "/playlist/";
   static const char FNPREFIX_PLAYLIST [] PROGMEM = "playlist_";
@@ -61,7 +68,7 @@
   static const char RANAME_022[] PROGMEM = "RA_LSET_LBNEXT";
   static const char RANAME_023[] PROGMEM = "RA_LSET_LBPREV";
   static const char RANAME_024[] PROGMEM = "RA_LSET_LBRND";
-  static const char RANAME_025[] PROGMEM = "RA_LGET_PL";
+  // static const char RANAME_025[] PROGMEM = "RA_LGET_PL";
   static const char RANAME_026[] PROGMEM = "RA_PLI_NEW";
   static const char RANAME_027[] PROGMEM = "RA_PLI_REM";
   static const char RANAME_028[] PROGMEM = "RA_PLI_REP";
@@ -73,7 +80,7 @@
   RANAME_006, RANAME_007, RANAME_008, RANAME_009, RANAME_010, 
   RANAME_011, RANAME_012, RANAME_013, RANAME_014, RANAME_015,
   RANAME_016, RANAME_017, RANAME_018, RANAME_019, RANAME_020, 
-  RANAME_021, RANAME_022, RANAME_023, RANAME_024, RANAME_025,
+  RANAME_021, RANAME_022, RANAME_023, RANAME_024,
   RANAME_026, RANAME_027, RANAME_028, RANAME_029
   };
   typedef enum _remote_action {
@@ -101,7 +108,6 @@
     RA_LSET_LBNEXT,     
     RA_LSET_LBPREV,     
     RA_LSET_LBRND,
-    RA_LGET_PL,
     RA_PLI_NEW,
     RA_PLI_REM,
     RA_PLI_REP,
@@ -134,11 +140,13 @@
   static const char REQ_014[] PROGMEM = "listc";        // DEMO WEBSERVER
 
   static const char REQ_015[] PROGMEM = "loop_select";        
+  static const char REQ_016[] PROGMEM = "list_pld";
 
   static const char* const REQALL[] PROGMEM = {
   REQ_001, REQ_002, REQ_003, REQ_004, REQ_005,
   REQ_006, REQ_007, REQ_008, REQ_009, REQ_010,
-  REQ_011, REQ_012, REQ_013, REQ_014, REQ_015
+  REQ_011, REQ_012, REQ_013, REQ_014, REQ_015, 
+  REQ_016
   };  
   // typedef enum _requette_type {
   //     REQ_LB,      

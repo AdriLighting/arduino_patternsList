@@ -416,8 +416,6 @@ void Program::remote_action(RA action, const char * const & key, const char * co
         pl_set_listPos((uint8_t)atoi(key), pN);
         reset();}
     break;
-    case RA::RA_LGET_PL:
-    break;
     case RA::RA_PLI_NEW: if (String(key) != "") pl_item_new((uint8_t)atoi(key)); break;    
     case RA::RA_PLI_REP: if ((String(key) != "") && (String(val) != "")) pl_item_new(     (uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
     case RA::RA_PLI_REM: if ((String(key) != "") && (String(val) != "")) pl_item_remove(  (uint8_t)atoi(key), (uint8_t)atoi(val)); break;    

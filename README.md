@@ -449,8 +449,13 @@ HTTP_POST, UDP, SOCKET
     get   array   advanced
           [  "", {"":["",""]}] 
 
+    get   array   advanced
+          [  "", {"":{"":""}}] 
+          
+
 // example:
-{"op":0,"cli":"","set":[{"n":"1","v":"1"}, {"n":"2","v":"2"}],"get":["list",{"loop_select":["statu", "lb"]}]}          
+{"op":0,"cli":"","set":[{"n":"1","v":"1"}, {"n":"2","v":"2"}],"get":["list",{"loop_select":["statu", "lb"]}]}   
+{"op":0,"cli":"","set":[],"get":[{"gv":{"n":"list_pld","v":"1"}}]}       
   {"op":0,"cli":"HTTP_POST","set":[],"get":["loop"]}   
   {"op":0,"cli":"SOKCET","set":[{"n":"RA_ITEM_NEXT","v":""}],"get":[]}       
   {"op":0,"cli":"SOKCET","set":[{"n":"RA_PLAY_DELAY","v":"35"}],"get":[]}       

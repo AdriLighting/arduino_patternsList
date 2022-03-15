@@ -306,18 +306,6 @@ void AP_ApiReply::reply_generate(DynamicJsonDocument & doc){
     case RA::RA_LSET_PL:
     break;
 
-
-    case RA::RA_LGET_PL:
-      // pld
-      if (!doc.containsKey(FPSTR(REP_007))){
-        doc.createNestedObject(FPSTR(REP_007)); // 
-        temp.clear();
-        root = temp.to<JsonObject>();   
-        pPtr->get_json_pl_items(_value.toInt(), root, true);
-        doc[FPSTR(REP_007)] = temp;
-      } 
-    break;
-
     case RA::RA_PLI_NEW:
     case RA::RA_PLI_REM:
     case RA::RA_PLI_REP:
@@ -368,10 +356,10 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
       0 = ?
       1 = playlist items management
     */
-    if (doc.containsKey(F("op"))) {
-      uint8_t op = doc[F("op")].as<uint8_t>();
+    if (doc.containsKey(FPSTR(APPPTT_004))) {
+      uint8_t op = doc[FPSTR(APPPTT_004)].as<uint8_t>();
       if (op == 1) {
-        // Serial.printf("op: %s\n", doc[F("op")].as<String>().c_str());
+        // Serial.printf("op: %s\n", doc[FPSTR(APPPTT_004)].as<String>().c_str());
         pPtr->pl_item_new(doc, reply);
         pPtr->pl_item_remove(doc, reply);
       }
@@ -382,16 +370,16 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
     // if (doc.containsKey(F("type"))) Serial.printf("type: %s\n",   doc[F("type")].as<String>().c_str());   
 
 
-    if (doc.containsKey(F("set"))) {
-      arr                       = doc[F("set")].as<JsonArray>();
+    if (doc.containsKey(FPSTR(APPPTT_005))) {
+      arr                       = doc[FPSTR(APPPTT_005)].as<JsonArray>();
       sizeReponse               = arr.size();
       _webserverRequest_reply = new AP_ApiReply[sizeReponse];
       posReponse                = 0;
 
       for (uint8_t i = 0; i < sizeReponse; i++) {
         JsonObject item = arr[i];
-        String  n     = item[F("n")].as<String>();
-        String  v     = item[F("v")].as<String>();
+        String  n     = item[FPSTR(APPPTT_002)].as<String>();
+        String  v     = item[FPSTR(APPPTT_003)].as<String>();
                 size  = ARRAY_SIZE(RAALLNAMES);
         for (int j = 0; j < size; ++j) {
           if (n == "") continue;
@@ -408,12 +396,27 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
     }
 
     // GETTER
-    if (doc.containsKey(F("get"))) {
-      arr = doc[F("get")].as<JsonArray>();
+    if (doc.containsKey(FPSTR(APPPTT_006))) {
+      arr = doc[FPSTR(APPPTT_006)].as<JsonArray>();
       for (size_t i = 0; i < arr.size(); i++) {
         JsonObject  item  = arr[i];
         String      req   = arr[i].as<String>();
         if (!item && req == "") continue;
+
+        if (item) {
+          if (item[FPSTR(APPPTT_001)]) { // gv "get":[{"gv":{"n":"list_pld","v":"1"}}]
+            String  gGet = item[FPSTR(APPPTT_001)][FPSTR(APPPTT_002)].as<String>();
+            if (gGet == FPSTR(REQ_016)) {
+              if (!reply.containsKey(FPSTR(REP_007))){
+                reply.createNestedObject(FPSTR(REP_007)); // 
+                temp.clear();
+                root = temp.to<JsonObject>();   
+                pPtr->get_json_pl_items(item[FPSTR(APPPTT_001)][FPSTR(APPPTT_003)].as<int>(), root, true);
+                reply[FPSTR(REP_007)] = temp;
+              }               
+            }
+          }
+        }
 
         // list_alllb
         if (req == FPSTR(REQ_001)) {

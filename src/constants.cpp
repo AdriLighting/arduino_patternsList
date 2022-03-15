@@ -25,7 +25,6 @@
       RA_LSET_LBNEXT,     
       RA_LSET_LBPREV,     
       RA_LSET_LBRND,
-      RA_LGET_PL,
       RA_PLI_NEW,
       RA_PLI_REM,
       RA_PLI_REP,
