@@ -32,12 +32,12 @@
       uint8_t pos;
   } LB_flag;
 
-  static const char APPPTT_001   [] PROGMEM = "gv";
-  static const char APPPTT_002   [] PROGMEM = "n";
-  static const char APPPTT_003   [] PROGMEM = "v";
-  static const char APPPTT_004   [] PROGMEM = "op";
-  static const char APPPTT_005   [] PROGMEM = "set";
-  static const char APPPTT_006   [] PROGMEM = "get";
+  static const char APPTT_001   [] PROGMEM = "gv";
+  static const char APPTT_002   [] PROGMEM = "n";
+  static const char APPTT_003   [] PROGMEM = "v";
+  static const char APPTT_004   [] PROGMEM = "op";
+  static const char APPTT_005   [] PROGMEM = "set";
+  static const char APPTT_006   [] PROGMEM = "get";
 
 
   static const char FOPATH_PLAYLIST   [] PROGMEM = "/playlist/";
