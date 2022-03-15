@@ -849,9 +849,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <hr>
 </details>
 
-
-<br>
-
 `list of avaible getter`
 
 <details>
