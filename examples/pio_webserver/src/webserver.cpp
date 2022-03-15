@@ -158,9 +158,9 @@ void espwebServer::handleJson() {
       replyOK();
     } else {
       // DeviceserverPtrGet()->handleJson(doc);
-      String reponse;
-      _WebserverRequest.parsingRequest(doc, reponse, "");
-      replyJson(reponse);
+      String reply;
+      _AP_Api.parsingRequest(doc, reply, "");
+      replyJson(reply);
     } 
     
   }  

@@ -11,7 +11,7 @@
 #endif
 
 #include "../include/Stringsort.h"
-#include "../include/webserverRequest.h"
+#include "../include/apapi.h"
 
 
 // #define DEBUG
@@ -524,14 +524,14 @@ void Program::pl_item_new(uint8_t pP) {
 
   JsonObject root;
   DynamicJsonDocument temp(2048);
-  DynamicJsonDocument reponse(2048);
-  reponse.createNestedObject(FPSTR(REP_007));
+  DynamicJsonDocument reply(2048);
+  reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
   get_json_pl_items(pP, root, true);
-  reponse[FPSTR(REP_007)] = temp;
+  reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
-    // pl_fs(pP, reponse);  
+    // pl_fs(pP, reply);  
   #endif
 }
 void Program::pl_item_new(uint8_t pP, uint8_t iP) {
@@ -546,14 +546,14 @@ void Program::pl_item_new(uint8_t pP, uint8_t iP) {
 
   JsonObject root;
   DynamicJsonDocument temp(2048);
-  DynamicJsonDocument reponse(2048);
-  reponse.createNestedObject(FPSTR(REP_007));
+  DynamicJsonDocument reply(2048);
+  reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
   get_json_pl_items(pP, root, true);
-  reponse[FPSTR(REP_007)] = temp;
+  reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
-    // pl_fs(pP, reponse);  
+    // pl_fs(pP, reply);  
   #endif
 }
 void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
@@ -566,18 +566,18 @@ void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
 
   JsonObject root;
   DynamicJsonDocument temp(2048);
-  DynamicJsonDocument reponse(2048);
-  reponse.createNestedObject(FPSTR(REP_007));
+  DynamicJsonDocument reply(2048);
+  reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
   get_json_pl_items(pP, root, true);
-  reponse[FPSTR(REP_007)] = temp;
+  reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
-    // pl_fs(pP, reponse);  
+    // pl_fs(pP, reply);  
   #endif
 }
 
-void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
+void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & reply) {
   if (!doc.containsKey(F("pl_item_new"))) return;
   uint8_t pP          = doc[F("pl_item_new")][F("pP")].as<uint8_t>();
   uint8_t iP          = doc[F("pl_item_new")][F("iP")].as<uint8_t>();
@@ -590,16 +590,16 @@ void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & repon
   ListLoop::updatePos(&_pltFlag, pC-1);
   JsonObject root;
   DynamicJsonDocument temp(2048);
-  reponse.createNestedObject(FPSTR(REP_007));
+  reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
   get_json_pl_items(pP, root, true);
-  reponse[FPSTR(REP_007)] = temp;
+  reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
-    // pl_fs(pP, reponse); 
+    // pl_fs(pP, reply); 
   #endif
 }
-void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & reponse) {
+void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & reply) {
   if (!doc.containsKey(F("pl_item_remove"))) return;
 
   uint8_t pP = doc[F("pl_item_remove")][F("pP")].as<uint8_t>();
@@ -612,13 +612,13 @@ void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & re
 
   JsonObject root;
   DynamicJsonDocument temp(2048);
-  reponse.createNestedObject(FPSTR(REP_007));
+  reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
   get_json_pl_items(pP, root, true);
-  reponse[FPSTR(REP_007)] = temp;
+  reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
-    // pl_fs(pP, reponse);  
+    // pl_fs(pP, reply);  
   #endif
 }
 

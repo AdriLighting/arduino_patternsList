@@ -1,3 +1,12 @@
+/**
+ * @defgroup    PROGRAM program
+ *
+ * @brief       This file implements program.
+ *
+ * @author      Adrien Grellard
+ * @date        15/03/2022
+ */
+
 #ifndef PROGRAM_H
 #define PROGRAM_H
 
@@ -35,6 +44,7 @@
     void json(JsonArray & );
 
   };
+  
   class Program : public Listbase, public ListLoop {
     typedef std::function<void(const String & v1, const uint16_t & v2, boolean upd)> callback_function_t;
     // typedef std::function<void(const String & v1)> callback_error;
@@ -66,42 +76,15 @@
     boolean _fs_pl    = false;
 
   public:
-    /**
-     * @brief      Constructs a new instance.
-     *
-     * @param[in]  nbLb  nb of basic list
-     * @param[in]  fs    enabled filesystem management
-     */
+
     Program (uint8_t nbLb , boolean fs );
     ~Program ();
 
 
     PL_flag         _plStatu;
-    /**
-     * @brief      loading one of the basic list   
-     *
-     * @param[in]  <unnamed>  size of items array
-     * @param      arr        static const char* const items[] PROGMEM
-     * @param      <unnamed>  id of basic list
-     * @param[in]  t          classification type
-     */
+
     void initialize(const uint16_t & , const char* const* arr, const char  * const &, SORT_TYPE t = ST_BASE);
-    /**
-     * @brief      Initializes the playlist.
-     *
-     * @param[in]  <unnamed>  nb of playlist
-     * @param      <unnamed>  playlist item size
-     * @param      <unnamed>  id of basic list
-     */
     void initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
-    /**
-     * @brief      basiclist initialization.
-     *
-     * @param[in]  p      position of basic list array  
-     * @param[in]  name   id of list
-     * @param[in]  items  size of items array
-     * @param      arr    static const char* const items[] PROGMEM
-     */
     void initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
 
 

@@ -143,7 +143,12 @@ void loop() {
   #endif
   _TaskScheduler->loop();
 }
-
+/**
+ * @brief 
+ * @param request 
+ * @param pos 
+ * @param data 
+*/
 void _http_get_cb(AsyncWebServerRequest * request, uint8_t pos, const String & data){
   _Webserver.http_send(request, 200, WSTE_TXTPLAIN, "ok");
 }
@@ -151,14 +156,14 @@ void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String & 
   String json = data;
   json.replace("\r\n", "");
   // Serial.printf_P(PSTR("[_callPost /json] %s\n"), json.c_str());  
-  String reponse = "";
+  String reply = "";
   DynamicJsonDocument doc(2048);  
   DeserializationError error = deserializeJson(doc, json);
   if (error) {
     Serial.printf_P(PSTR("[_http_post_cb][PARSSING ERROR] %s\n"), json.c_str());  
-  } else {_WebserverRequest.parsingRequest(doc, reponse, "");} 
-  _Webserver.http_send(request, 200, WSTE_APPJSON, reponse);
-  _TaskScheduler->get_task(3)->set_callbackOstart([=](){_Webserver.socket_send(reponse);});
+  } else {_AP_Api.parsingRequest(doc, reply, "");} 
+  _Webserver.http_send(request, 200, WSTE_APPJSON, reply);
+  _TaskScheduler->get_task(3)->set_callbackOstart([=](){_Webserver.socket_send(reply);});
   _TaskScheduler->get_task(3)->set_iteration_max(0);
   _TaskScheduler->get_task(3)->set_taskDelay(ETD::ETD_DELAY, true, 250, 1);
   _TaskScheduler->get_task(3)->set_taskDelayEnabled(ETD::ETD_DELAY, true);
@@ -170,9 +175,9 @@ void _socket_cb(const String & s){
   if (error) {      
       Serial.printf_P(PSTR("[webserver_parsingRequest][deserializeJson ERROR: %d]\nstring:\n\t%s"), error, s.c_str());  
   } else {
-    String reponse;
-    _WebserverRequest.parsingRequest(doc, reponse, "");
-    _Webserver.socket_send(reponse);
+    String reply;
+    _AP_Api.parsingRequest(doc, reply, "");
+    _Webserver.socket_send(reply);
   }
 }  
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
@@ -187,12 +192,12 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   if (!updWebserver) return; 
    
   String                    rep;
-  DynamicJsonDocument       reponse(2048);
-  webserverRequest_reponse  * _reponse = new webserverRequest_reponse();
-  _reponse->set_ra(RA::RA_ITEM_NEXT);
-  _reponse->make_reponse(reponse);
-  delete _reponse; 
-  serializeJson(reponse, rep); 
+  DynamicJsonDocument       reply(2048);
+  AP_ApiReply  * _reply = new AP_ApiReply();
+  _reply->set_ra(RA::RA_ITEM_NEXT);
+  _reply->reply_generate(reply);
+  delete _reply; 
+  serializeJson(reply, rep); 
   _Webserver.socket_send(rep);  
 
 }
@@ -209,7 +214,7 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
       DynamicJsonDocument doc(1024);
       JsonArray           arr;
       JsonObject          var;
-      String              reponse;
+      String              reply;
 
       doc[F("op")]    = 0;
       doc[F("type")]  = "ESP";
@@ -222,8 +227,8 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
       arr = doc.createNestedArray(F("get"));  
       arr.add("loop");
 
-      _WebserverRequest.parsingRequest(doc, reponse, "");
-      _Webserver.socket_send(reponse);
+      _AP_Api.parsingRequest(doc, reply, "");
+      _Webserver.socket_send(reply);
       // RA action = RAARR[p];
       // _Program->remote_action(action, v.c_str(), "", NULL);    
   }  

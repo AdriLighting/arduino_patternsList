@@ -164,14 +164,14 @@ void _Program_handleCallback(const String itemBaseName, const uint16_t& itemBase
   if (!updWebserver) return;
 
   String                    rep;
-  DynamicJsonDocument       reponse(2048);
-  webserverRequest_reponse* _webserverRequest_reponse = new webserverRequest_reponse[1];
+  DynamicJsonDocument       reply(2048);
+  AP_ApiReply* _webserverRequest_reply = new AP_ApiReply[1];
 
-  _webserverRequest_reponse[0].set_ra(RA::RA_ITEM_NEXT);
-  _webserverRequest_reponse[0].make_reponse(reponse);
-  serializeJson(reponse, rep);
+  _webserverRequest_reply[0].set_ra(RA::RA_ITEM_NEXT);
+  _webserverRequest_reply[0].reply_generate(reply);
+  serializeJson(reply, rep);
 
-  delete[] _webserverRequest_reponse;
+  delete[] _webserverRequest_reply;
 
   Socketserver.sendTXT(0, rep);
 }
@@ -182,9 +182,9 @@ void webserver_parsingRequest(String s) {
     Serial.printf_P(PSTR("[webserver_parsingRequest][deserializeJson ERROR: %d]\nstring:\n\t%s"), error, s.c_str());
   }
   else {
-    String reponse;
-    _WebserverRequest.parsingRequest(doc, reponse, "");
-    Socketserver.sendTXT(0, reponse);
+    String reply;
+    _AP_Api.parsingRequest(doc, reply, "");
+    Socketserver.sendTXT(0, reply);
   }
 }
 
@@ -205,7 +205,7 @@ void serial_menu_cmd(const String& cmd, const String& value) {
   DynamicJsonDocument doc(1024);
   JsonArray           arr;
   JsonObject          var;
-  String              reponse;
+  String              reply;
 
   doc[F("op")] = 0;
   doc[F("type")] = "ESP";
@@ -218,8 +218,8 @@ void serial_menu_cmd(const String& cmd, const String& value) {
   arr = doc.createNestedArray(F("get"));
   arr.add("loop");
 
-  _WebserverRequest.parsingRequest(doc, reponse, "");
-  Socketserver.sendTXT(0, reponse);
+  _AP_Api.parsingRequest(doc, reply, "");
+  Socketserver.sendTXT(0, reply);
   // RA action = RAARR[p];
   // _Program->remote_action(action, v.c_str(), "", NULL);    
 }

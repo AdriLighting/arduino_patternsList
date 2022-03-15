@@ -218,6 +218,59 @@ void loop() {
 <hr>
 </details>
 
+<details>
+<summary>user api</summary>
+<br>
+
+```c++
+class AP_userApi;
+```
+**`a static instance is already instanced`**
+```c++
+extern AP_userApi _AP_userApi;
+```
+```c++
+/**
+ * @brief      Initializes then aray int the void setup().
+ *
+ * @param[in]  size of AP_userApiItem object array
+ */
+void AP_userApi::initialize(uint8_t cmax)
+```
+```c++
+// examples: 
+void setup() {
+  _AP_userApi.initialize(2);
+}
+```
+```c++
+typedef std::function<void(const String & v1, DynamicJsonDocument & doc)> _wsur_cb_f;
+```
+```c++
+/**
+ * @param[in]   p     position of the obejct array
+ * @param[in]   id    id used when an API getter request is received 
+ * @param[in]   f     The callback associate with identifier         
+ */
+void AP_userApi::set_request(uint8_t p, const char * const & id, _wsur_cb_f f)
+```
+**`function to initialize a request with its return function allowing to add the response to the json object `**
+```c++
+// examples: 
+void setup() {
+  _AP_userApi.initialize(2);
+  _AP_userApi.set_request(0, "user", [](const String & v1, DynamicJsonDocument & doc){
+    Serial.printf("[user getter][req: %s]\n", v1.c_str());
+    JsonObject var = doc.createNestedObject(FPSTR(REQ_005));
+    _Program->get_json_jsInit(var);});
+}
+```
+
+
+
+<hr>
+</details>
+
 ### USER_MANAGEMENT
 
 <details>
@@ -281,14 +334,14 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   if (!updWebserver) return; 
    
   String                    rep;
-  DynamicJsonDocument       reponse(2048);
-  webserverRequest_reponse  * _webserverRequest_reponse = new webserverRequest_reponse[1];
+  DynamicJsonDocument       reply(2048);
+  AP_ApiReply  * _webserverRequest_reply = new AP_ApiReply[1];
 
-  _webserverRequest_reponse[0].set_ra(RA::RA_ITEM_NEXT);
-  _webserverRequest_reponse[0].make_reponse(reponse);
-  serializeJson(reponse, rep); 
+  _webserverRequest_reply[0].set_ra(RA::RA_ITEM_NEXT);
+  _webserverRequest_reply[0].reply_generate(reply);
+  serializeJson(reply, rep); 
 
-  delete[] _webserverRequest_reponse; 
+  delete[] _webserverRequest_reply; 
   _Webserver.socket_send(rep);   
 }
 
@@ -309,21 +362,21 @@ _Program->set_callback(_Program_cb);
 <br>
 
 ```c++
-class WebserverRequest;
+class AP_Api;
 ```
 **`a static instance is already instanced`**
 ```c++
-extern WebserverRequest _WebserverRequest;
+extern AP_Api _AP_Api;
 ```
 ```c++
 /**
  * @brief      function to use to process a user request formulated with a query in json format
  *
- * @param      doc   query
- * @param      r     reponse json in String format
- * @param[in]  upd   parmaeter for send a reponse query
+ * @param[out]  doc   query
+ * @param[out]  r     reply json in String format
+ * @param[in]   upd   parmaeter for send a reply query
  */
-void WebserverRequest::parsingRequest(DynamicJsonDocument & doc, String & r, const String & upd);
+void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & r, const String & upd);
 ```
 **`function to use to process a user request formulated with a query in json format`**
 ```c++
@@ -340,9 +393,9 @@ void espwebServer::handleJson() {
     if (error) {
       server.send(200, "text/plain", "");
     } else {
-      String reponse;
-      _WebserverRequest.parsingRequest(doc, reponse, "");
-      server.send(200, "application/json", reponse);
+      String reply;
+      _AP_Api.parsingRequest(doc, reply, "");
+      server.send(200, "application/json", reply);
     } 
     
   }  
@@ -359,9 +412,9 @@ web_server.on(requestName, HTTP_POST, [](AsyncWebServerRequest * request){}, NUL
   if (error) {
     request->send(200, "text/plain", "");
   } else {
-    String reponse;
-    _WebserverRequest.parsingRequest(doc, reponse, "");
-    request->send(200, "application/json", reponse);
+    String reply;
+    _AP_Api.parsingRequest(doc, reply, "");
+    request->send(200, "application/json", reply);
   } 
 });
 ```
@@ -480,7 +533,7 @@ xhr.send(data);
 #### SETTER  
 
 <details>
-<summary>id with reponse</summary>
+<summary>id with reply</summary>
 
 ```html
 RA_ITEM:             arg1: position of items list array
@@ -703,8 +756,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
 ```
 <hr>
 </details>
-
-<br>
 
 `get all playlist by basiclist reference`
 

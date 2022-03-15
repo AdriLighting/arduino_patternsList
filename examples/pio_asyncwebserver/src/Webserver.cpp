@@ -261,7 +261,7 @@ void Webserver::setup(){
     _requestArray[i].get_contentType(contentType);
     _requestArray[i].get_rType(rType);
 
-    LOG(printf_P, PSTR("[%d][New request]\n\t[method: %d][name: %s]\n\t[content-type: %s][reponse-type: %d]\n"),
+    LOG(printf_P, PSTR("[%d][New request]\n\t[method: %d][name: %s]\n\t[content-type: %s][reply-type: %d]\n"),
      i, method, requestName, contentType, rType);
 
     web_server.on(requestName, method, [=](AsyncWebServerRequest *request){

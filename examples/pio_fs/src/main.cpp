@@ -118,7 +118,7 @@ void serial_menu_cmd(const String& cmd, const String& value) {
   DynamicJsonDocument doc(1024);
   JsonArray           arr;
   JsonObject          var;
-  String              reponse;
+  String              reply;
 
   doc[F("op")] = 0;
   doc[F("type")] = "ESP";
@@ -131,8 +131,8 @@ void serial_menu_cmd(const String& cmd, const String& value) {
   // arr = doc.createNestedArray(F("get"));  
   // arr.add("loop");
 
-  _WebserverRequest.parsingRequest(doc, reponse, v2);
-  Serial.printf_P(PSTR("[serial_menu_cmd->reponse]\n%S\n"), reponse.c_str());
+  _AP_Api.parsingRequest(doc, reply, v2);
+  Serial.printf_P(PSTR("[serial_menu_cmd->reply]\n%S\n"), reply.c_str());
 
   // RA action = RAARR[p];
   // _Program->remote_action(action, v.c_str(), v2.c_str(), NULL);    

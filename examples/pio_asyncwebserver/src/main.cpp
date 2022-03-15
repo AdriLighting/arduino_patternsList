@@ -166,7 +166,7 @@ void _calltest(AsyncWebServerRequest * request, uint8_t pos){
   wRequest->get_contentType(contentType);
   wRequest->get_rType(rType);
 
-  Serial.printf_P(PSTR("[%d][_calltest]\n\t[method: %d][name: %s]\n\t[content-type: %s][reponse-type: %d]\n"),
+  Serial.printf_P(PSTR("[%d][_calltest]\n\t[method: %d][name: %s]\n\t[content-type: %s][reply-type: %d]\n"),
   pos, method, requestName, contentType, rType);
   int params = request->params();
   for(uint8_t i=0;i<params;i++){
@@ -183,7 +183,7 @@ void _calltest(AsyncWebServerRequest * request, uint8_t pos){
   DynamicJsonDocument doc(5000);
   JsonArray           arr;
   JsonObject          var;
-  String              reponse;
+  String              reply;
 
   doc[F("op")]    = 0;
   doc[F("type")]  = "ESP";
@@ -197,9 +197,9 @@ void _calltest(AsyncWebServerRequest * request, uint8_t pos){
   arr.add("loop");
   // arr.add("list_pl");
 
-  _WebserverRequest.parsingRequest(doc, reponse, "");
+  _AP_Api.parsingRequest(doc, reply, "");
 
-  if (rType == WSRM_FROMCALLBACK) request->send(200, contentType, reponse);      
+  if (rType == WSRM_FROMCALLBACK) request->send(200, contentType, reply);      
 }
 
 void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
@@ -213,14 +213,14 @@ void _Program_handleCallback(const String itemBaseName, const uint16_t & itemBas
   if (!updWebserver) return; 
    
   String                    rep;
-  DynamicJsonDocument       reponse(2048);
-  webserverRequest_reponse  * _webserverRequest_reponse = new webserverRequest_reponse[1];
+  DynamicJsonDocument       reply(2048);
+  AP_ApiReply  * _webserverRequest_reply = new AP_ApiReply[1];
 
-  _webserverRequest_reponse[0].set_ra(RA::RA_ITEM_NEXT);
-  _webserverRequest_reponse[0].make_reponse(reponse);
-  serializeJson(reponse, rep); 
+  _webserverRequest_reply[0].set_ra(RA::RA_ITEM_NEXT);
+  _webserverRequest_reply[0].reply_generate(reply);
+  serializeJson(reply, rep); 
 
-  delete[] _webserverRequest_reponse; 
+  delete[] _webserverRequest_reply; 
   _Webserver.socket_send(rep);   
 }
 void webserver_parsingRequest(const String & s){
@@ -229,9 +229,9 @@ void webserver_parsingRequest(const String & s){
   if (error) {      
       Serial.printf_P(PSTR("[webserver_parsingRequest][deserializeJson ERROR: %d]\nstring:\n\t%s"), error, s.c_str());  
   } else {
-    String reponse;
-    _WebserverRequest.parsingRequest(doc, reponse, "");
-    _Webserver.socket_send(reponse);
+    String reply;
+    _AP_Api.parsingRequest(doc, reply, "");
+    _Webserver.socket_send(reply);
   }
 }  
 
@@ -254,7 +254,7 @@ void wehnAPisReady(){_Webserver.begin();}
       DynamicJsonDocument doc(1024);
       JsonArray           arr;
       JsonObject          var;
-      String              reponse;
+      String              reply;
 
       doc[F("op")]    = 0;
       doc[F("type")]  = "ESP";
@@ -267,8 +267,8 @@ void wehnAPisReady(){_Webserver.begin();}
       arr = doc.createNestedArray(F("get"));  
       arr.add("loop");
 
-      _WebserverRequest.parsingRequest(doc, reponse, "");
-      _Webserver.socket_send(reponse);
+      _AP_Api.parsingRequest(doc, reply, "");
+      _Webserver.socket_send(reply);
       // RA action = RAARR[p];
       // _Program->remote_action(action, v.c_str(), "", NULL);    
   }  

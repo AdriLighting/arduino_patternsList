@@ -19,6 +19,12 @@
   }
 #endif
 void define_print(){
+
+  #ifdef AP_DEFAULT
+    Serial.println(F("[AP_DEFAULT][OK]"));  
+  #else
+    Serial.println(F("[AP_DEFAULT][NO]"));  
+  #endif
   #ifdef DEBUGSERIAL
     Serial.println(F("[DEBUGSERIAL][OK]"));  
   #else
@@ -43,7 +49,33 @@ void define_print(){
     Serial.println(F("[DEBUG_AP][OK]"));  
   #else
     Serial.println(F("[DEBUG_AP][NO]"));  
-  #endif  
+  #endif 
+  #ifdef DEBUG_BASICLIST
+    Serial.println(F("[DEBUG_BASICLIST][OK]"));  
+  #else
+    Serial.println(F("[DEBUG_BASICLIST][NO]"));  
+  #endif 
+  #ifdef DEBUG_PROGRAM
+    Serial.println(F("[DEBUG_PROGRAM][OK]"));  
+  #else
+    Serial.println(F("[DEBUG_PROGRAM][NO]"));  
+  #endif 
+  #ifdef DEBUG_PLAYLIST
+    Serial.println(F("[DEBUG_PLAYLIST][OK]"));  
+  #else
+    Serial.println(F("[DEBUG_PLAYLIST][NO]"));  
+  #endif 
+  #ifdef DEBUG_TASK
+    Serial.println(F("[DEBUG_TASK][OK]"));  
+  #else
+    Serial.println(F("[DEBUG_TASK][NO]"));  
+  #endif 
+  #ifdef DEBUG_WEBSERVER
+    Serial.println(F("[DEBUG_WEBSERVER][OK]"));  
+  #else
+    Serial.println(F("[DEBUG_WEBSERVER][NO]"));  
+  #endif 
+
 }
 
 String ch_toString(const char * c){
