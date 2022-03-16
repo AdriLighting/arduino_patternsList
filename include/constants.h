@@ -4,12 +4,6 @@
 
   #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-  // #define DEBUGSERIAL
-  // #define WEBSERVEROK
-  // #define WEBSOCKETSERVEROK
-  // #define USE_LITTLEFS
-  // #define FSOK
-
   enum mod_pattern_loop { 
     mpl_next,
     mpl_off

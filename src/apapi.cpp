@@ -450,6 +450,7 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
             lbt:{pos: min: max:}
           */
           pPtr->get_json_jsInit(var);}  // 
+        
         // list
         else if (req == FPSTR(REQ_006)) {
           var = reply.createNestedObject(FPSTR(REQ_006));
