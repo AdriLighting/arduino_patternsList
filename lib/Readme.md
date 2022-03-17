@@ -1,8 +1,7 @@
 ## Lirairies  
 ---
 #### Jim Lee - leftCoast  
-- ![lists](https://github.com/leftCoast/LC_baseTools) - [download archive](https://drive.google.com/file/d/1lT-wj2V2yDMdxxD3QI82Enb6GBCkEgv-/view?usp=sharing/)
-- ![resizeBuff](https://github.com/leftCoast/LC_baseTools) - [download archive](https://drive.google.com/file/d/1kAhTUemvxnZG_V7tRndZjkLcULPDAXVh/view?usp=sharing/)
+- ![LC_baseTools](https://github.com/leftCoast/LC_baseTools.git) 
 ---
 #### ivanseidel    
 - ![LList](https://github.com/DmytroKorniienko/FireLamp_JeeUI/blob/master/include/LList.h) - [download archive](https://drive.google.com/file/d/1BZLGuW0Qv7570ETxc4MnCrJ27n74m-89/view?usp=sharing/)
