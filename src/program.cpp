@@ -51,6 +51,8 @@ void ListSortItems_delete(){
   ListSortItemsPtr.clear();  
 }
 /*
+>>>>41608<<<
+
   Serial.printf_P(PSTR(">>>>%-15d\n"), ESP.getFreeHeap());   
   const char * const * arr= LPALLNAMES;
   uint8_t cnt = ARRAY_SIZE(LPALLNAMES);

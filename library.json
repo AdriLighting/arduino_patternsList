@@ -24,6 +24,11 @@
         "version": "https://github.com/bblanchon/ArduinoJson.git"
     },
     {
+        "owner": "jim lee",
+        "name": "LC_baseTools",
+        "version": "https://github.com/leftCoast/LC_baseTools.git"
+    },
+    {
         "owner": "Grellard Adrien",
         "name": "AdriLighting_millisTimer",
         "version": "https://github.com/AdriLighting/millisTimer.git"

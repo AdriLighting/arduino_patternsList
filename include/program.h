@@ -56,7 +56,7 @@
 
     HeapStatu           _HeapStatu;
 
-    callback_function_t _callback       = nullptr;
+    callback_function_t _callback     = nullptr;
     // callback_error      _callbackError  = nullptr;
  
     void get_itemBase(String &);
@@ -80,8 +80,7 @@
     Program (uint8_t nbLb , boolean fs );
     ~Program ();
 
-
-    PL_flag         _plStatu;
+    PL_flag _plStatu;
 
     void initialize(const uint16_t & , const char* const* arr, const char  * const &, SORT_TYPE t = ST_BASE);
     void initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);

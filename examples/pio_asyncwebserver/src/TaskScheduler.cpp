@@ -3,22 +3,21 @@
 uint8_t Task_unique_id = 0;
 
 #ifdef _TASK_MICRO_RES
-
-  #undef _TASK_SLEEP_ON_IDLE_RUN     // SLEEP_ON_IDLE has only millisecond resolution
   #define _TASK_TIME_FUNCTION() _task_micros()
-
 #else
   #define _TASK_TIME_FUNCTION() _task_millis()
-
 #endif  // _TASK_MICRO_RES
 
 #ifndef _TASK_EXTERNAL_TIME
-  static uint32_t _task_millis() {return millis();}
-  static uint32_t _task_micros() {return micros();}
+  #ifdef _TASK_MICRO_RES
+    static uint32_t _task_micros() {return micros();}
+  #else
+    static uint32_t _task_millis() {return millis();}
+  #endif    
 #endif  //  _TASK_EXTERNAL_TIME
 
-#define DEBUG_TASK
-#if defined(DEBUG_TASK)
+// #define TASK_DEBUG
+#if defined(TASK_DEBUG)
   #define LOG(func, ...) Serial.func(__VA_ARGS__)
 #else
   #define LOG(func, ...) ;
@@ -32,6 +31,21 @@ uint32_t hours          = ((((( (timestamp / 1000) - milliseconds)/1000) - secon
   sprintf(time,"%lu:%02lu:%02lu:%02lu", (unsigned long)hours, (unsigned long)minutes , (unsigned long)seconds, (unsigned long)milliseconds);
 
 }
+/*
+namespace {
+  void seconds2timeD(unsigned long s, char * time) {
+    int seconds    = (s /   (1000)         ) % 60   ;
+    int minutes    = (s /   (1000*60)      ) % 60   ;
+    int hours      = (s /   (1000*3600)    ) % 24   ;
+    sprintf(time,"%02d:%02d:%02d", hours , minutes, seconds);
+  }
+  void on_timeD(String & result) {
+    char t[100];
+    seconds2timeD(millis(), t);
+    result = String(t);
+  } 
+}
+*/
 
 TaskDelay::TaskDelay(){
   _delay      = 0;
@@ -95,7 +109,7 @@ void Task::execute(){
       _delay=nullptr;
       setup_timer("[DELAY]", true);
   }
-  if (!_timer) {return;}
+  if (!_timer)              {return;}
   if (!_timer->isEnabled()) {return;}
 
   if (execute(_timerEnd)) {
@@ -115,13 +129,19 @@ void Task::execute(){
       if (iteration_next()) {
         _iteration_cnt = 0;
         _timer->set_enabled(false);
-        if (_callback && !_iteration_next_greater) {_callback();yield();}
+        if (_callback && !_iteration_next_greater) {_callback();
+          yield();
+        }
         if (_callbackOend) _callbackOend();
       } else {
-        if (_callback) {_callback();yield();}
+        if (_callback) {_callback();
+          yield();
+        }
       }
     } else {
-      if (_callback) {_callback();yield();}
+      if (_callback) {_callback();
+        yield();
+      }
     }
   }
   // LOG(printf, "\n---------------\n[loop]\n---------------\n"); 
@@ -134,57 +154,59 @@ void Task::setup(boolean v1){
   }
 }
 void Task::setup_timer(const String & v1, boolean v2){
-      LOG(printf_P, PSTR("[ID: %d][Task::setup_timer] %s\n\t[_iteration_max: %d]\n"), _ID, v1.c_str(), _iteration_max);
-
-      if (_iteration_max == 0 ) {
-        if (v2){
-          LOG(printf, "\t[oneshot]\n");
-          switch (_osMode) {
-            case ETO_S:   if (_callbackOstart)  _callbackOstart();  break;
-            case ETO_C:   if (_callback)        _callback();        break;
-            case ETO_SC:  if (_callbackOstart)  _callbackOstart();  if (_callback)      _callback();      break;
-            case ETO_SCE: if (_callbackOstart)  _callbackOstart();  if (_callback)      _callback(); if (_callbackOend) _callbackOend(); break;
-            case ETO_SE:  if (_callbackOstart)  _callbackOstart();  if (_callbackOend)  _callbackOend();  break;
-            case ETO_CE:  if (_callbackOstart)  _callback();        if (_callbackOend)  _callbackOend();  break;
-            default: break;
-          }         
-          if (_timer && _timer->isEnabled()) {
-            LOG(printf, "\t[_timer: stop]\n");
-            _timer->set_enabled(false);
-          }
-        }
-      } 
-      else  {
-        if (_callbackOstart)_callbackOstart();
-        if (_delay) {
-          LOG(printf_P, PSTR("\t[_delay: instanced][starting: %d]\n"), v2);
-          _delay->set_enabled(v2);
-          _delay->reset();
-        } else {
-          LOG(printf, "\t[_delay: not instanced]\n");
-        }       
-        if (_timer) {
-          LOG(printf_P, PSTR("\t[_timer: instanced][starting: %d]\n"), v2);
-          _timer->set_enabled(v2);
-          _timer->reset();
-        } else {
-          LOG(printf, "\t[_timer: not instanced]\n");
-        }
-        if (_timerEnd) {
-          char t[12];
-          char t2[12];
-          uint32_t duration;
-          _timerEnd->get_delay(duration);
-          _timeStamp(_TASK_TIME_FUNCTION()+(duration), t);
-          _timeStamp(_TASK_TIME_FUNCTION(), t2);
-          LOG(printf_P, PSTR("\t[_timerEnd: instanced][starting: %d][%s -> %s]\n"), v2, t2, t);
-          _timerEnd->set_enabled(v2);
-          _timerEnd->reset();
-        } else {
-          LOG(printf, "\t[_timerEnd: not instanced]\n");
-        }       
+  char time[12];
+  _timeStamp(micros(), time);
+  LOG(printf_P, PSTR("[ID: %d][Task::setup_timer] %s\n\t[_iteration_max: %d]\n\t[%s]\n"), 
+    _ID, v1.c_str(), _iteration_max, time);
+  if (_iteration_max == 0 ) {
+    if (v2){
+      LOG(printf, "\t[oneshot]\n");
+      switch (_osMode) {
+        case ETO_S:   if (_callbackOstart)  _callbackOstart();  break;
+        case ETO_C:   if (_callback)        _callback();        break;
+        case ETO_SC:  if (_callbackOstart)  _callbackOstart();  if (_callback)      _callback();      break;
+        case ETO_SCE: if (_callbackOstart)  _callbackOstart();  if (_callback)      _callback(); if (_callbackOend) _callbackOend(); break;
+        case ETO_SE:  if (_callbackOstart)  _callbackOstart();  if (_callbackOend)  _callbackOend();  break;
+        case ETO_CE:  if (_callbackOstart)  _callback();        if (_callbackOend)  _callbackOend();  break;
+        default: break;
+      }         
+      if (_timer && _timer->isEnabled()) {
+        LOG(printf, "\t[_timer: stop]\n");
+        _timer->set_enabled(false);
       }
-      LOG(println, "---");
+    }
+  } 
+  else  {
+    if (_callbackOstart)_callbackOstart();
+    if (_delay) {
+      LOG(printf_P, PSTR("\t[_delay: instanced][starting: %d]\n"), v2);
+      _delay->set_enabled(v2);
+      _delay->reset();
+    } else {
+      LOG(printf, "\t[_delay: not instanced]\n");
+    }       
+    if (_timer) {
+      LOG(printf_P, PSTR("\t[_timer: instanced][starting: %d]\n"), v2);
+      _timer->set_enabled(v2);
+      _timer->reset();
+    } else {
+      LOG(printf, "\t[_timer: not instanced]\n");
+    }
+    if (_timerEnd) {
+      char t[12];
+      char t2[12];
+      uint32_t duration;
+      _timerEnd->get_delay(duration);
+      _timeStamp(_TASK_TIME_FUNCTION()+(duration), t);
+      _timeStamp(_TASK_TIME_FUNCTION(), t2);
+      LOG(printf_P, PSTR("\t[_timerEnd: instanced][starting: %d][%s -> %s]\n"), v2, t2, t);
+      _timerEnd->set_enabled(v2);
+      _timerEnd->reset();
+    } else {
+      LOG(printf, "\t[_timerEnd: not instanced]\n");
+    }       
+  }
+  LOG(println, "---");
 }
 
 void Task::set_callbackOstart(TaskCallback v1){_callbackOstart = std::move(v1);}

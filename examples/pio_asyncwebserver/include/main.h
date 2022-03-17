@@ -1,7 +1,9 @@
-#ifndef MAIN_H
-#define MAIN_H 
+#ifndef _MAIN_H
+#define _MAIN_H 
     #include <Arduino.h>
-    
+    #include <resizeBuff.h>
+    #include "queue.h"
+
     // static const char FOPATH_PLAYLISTEFF    [] PROGMEM = "/TEST/eff/";
     // static const char FSLSH                 [] PROGMEM = "/";
 
@@ -29,4 +31,41 @@
     LPNAME_011, LPNAME_012, LPNAME_013
     };
 
+
+
+
+    class socketQuee {
+        uint32_t              _last_call = 0;
+        uint32_t              _last_item = 0;
+        boolean               _executeQuee = false;
+        // Task                  * _task_quee = nullptr;
+        QueueItemList   * _list;
+    public:
+        socketQuee();
+        ~socketQuee();
+        void receive(const String &);
+        void quee();
+        void handle();
+    };
+
+
+
+
+
+/*
+    class _socketQueeItemsList {
+      uint8_t _cnt=0;
+    public:
+      _socketQueeItemsList(){_list = new QueueItem*[10];};
+      ~_socketQueeItemsList(){
+      for(int i=0;i<_cnt;i++)
+          delete _list[i];
+      delete[] _list;
+      };
+      void addString(String* inStr);
+      void addString(char* inStr);  
+      QueueItem ** _list;
+    };
+
+*/
 #endif

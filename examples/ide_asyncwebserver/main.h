@@ -1,7 +1,10 @@
 #ifndef _MAIN_H
 #define _MAIN_H 
     #include <Arduino.h>
-    
+    #include <resizeBuff.h>
+    #include <LList.h>
+    #include "TaskScheduler.h"
+
     // static const char FOPATH_PLAYLISTEFF    [] PROGMEM = "/TEST/eff/";
     // static const char FSLSH                 [] PROGMEM = "/";
 
@@ -29,4 +32,65 @@
     LPNAME_011, LPNAME_012, LPNAME_013
     };
 
+    class socketQueeItem {
+        char* _mStr;
+      public:
+        socketQueeItem();
+        ~socketQueeItem();
+        void add(char* inStr);
+        void get_string(String & v1);
+    };
+    class socketQueeItemsList {
+      LList<socketQueeItem *> _list;
+    public:
+      socketQueeItemsList(){};
+      ~socketQueeItemsList(){
+        while (_list.size()) {
+          socketQueeItem *eff = _list.shift();
+          delete eff;
+        }
+        _list.clear();
+      };
+      void addString(String* inStr);
+      void addString(char* inStr);  
+      uint8_t get_size();
+      void execute();  
+    };
+    class socketQuee {
+        uint32_t              _last_call = 0;
+        uint32_t              _last_item = 0;
+        boolean               _executeQuee = false;
+
+        // Task                  * _task_quee = nullptr;
+        socketQueeItemsList   * _list;
+
+    public:
+
+        socketQuee();
+        ~socketQuee();
+        void receive(const String &);
+        void quee();
+        void handle();
+    };
+
+
+
+
+
+/*
+    class _socketQueeItemsList {
+      uint8_t _cnt=0;
+    public:
+      _socketQueeItemsList(){_list = new socketQueeItem*[10];};
+      ~_socketQueeItemsList(){
+      for(int i=0;i<_cnt;i++)
+          delete _list[i];
+      delete[] _list;
+      };
+      void addString(String* inStr);
+      void addString(char* inStr);  
+      socketQueeItem ** _list;
+    };
+
+*/
 #endif

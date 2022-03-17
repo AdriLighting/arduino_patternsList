@@ -1,10 +1,34 @@
-#ifndef WEBSERVER_H_
-#define WEBSERVER_H_
+#ifndef _APWEBSERVER_H
+#define _APWEBSERVER_H
 
 #include <Arduino.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include "TaskScheduler.h"
+// typedef enum {
+//   HTTP_GET     = 0b00000001,
+//   HTTP_POST    = 0b00000010,
+//   HTTP_DELETE  = 0b00000100,
+//   HTTP_PUT     = 0b00001000,
+//   HTTP_PATCH   = 0b00010000,
+//   HTTP_HEAD    = 0b00100000,
+//   HTTP_OPTIONS = 0b01000000,
+//   HTTP_ANY     = 0b01111111,
+// } WebRequestMethod;
+
+
+static const char WRMTP_001 [] PROGMEM = "HTTP_GET";
+static const char WRMTP_002 [] PROGMEM = "HTTP_POST";
+static const char WRMTP_003 [] PROGMEM = "HTTP_DELETE";
+static const char WRMTP_004 [] PROGMEM = "HTTP_PUT";
+static const char WRMTP_005 [] PROGMEM = "HTTP_PATCH";
+static const char WRMTP_006 [] PROGMEM = "HTTP_HEAD";
+static const char WRMTP_007 [] PROGMEM = "HTTP_OPTIONS";
+static const char WRMTP_008 [] PROGMEM = "HTTP_ANY";
+static const char* const WRMTP_ARR[] PROGMEM = {
+  WRMTP_001, WRMTP_002, WRMTP_003, WRMTP_004,
+  WRMTP_005, WRMTP_006, WRMTP_007, WRMTP_008
+};
 
 static const char WSTP_001 [] PROGMEM = "text/json";
 static const char WSTP_002 [] PROGMEM = "application/json";
@@ -23,12 +47,13 @@ typedef enum : uint8_t {
   WSRM_FROMDEF=0,    WSRM_FROMCALLBACK
 } ENUM_WSRM;
 
-typedef std::function<void(AsyncWebServerRequest *request, uint8_t pos)> _webServerRequest_f;
-
 typedef struct  WSREP_FLAG{ 
     ENUM_WSTP _cType;
     ENUM_WSRM _rType ;
 } WSREP_flag;
+
+typedef std::function<void(AsyncWebServerRequest *request, uint8_t pos, const String & data)> _webServerRequest_f;
+typedef std::function<void(const String & v1)> callback_function_t;
 
 class Webserver_request
 {
@@ -41,6 +66,7 @@ public:
 
   Webserver_request( );
   ~Webserver_request();
+
   void set_callback(_webServerRequest_f v1);
   void set_request(const char * const & , WebRequestMethod, ENUM_WSTP);
   void set_request(const char * const & , WebRequestMethod, ENUM_WSTP, _webServerRequest_f);
@@ -57,23 +83,19 @@ class Webserver {
   uint8_t                 _requestArrayCnt      = 0;
   uint8_t                 _requestArrayCntMax   = 0;
 
-  boolean                 _httpCallback             = false;
-  boolean                 _httpCallbackPos          = false;
+  String                  _httpCallbackData       = "";
   AsyncWebServerRequest   * _httpCallbackRequest    = NULL;
   
-  AsyncWebSocketClient    * _socketClient   = NULL;
-  AsyncWebSocket          * _socketServer   = NULL;
-  boolean                 _socketTrace      = true;
-  boolean                 _socketIsConnected = false;
-
-  typedef std::function<void(const String & v1)> callback_function_t;
+  AsyncWebSocketClient    * _socketClient     = NULL;
+  AsyncWebSocket          * _socketServer     = NULL;
+  boolean                 _socketTrace        = true;
+  boolean                 _socketIsConnected  = false;
   callback_function_t     _socketCallback     = nullptr;
-  String                  _socketReceivedMsg  = "";
-  boolean                 _socketReceived     = false;
+  String                  _socketCallbackData  = "";
 
   Task * _task_httpCallback = nullptr;
 public:
-  boolean                 _httpTrace = true;
+  boolean _httpTrace = true;
 
 
   Webserver();
@@ -85,22 +107,22 @@ public:
   uint8_t request_new(const char * const & , WebRequestMethod, ENUM_WSTP, _webServerRequest_f);
 
   void socket_send(const String & message);
+  void http_send(AsyncWebServerRequest *, const int &, ENUM_WSTP, const String &);
 
   void set_socketCallback(callback_function_t v1);
   void set_socketIsConnected(boolean v1);
   void set_socketClient(AsyncWebSocketClient * v1);
   void set_socketServer(AsyncWebSocket * v1);
-  void set_socketReceivedMsg(const String & v1);
-  void set_socketReceived(boolean v1);
-
-  void set_httpCallback(boolean v1);
+  void set_socketCallbackData(const String & v1);
+  void socketHandle();  
 
 
   void begin();
   void setup();
+
   void handle();  
-  void socketHandle();  
-  void httpHandle();  
+  void httpHandle();
+
 };
 extern Webserver _Webserver;
 #endif

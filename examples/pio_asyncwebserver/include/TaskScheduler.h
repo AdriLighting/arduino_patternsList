@@ -1,5 +1,5 @@
-#ifndef TASKSCHEDULER_H
-#define TASKSCHEDULER_H
+#ifndef _TASKSCHEDULER_H
+#define _TASKSCHEDULER_H
 #include <Arduino.h>
 #include <functional>
 
@@ -22,7 +22,7 @@
 #endif  // _TASK_MICRO_RES
 
 
-
+void _timeStamp(uint32_t timestamp, char * time);
 
 
 typedef enum : uint8_t {ETD_TIMER=0, ETD_DELAY, ETD_TIMEREND} ETD; 

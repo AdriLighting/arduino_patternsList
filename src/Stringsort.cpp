@@ -74,7 +74,11 @@ stringList::~stringList(void) {  }
 
 
 // Add in a String object. We use a pointer and call the c string addString() method with that.
-void stringList::addString(String* inStr) {char buffer[255]; sprintf(buffer, "%s", inStr->c_str()); addString(buffer); }
+void stringList::addString(String* inStr) {
+   char buffer[255]; 
+   sprintf(buffer, "%s", inStr->c_str()); 
+   addString(buffer); 
+}
 
 // Here's where we actually add the string to the list.
 void stringList::addString(char* inStr) {

@@ -21,7 +21,7 @@ class stringObj : public linkListObj {
 
    virtual  bool   isGreaterThan(linkListObj* compObj);   // Are we greater than the obj being passed in? Primary sorting function.
    virtual  bool   isLessThan(linkListObj* compObj);      // Are we less than the obj being passed in? Primary sorting function.
-
+   
             char* mStr;
 };
 
