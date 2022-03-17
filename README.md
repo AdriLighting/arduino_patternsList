@@ -676,7 +676,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
                     n     object                  list name
                     cmax  object                  nb of maximum items
 ```
-<hr>
 </details>
 
 <hr>
@@ -781,8 +780,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <hr>
 </details>
 
-<br>
-
 `get all playlist by basiclist reference`
 
 <details>
@@ -803,7 +800,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
                     lbl   object                label of the lsit
                     lref  object                basiclist reference
 ```
-<hr>
 </details>
 
 <hr>
@@ -856,6 +852,8 @@ RA_PL_TOFS:         arg1: position of playlist list array
 </details>
 
 </details>
+
+<hr>
 
 ##### DIVERS
 
