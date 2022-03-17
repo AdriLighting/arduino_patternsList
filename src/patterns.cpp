@@ -37,7 +37,7 @@ void Listbase::list_delete(){
 
 void Listbase::item_add(const String & value){
   #ifdef DEBUG
-    Serial.printf_P(PSTR("[Listbase::item_add]pos: %d name: %S\n"), _cnt, value);
+    Serial.printf_P(PSTR("[Listbase::item_add]pos: %d name: %S\n"), _cnt, value.c_str());
   #endif
   _list[_cnt] = value;
   _cnt++;

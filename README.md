@@ -58,18 +58,20 @@ keyboard for serial monitor
 ````c++
 #define DEBUGSERIAL       // include/def.h
 ````
-serial print trace macro  
+macro trace
 ````c++
 #define DEBUG_AP          // include/def.h
 ````
-serial print per file  
+degug 
 ````c++
 #define DEBUG_BASICLIST   // src/patterns.cpp  
 #define DEBUG_PROGRAM     // src/program.cpp
 #define DEBUG_PLAYLIST    // src/playlist.cpp
-#define DEBUG_TASK        // TaskScheduler.cpp
-#define DEBUG_WEBSERVER   // apwebserver.cpp
+#define DEBUG_TASK        // examples/..._asyncwebserver/TaskScheduler.cpp
+#define DEBUG_WEBSERVER   // examples/..._asyncwebserver/apwebserver.cpp
+#define DEBUG_QUEUE      // examples/..._asyncwebserver/queue.cpp
 ````
+
 </details>
 
 ### SETUP
