@@ -707,8 +707,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <hr>
 </details>
 
-<br>
-
 `get all items object of all playlist`
 
 <details>
@@ -733,8 +731,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
 ```
 <hr>
 </details>
-
-<br>
 
 `get all items object of slected playlist`
 
@@ -877,8 +873,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
 ```
 <hr>
 </details>
-
-<br>
 
 `list of avaible getter`
 
