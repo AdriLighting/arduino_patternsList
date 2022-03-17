@@ -638,8 +638,6 @@ RA_PL_TOFS:         arg1: position of playlist list array
 <hr>
 </details>
 
-<br>
-
 `get all items of the current basic list`
 
 <details>
