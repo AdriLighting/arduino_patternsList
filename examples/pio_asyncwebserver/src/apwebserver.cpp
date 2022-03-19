@@ -14,6 +14,7 @@
 #include <functional>
 
 
+
 #ifndef DEBUG
   #ifdef DEBUG_WEBSERVER
     #define DEBUG
@@ -25,57 +26,107 @@
   #define LOG(func, ...) ;
 #endif
 
+
+
 AsyncWebServer    web_server(80);
 AsyncWebSocket    web_socket("/ws");
 AsyncEventSource  event("/events");
 Webserver         _Webserver;
 Task              * _task_socketCallback = nullptr;
 
-extern TaskScheduler * _TaskScheduler;
+extern socketQueueReply * _socketQueueReply;
 
 void not_found_server(AsyncWebServerRequest * request);
 
 
 
-socketQuee::socketQuee() {
+
+socketQueue::socketQueue() {
   _list = new QueueItemList();
+  if(!_task) _task = new Task();
+  _list->set_task(_task);
+  
 }
-socketQuee::~socketQuee() {
+socketQueue::~socketQueue() {
   delete _list;
 }
-
-void socketQuee::receive(const String & msg) {
+boolean socketQueue::receiveToQueue(const String & msg) {
   String gMsg = msg;
-  if (( (_list->get_size() == 0) && (millis()-_last_item) < 250)) {
+  if (( (_list->get_size() == 0) && (millis()-_last_item) < _timer_item)) {
       _list->addString(&gMsg);
       _last_item = millis();
-      return;
+      return false;
   }
   _last_item = millis();
 
   if (_list->get_size() > 0) {
     _list->addString(&gMsg);
-    return;}
+    return false;}   
 
-  _TaskScheduler->get_task(3)->set_callbackOstart([=](){_Webserver.socket_send(msg);});
-  _TaskScheduler->get_task(3)->set_iteration_max(0);
-  _TaskScheduler->get_task(3)->set_taskDelay(ETD::ETD_DELAY, true, 250, 1);
-  _TaskScheduler->get_task(3)->set_taskDelayEnabled(ETD::ETD_DELAY, true);
-  _TaskScheduler->get_task(3)->set_enabled(true);               
+  return true;         
 }
-void socketQuee::handle(){
-  // if(_task_quee) {if (_task_quee->isEnabled()) _task_quee->execute();}
-
+void socketQueue::handle(){
+  if(_task) {if (_task->isEnabled()) _task->execute();}
   if ( (_list->get_size() == 0) && _executeQuee ) _executeQuee = false;
-  if ( (_list->get_size() > 0) && ((millis()-_last_item) > 500) && !_executeQuee ){
+  if ( (_list->get_size() > 0) && ((millis()-_last_item) > _timer_handle) && !_executeQuee ){
     _executeQuee = true;
-    _TaskScheduler->get_task(3)->set_callbackOstart([=](){_list->execute_cbTask();});
-    _TaskScheduler->get_task(3)->set_iteration_max(0);
-    _TaskScheduler->get_task(3)->set_taskDelay(ETD::ETD_DELAY, true, 500, 1);
-    _TaskScheduler->get_task(3)->set_taskDelayEnabled(ETD::ETD_DELAY, true);
-    _TaskScheduler->get_task(3)->set_enabled(true);    
+    _task->set_callbackOstart([=](){_list->execute_cbTask();});
+    _task->set_iteration_max(0);
+    _task->set_taskDelay(ETD::ETD_DELAY, true, _task_delay, 1);
+    _task->set_taskDelayEnabled(ETD::ETD_DELAY, true);
+    _task->set_enabled(true);    
   }
+}
 
+socketQueueReply::socketQueueReply() {
+  _list->set_callback([](const String & v1){_Webserver.socket_send(v1);});  
+  _timer_item   = 250;    
+  _task_delay   = 500;  
+  _timer_handle = 500;    
+}
+socketQueueReply::~socketQueueReply() {
+}
+void socketQueueReply::receive(const String & msg) {
+
+  if (!receiveToQueue(msg)) return;
+
+  _task->set_callbackOstart([=](){_Webserver.socket_send(msg);});
+  _task->set_iteration_max(0);
+  _task->set_taskDelay(ETD::ETD_DELAY, true, 180, 1);
+  _task->set_taskDelayEnabled(ETD::ETD_DELAY, true);
+  _task->set_enabled(true);               
+}
+
+
+socketQueueSetter::socketQueueSetter() {
+  _list->set_callback([](const String & v1){
+    DynamicJsonDocument doc(1024);
+    deserializeJson(doc, v1);
+    String reply;
+    _AP_Api.parsingRequest(doc, reply, ""); 
+    _socketQueueReply->receive(reply);   
+  });
+  _timer_item   = 250;    
+  _task_delay   = 250;  
+  _timer_handle = 200;  
+
+}
+socketQueueSetter::~socketQueueSetter() {
+}
+void socketQueueSetter::receive( DynamicJsonDocument & doc) {
+  String s;
+  serializeJson(doc, s);
+
+  if (!receiveToQueue(s)) return;
+
+  String reply;
+  _AP_Api.parsingRequest(doc, reply, "");
+
+  _task->set_callbackOstart([=](){_socketQueueReply->receive(reply); });
+  _task->set_iteration_max(0);
+  _task->set_taskDelay(ETD::ETD_DELAY, true, 50, 1);
+  _task->set_taskDelayEnabled(ETD::ETD_DELAY, true);
+  _task->set_enabled(true);  
 }
 
 
@@ -114,6 +165,9 @@ Webserver::Webserver() {
   _httpTrace    = false;  
   #endif
 }
+
+
+
 
 Webserver::~Webserver() {
 }

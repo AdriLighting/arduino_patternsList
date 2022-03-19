@@ -12,7 +12,8 @@ Program       * _Program = nullptr;
 HeapStatu     _HeapStatu;
 HeapStatu     _HeapStatu_2;
 TaskScheduler * _TaskScheduler;
-socketQuee    * _socketQuee;
+socketQueue   * _socketQueueReply;
+socketQueue   * _socketQueueSetter;
 
 #ifdef DEBUGSERIAL
     void serial_menu_cmd(const String & cmd, const String & value);
@@ -132,12 +133,16 @@ void setup() {
   on_timeD(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str()); 
 
-  _socketQuee = new socketQuee();
-  _socketQuee->_list->set_task(_TaskScheduler->get_task(3));
-  _socketQuee->_list->set_callback([](const String & v1){_Webserver.socket_send(v1);});
+  _socketQueueReply   = new socketQueueReply();
+  _socketQueueSetter  = new socketQueueSetter();
+
+
   delay(3000);
 
 }
+  // Querrry_child _qc;
+  // _qc.Querry_1();
+  // _qc.Querry_2();
 
 
 void loop() {
@@ -145,7 +150,8 @@ void loop() {
     _Sr_menu.serialRead();
   #endif
   _TaskScheduler->loop();
-  _socketQuee->handle();
+  _socketQueueReply->handle();
+  _socketQueueSetter->handle();
 }
 
 void _http_get_cb(AsyncWebServerRequest * request, uint8_t pos, const String & data){
@@ -183,9 +189,10 @@ void _socket_cb(const String & s){
   if (error) {      
     Serial.printf_P(PSTR("[_socket_cb][deserializeJson ERROR: %d]\nstring:\n\t%s"), error, s.c_str());  
   } else {
-    String reply;
-    _AP_Api.parsingRequest(doc, reply, "");
-    _socketQuee->receive(reply);
+    // String reply;
+    // _AP_Api.parsingRequest(doc, reply, "");
+    _socketQueueSetter->receive(doc);
+    // _socketQueueReply->receive(reply);
   }
 }  
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
@@ -206,7 +213,8 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   _ApiReply->reply_generate(doc);
   delete _ApiReply; 
   serializeJson(doc, reply); 
-  _socketQuee->receive(reply);
+  
+  _socketQueueReply->receive(reply);
 }
 
 

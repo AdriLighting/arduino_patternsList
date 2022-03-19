@@ -129,17 +129,38 @@ public:
 extern Webserver _Webserver;
 
 
-class socketQuee {
-    uint32_t              _last_call = 0;
-    uint32_t              _last_item = 0;
-    boolean               _executeQuee = false;
-public:
+class socketQueue {
+protected:  
     QueueItemList   * _list;
-    socketQuee();
-    ~socketQuee();
-    void receive(const String &);
-    void quee();
+    boolean         _executeQuee  = false;
+
+    uint32_t        _last_item    = 0;
+    uint32_t        _timer_handle = 250;
+    uint32_t        _timer_item   = 250;
+
+    Task*           _task           = nullptr;
+    uint32_t        _task_delay   = 500;
+public:
+
+    socketQueue();
+    ~socketQueue();
+    virtual void receive(const String &) {};
+    virtual void receive(DynamicJsonDocument &) {};
+    boolean receiveToQueue(const String &);
     void handle();
+};
+
+class socketQueueReply : public socketQueue {
+public:
+    socketQueueReply();
+    ~socketQueueReply();
+    void receive(const String &) override;
+};
+class socketQueueSetter : public socketQueue {
+public:
+    socketQueueSetter();
+    ~socketQueueSetter();
+    void receive(DynamicJsonDocument & d) override ;
 };
 
 #endif

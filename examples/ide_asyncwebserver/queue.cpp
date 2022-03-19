@@ -23,6 +23,10 @@
 
 QueueItem::QueueItem() {
 }
+QueueItem::~QueueItem(void)  { resizeBuff(0,&_mStr); }
+
+
+void QueueItem::get_string(String & v1){v1 = String(_mStr);}
 
 void QueueItem::add(char* inStr) {
    _mStr = NULL;                              // Defualt our dynamic memory pointer to NULL
@@ -30,10 +34,6 @@ void QueueItem::add(char* inStr) {
       strcpy(_mStr,inStr);                    // Stuff a copy of what we got into our object.
    }
 }
-
-QueueItem::~QueueItem(void)  { resizeBuff(0,&_mStr); }
-
-void QueueItem::get_string(String & v1){v1 = String(_mStr);}
 
 void QueueItemList::addString(String* inStr) {
    char buffer[255]; 
@@ -43,13 +43,13 @@ void QueueItemList::addString(String* inStr) {
       Serial.printf_P(PSTR("[QueueItemList::addString]\n\t[listSize]: %d\n\t[queue item][%d]: %s\n"), _list.size(), String(buffer).length(), buffer);   
    #endif
 }
-
 void QueueItemList::addString(char* inStr) {
   // Serial.printf_P(PSTR("size: %d\n"), _list.size());
   _list.add(new QueueItem());
   uint8_t pos = _list.size()-1;
   _list[pos]->add(inStr);
 }
+
 
 uint8_t QueueItemList::get_size(){return _list.size();}
 void QueueItemList::set_callback(_execute_callback_f v1){_execute_callback = std::move(v1);}
@@ -63,9 +63,11 @@ void QueueItemList::set_task(Task * v1){_task = v1;}
  */
 void QueueItemList::execute_cbTask(){
   if (_list.size() == 0) return;
-  
+
   String sT = "";
+  
   _list[0]->get_string(sT);
+
   if (_execute_callback) {
     #ifdef DEBUG
       Serial.printf_P(PSTR("[QueueItemList::execute_cbTask]\n\t[listSize]: %d\n\t[queue item][%d]\n\t[CALLBACK]\n"), _list.size(), sT.length());   

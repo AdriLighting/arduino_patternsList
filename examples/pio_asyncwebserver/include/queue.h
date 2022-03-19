@@ -1,6 +1,7 @@
 #ifndef _QUEUE_H
 #define _QUEUE_H 
     #include <Arduino.h>
+    #include <ArduinoJson.h>
     #include <resizeBuff.h>
     #include <LinkedList.h>
     #include "TaskScheduler.h"
@@ -12,8 +13,10 @@
       public:
         QueueItem();
         ~QueueItem();
-        void add(char* inStr);
         void get_string(String &);
+        void init_doc(uint32_t);
+        void add(char* inStr);
+
     };
     class QueueItemList {
       typedef std::function<void(const String &)> _execute_callback_f;
