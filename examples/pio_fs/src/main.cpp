@@ -7,8 +7,8 @@
 Program* _Program = nullptr;
 
 #ifdef DEBUGSERIAL
-SerialRead* _serial;
-void serial_menu(const String& cmd, const String& value);
+    Sr_menu _Sr_menu;
+    void serial_menu_cmd(const String & cmd, const String & value);
 #endif
 void _Program_handleCallback(const String itemBaseName, const uint16_t& itemBasePos, boolean updWebserver);
 
@@ -26,21 +26,15 @@ void setup() {
 
   Serial.setDebugOutput(false);
 
-#ifdef DEBUGSERIAL
-  //debug 
-  _serial = new SerialRead();
-  _serial->cmd_array(1, 7);
-  _serial->cmd_item_add(1, "menu",                "a", [](const String& cmd, const String& value) { _serial->menu();  });
-  _serial->cmd_item_add(1, "ESPreset",            "z", [](const String& cmd, const String& value) { ESP.restart();    });
-  _serial->cmd_item_add(1, "freeHeap",            "e", [](const String& cmd, const String& value) { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
-  _serial->cmd_item_add(1, "debug prog",          "r", [](const String& cmd, const String& value) { _Program->print(PM_LOOP);  });
-  _serial->cmd_item_add(1, "remote action list",  "t", [](const String& cmd, const String& value) { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for (int i = 0; i < cnt; i++) { Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]); }});
-  _serial->cmd_item_add(1, "lb+allpl",            "y", [](const String& cmd, const String& value) { _Program->print(PM_LB); _Program->print(PM_PL); });
-  _serial->cmd_item_add(1, "fs format",           "u", [](const String& cmd, const String& value) { FILESYSTEM.format(); });
-  _serial->cmd_array(2, 1); // !e=v1,v2
-  _serial->cmd_item_add(2, "remote action", "e", serial_menu_cmd);
-  Serial.printf_P(PSTR("\t[0 | freeheap: %d]\n"), ESP.getFreeHeap()); // debug Serial
-#endif
+  #ifdef DEBUGSERIAL
+    _Sr_menu.add("menu",               "a", []() { /*_serial->menu();*/  });
+    _Sr_menu.add("ESPreset",           "z", []() { ESP.restart();    });
+    _Sr_menu.add("freeHeap",           "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
+    _Sr_menu.add("debug prog",         "r", []() { _Program->print(PM_LOOP);  });
+    _Sr_menu.add("remote action list", "t", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
+    _Sr_menu.add("lb+allpl",           "y", []() { _Program->print(PM_LB); _Program->print(PM_PL); });
+    _Sr_menu.add("name_1",             "!", serial_menu_cmd, SR_MM::SRMM_KEY);
+  #endif
 
   boolean fs = false;
 #ifdef FSOK
@@ -93,7 +87,7 @@ void setup() {
 
 void loop() {
   #ifdef DEBUGSERIAL
-    _serial->loop();
+    _Sr_menu.serialRead();
   #endif
   _Program->handle();
 }

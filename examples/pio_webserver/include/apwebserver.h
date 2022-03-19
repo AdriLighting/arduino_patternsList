@@ -25,8 +25,8 @@
 
 // Select the FileSystem by uncommenting one of the lines below
 
-#ifndef WEBSERVER_H
-#define WEBSERVER_H
+#ifndef _APWEBSERVER
+#define _APWEBSERVER
 
 //#define USE_SPIFFS
 // #ifdef FSOK
