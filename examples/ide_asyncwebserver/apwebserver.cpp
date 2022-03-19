@@ -13,8 +13,13 @@
 
 #include <functional>
 
-// #define WEBSERVER_DEBUG
-#if defined(WEBSERVER_DEBUG)
+
+#ifndef DEBUG
+  #ifdef DEBUG_WEBSERVER
+    #define DEBUG
+  #endif
+#endif
+ #ifdef DEBUG
   #define LOG(func, ...) Serial.func(__VA_ARGS__)
 #else
   #define LOG(func, ...) ;
@@ -26,7 +31,54 @@ AsyncEventSource  event("/events");
 Webserver         _Webserver;
 Task              * _task_socketCallback = nullptr;
 
+extern TaskScheduler * _TaskScheduler;
+
 void not_found_server(AsyncWebServerRequest * request);
+
+
+
+socketQuee::socketQuee() {
+  _list = new QueueItemList();
+}
+socketQuee::~socketQuee() {
+  delete _list;
+}
+
+void socketQuee::receive(const String & msg) {
+  String gMsg = msg;
+  if (( (_list->get_size() == 0) && (millis()-_last_item) < 250)) {
+      _list->addString(&gMsg);
+      _last_item = millis();
+      return;
+  }
+  _last_item = millis();
+
+  if (_list->get_size() > 0) {
+    _list->addString(&gMsg);
+    return;}
+
+  _TaskScheduler->get_task(3)->set_callbackOstart([=](){_Webserver.socket_send(msg);});
+  _TaskScheduler->get_task(3)->set_iteration_max(0);
+  _TaskScheduler->get_task(3)->set_taskDelay(ETD::ETD_DELAY, true, 250, 1);
+  _TaskScheduler->get_task(3)->set_taskDelayEnabled(ETD::ETD_DELAY, true);
+  _TaskScheduler->get_task(3)->set_enabled(true);               
+}
+void socketQuee::handle(){
+  // if(_task_quee) {if (_task_quee->isEnabled()) _task_quee->execute();}
+
+  if ( (_list->get_size() == 0) && _executeQuee ) _executeQuee = false;
+  if ( (_list->get_size() > 0) && ((millis()-_last_item) > 500) && !_executeQuee ){
+    _executeQuee = true;
+    _TaskScheduler->get_task(3)->set_callbackOstart([=](){_list->execute_cbTask();});
+    _TaskScheduler->get_task(3)->set_iteration_max(0);
+    _TaskScheduler->get_task(3)->set_taskDelay(ETD::ETD_DELAY, true, 500, 1);
+    _TaskScheduler->get_task(3)->set_taskDelayEnabled(ETD::ETD_DELAY, true);
+    _TaskScheduler->get_task(3)->set_enabled(true);    
+  }
+
+}
+
+
 
 
 Webserver_request::Webserver_request(){
@@ -54,7 +106,7 @@ void Webserver_request::get_contentType(const char * & v1)  {v1 = WSTP_ARR[_repF
 
 
 Webserver::Webserver() {
-  #if defined(WEBSERVER_DEBUG)
+  #if defined(DEBUG)
   _socketTrace  = true;
   _httpTrace    = true;  
   #else
@@ -120,7 +172,7 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
     String msg = "";
     if(info->final && info->index == 0 && info->len == len){
       //the whole message is in a single frame and we got all of it's data
-      #ifdef WEBSERVER_DEBUG
+      #ifdef DEBUG
         char time[12];
         _timeStamp(micros(), time);  
       #endif      
@@ -198,7 +250,7 @@ void Webserver::socket_send(const String & message) {
     _socketClient->text(message);
 
     if (_socketTrace) {  
-      #ifdef WEBSERVER_DEBUG
+      #ifdef DEBUG
         char time[12];
         _timeStamp(micros(), time);  
         LOG(printf_P, PSTR("ws >>>[%s][%u][%s] message[%d]: %s\n"), _socketServer->url(), _socketClient->id(), time, message.length(), message.c_str());
@@ -218,7 +270,7 @@ void Webserver::http_send(AsyncWebServerRequest * request, const int & code, ENU
 
   request->send(code, FPSTR(WSTP_ARR[ct]), data); 
 
-  #ifdef WEBSERVER_DEBUG
+  #ifdef DEBUG
     char time[12];
     _timeStamp(micros(), time);  
     LOG(printf_P, PSTR("http >>>[%s][%s][%s] %s-message[%d]: %s\n"), 
@@ -279,7 +331,7 @@ void Webserver::setup(){
           _httpCallbackData     = "";
           for (size_t i = 0; i < len; i++) {_httpCallbackData += (char) data[i];}
           _httpCallbackData.replace("\r\n", "");
-          #ifdef WEBSERVER_DEBUG
+          #ifdef DEBUG
             char time[12];
             _timeStamp(micros(), time);  
             LOG(printf_P, PSTR("http <<<[%s][%s][%s][%s] %s-message[%d]: %s\n"), 
@@ -296,7 +348,7 @@ void Webserver::setup(){
     else if (method== HTTP_GET) {
       web_server.on(requestName, HTTP_GET, [=](AsyncWebServerRequest *request){
         if (_requestArray[i]._callback) {
-          #ifdef WEBSERVER_DEBUG
+          #ifdef DEBUG
             char time[12];
             _timeStamp(micros(), time);
             LOG(printf_P, PSTR("http <<<[%s][%s][%s][%s] %s\n"), 

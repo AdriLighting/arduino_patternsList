@@ -16,8 +16,12 @@ uint8_t Task_unique_id = 0;
   #endif    
 #endif  //  _TASK_EXTERNAL_TIME
 
-// #define DEBUG_TASK
-#if defined(DEBUG_TASK)
+#ifndef DEBUG
+  #ifdef DEBUG_TASK
+    #define DEBUG
+  #endif
+#endif
+#ifdef DEBUG
   #define LOG(func, ...) Serial.func(__VA_ARGS__)
 #else
   #define LOG(func, ...) ;
