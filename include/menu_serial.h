@@ -5,54 +5,42 @@
 	#define MENU_SERIAL_H
 
 	#include <Arduino.h>
+	#include <LinkedList.h>
 
-	typedef void (*at_srFunc)(const String &cmd, const String &value);  
-	class serialReadItem
+	typedef std::function<void()> sr_cb_v_f;
+	typedef std::function<void(const String &, const String &)> sr_cb_ss_f;
+	typedef enum sr_menumod { SRMM_SIMPLE, SRMM_KEY  } SR_MM;
+
+	class Sr_item
 	{
-
+		const char*		_name 	= "";
+		const char*		_key 		= "";
+		sr_cb_v_f			_cb_v 	= nullptr;			
+		sr_cb_ss_f 		_cb_ss 	= nullptr;		
+		SR_MM 				_mod 		= SRMM_SIMPLE;	
 	public:
-			const char*     _name;
-			const char*		_key;
-			at_srFunc 		_function;	
-
-		serialReadItem(){}
-		void item_add(
-			const char* name,
-			const char*	key,
-			at_srFunc 	f		);
-
-		~serialReadItem(){};
-		
+		Sr_item();
+		~Sr_item();
+		void set(const char*, const char*, sr_cb_v_f, SR_MM v4 = SRMM_SIMPLE);
+		void set(const char*, const char*, sr_cb_ss_f, SR_MM v4 = SRMM_SIMPLE);
+		void print();
+		void get_key(const char * &);
+		void get_mod(SR_MM&);
+		void get_callback();
+		void get_callback(const String &, const String&);
 	};
-	class SerialRead
+	class Sr_menu
 	{
-			int _cmd_1_cnt = 0;
-			int _cmd_2_cnt = 0;
-			serialReadItem * _cmd_1_Array = nullptr; // simpl letter 	- split
-			serialReadItem * _cmd_2_Array = nullptr; // ! 			- split
-			at_srFunc 	_cmd_3 		= NULL;		
-			char* 		_cmd_3_sep  = (char *)"";		
-			String		_cmd_3_desc = "";		
-			at_srFunc 	_cmd_4 		= NULL;		
-			char*		_cmd_4_sep  = (char *)"";		
-			String 		_cmd_4_desc = "";		
+		LList<Sr_item *> _list;
 	public:
-
-		SerialRead();
-		~SerialRead(){};
-
-		int splitText(const String & A_readString, const char* sep, String & cmd, String & value) ;
-		void cmd_array(int pos, int cnt);
-
-		void cmd_item_add (int pos, const char* name, const char* key, at_srFunc f);
-		void cmd_3(char* sep, const String & desc, at_srFunc f);
-		void cmd_4(char* sep, const String & desc, at_srFunc f);
-
-		void read(String a);
-		void loop();
-		void menu();
+		Sr_menu();
+		~Sr_menu();
+		Sr_item * add();
+		void add(const char*, const char*, sr_cb_v_f, SR_MM v4 = SRMM_SIMPLE);
+		void add(const char*, const char*, sr_cb_ss_f, SR_MM v4 = SRMM_SIMPLE);
+		void serialRead();
+		void serialReadString(const String &);
 	};
-	SerialRead * SerialReadPtr_get();
-	
+
 #endif // MENU_SERIAL_H
 #endif // MENU_SERIAL_H

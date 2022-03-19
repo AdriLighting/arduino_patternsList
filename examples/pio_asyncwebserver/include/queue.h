@@ -2,8 +2,9 @@
 #define _QUEUE_H 
     #include <Arduino.h>
     #include <resizeBuff.h>
-    #include <LList.h>
+    #include <LinkedList.h>
     #include "TaskScheduler.h"
+
 
 
     class QueueItem {
@@ -12,10 +13,17 @@
         QueueItem();
         ~QueueItem();
         void add(char* inStr);
-        void get_string(String & v1);
+        void get_string(String &);
     };
     class QueueItemList {
-      LList<QueueItem *> _list;
+      typedef std::function<void(const String &)> _execute_callback_f;
+
+      LList<QueueItem *>  _list;
+      
+      Task*               _task = nullptr;
+      uint32_t            _taskDelay = 500;
+
+      _execute_callback_f _execute_callback = nullptr;
     public:
       QueueItemList(){};
       ~QueueItemList(){
@@ -25,10 +33,16 @@
         }
         _list.clear();
       };
-      void addString(String* inStr);
-      void addString(char* inStr);  
+
+      void addString(String*);
+      void addString(char*); 
+
       uint8_t get_size();
-      void execute();  
+
+      void set_callback(_execute_callback_f);
+      void set_task(Task *);
+
+      void execute_cbTask();  
     };
     
 #endif

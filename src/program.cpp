@@ -579,6 +579,7 @@ void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
 
 void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & reply) {
   if (!doc.containsKey(F("pl_item_new"))) return;
+  
   uint8_t pP          = doc[F("pl_item_new")][F("pP")].as<uint8_t>();
   uint8_t iP          = doc[F("pl_item_new")][F("iP")].as<uint8_t>();
   String  lbl         = doc[F("pl_item_new")][F("lbl")].as<String>();

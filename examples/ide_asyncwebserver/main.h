@@ -2,7 +2,7 @@
 #define _MAIN_H 
     #include <Arduino.h>
     #include <resizeBuff.h>
-    #include <LList.h>
+    #include <LinkedList.h>
     #include "TaskScheduler.h"
 
     // static const char FOPATH_PLAYLISTEFF    [] PROGMEM = "/TEST/eff/";

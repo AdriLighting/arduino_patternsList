@@ -1,183 +1,11 @@
 #include "../include/menu_serial.h"
 
 #ifdef DEBUGSERIAL
+
 #include "../include/tools.h"
 
-void serialReadItem::item_add(   
-        const char* name,
-        const char* key,
-        at_srFunc   f 
-    )
-{
-    _name       = name;
-    _key        = key;
-    _function   = f;
-}
-
-
-SerialRead * SerialRead_ptr;
-SerialRead * SerialReadPtr_get(){
-    return SerialRead_ptr;
-}
-SerialRead::SerialRead(){
-    SerialRead_ptr = this;
-}
-void SerialRead::menu(){
-    Serial.printf("\n[SerialRead::menu]\n");
-    for (int i = 0; i < _cmd_1_cnt; ++i) {
-        Serial.printf_P(PSTR("[%5d][%25s][%-15s]\n"), 
-                    i, 
-                    _cmd_1_Array[i]._name, 
-                    _cmd_1_Array[i]._key
-                );
-    }
-    Serial.printf("\n[!]\n");
-    for (int i = 0; i < _cmd_2_cnt; ++i) {
-        Serial.printf_P(PSTR("[%5d][%25s][%-15s]\n"), 
-                    i, 
-                    _cmd_2_Array[i]._name, 
-                    _cmd_2_Array[i]._key
-                );
-    } 
-    if (_cmd_3_desc!="") { Serial.printf_P(PSTR("\n[%s][%s]\n"), _cmd_3_sep, _cmd_3_desc.c_str()); } 
-    if (_cmd_4_desc!="") { Serial.printf_P(PSTR("\n[%s][%s]\n"), _cmd_4_sep, _cmd_4_desc.c_str()); }                  
-}
-void SerialRead::cmd_array(int pos, int cnt) {
-    switch (pos){
-        case 1: 
-            _cmd_1_Array = new serialReadItem[cnt];
-        break;
-        case 2: 
-            _cmd_2_Array = new serialReadItem[cnt];
-        break;
-    }
-}
-
-
-void SerialRead::cmd_item_add(int pos, const char* name, const char* key, at_srFunc f){
-    switch (pos){
-        case 1: 
-            _cmd_1_Array[_cmd_1_cnt].item_add(name, key, f);
-            _cmd_1_cnt++;
-        break;
-        case 2: 
-            _cmd_2_Array[_cmd_2_cnt].item_add(name, key, f);
-            _cmd_2_cnt++;
-        break;
-    }
-}
-void SerialRead::cmd_3(char* sep, const String & desc, at_srFunc f){
-    _cmd_3_sep  = sep;
-    _cmd_3_desc = desc;
-    _cmd_3      = f;
-}
-void SerialRead::cmd_4(char* sep, const String & desc, at_srFunc f){
-    _cmd_4_sep  = sep;
-    _cmd_4_desc = desc;
-    _cmd_4      = f;    
-}
-
-void SerialRead::loop(){
-
-    if(Serial.available()) { 
-        boolean next = true;
-
-        String a = Serial.readStringUntil('\n');
-
-        String cmd = "";
-        String value = "";  
-        static String lastMsg = "";
-
-        if (a.indexOf("^")>=0)a=lastMsg;
-        lastMsg = a;
-
-        if (a.indexOf("!")>=0){
-            splitText(a, "!", cmd,  value) ; 
-            for (int i = 0; i < _cmd_2_cnt; ++i) {
-                if (cmd == _cmd_2_Array[i]._key) {
-                    _cmd_2_Array[i]._function(cmd, value);
-                    break;
-                }
-            } 
-            next = false;       
-        }       
-        if (!next) return;
-        if (_cmd_3_sep != (char *)"") {
-            if (a.indexOf(_cmd_3_sep)>=0) {
-                 splitText(a, _cmd_3_sep, cmd,  value) ; 
-                _cmd_3(cmd, value);
-                return;
-            }   
-        }   
-        if (_cmd_4_sep != (char *)"") {
-            if (a.indexOf(_cmd_4_sep)>=0) {
-                 splitText(a, _cmd_4_sep, cmd,  value) ; 
-                _cmd_4(cmd, value);
-                return;
-            }                            
-        } 
-        if (next) {
-            for (int i = 0; i < _cmd_1_cnt; ++i) {
-                if (a.indexOf(_cmd_1_Array[i]._key)>=0 ) {
-                    _cmd_1_Array[i]._function("", "");
-                    break;
-                }
-            }                        
-        }        
-        
-    }       
-}
-void SerialRead::read(String a){
-
-    // if(Serial.available()) { 
-        boolean next = true;
-
-        // String a = Serial.readStringUntil('\n');
-
-        String cmd = "";
-        String value = "";  
-        static String lastMsg = "";
-
-        if (a.indexOf("^")>=0)a=lastMsg;
-        lastMsg = a;
-
-        if (a.indexOf("!")>=0){
-            splitText(a, "!", cmd,  value) ; 
-            for (int i = 0; i < _cmd_2_cnt; ++i) {
-                if (cmd == _cmd_2_Array[i]._key) {
-                    _cmd_2_Array[i]._function(cmd, value);
-                    break;
-                }
-            } 
-            next = false;       
-        }       
-        if (!next) return;
-        if (_cmd_3_sep != (char *)"") {
-            if (a.indexOf(_cmd_3_sep)>=0) {
-                 splitText(a, _cmd_3_sep, cmd,  value) ; 
-                _cmd_3(cmd, value);
-                return;
-            }   
-        }   
-        if (_cmd_4_sep != (char *)"") {
-            if (a.indexOf(_cmd_4_sep)>=0) {
-                 splitText(a, _cmd_4_sep, cmd,  value) ; 
-                _cmd_4(cmd, value);
-                return;
-            }                            
-        } 
-        if (next) {
-            for (int i = 0; i < _cmd_1_cnt; ++i) {
-                if (a.indexOf(_cmd_1_Array[i]._key)>=0 ) {
-                    _cmd_1_Array[i]._function("", "");
-                    break;
-                }
-            }                        
-        }       
-        
-    // }       
-}
-int SerialRead::splitText(const String & A_readString, const char* sep, String & cmd, String & value) {
+namespace {
+  void splitText(const String & A_readString, const char* sep, String & cmd, String & value) {
 
     String  s_command;
     String  s_valueCommand;
@@ -203,7 +31,101 @@ int SerialRead::splitText(const String & A_readString, const char* sep, String &
         Rcommand = strtok(0, sep); 
     }
 
-    return 0;
+  }
 }
 
+
+Sr_item::Sr_item(){}
+Sr_item::~Sr_item(){}
+
+void Sr_item::set(const char* v1, const char* v2, sr_cb_v_f v3, SR_MM v4) {
+  _name   = v1;
+  _key    = v2;
+  _cb_v   = std::move(v3);   
+ _mod     = v4;  
+}
+void Sr_item::set(const char* v1, const char* v2, sr_cb_ss_f v3, SR_MM v4) {
+  _name   = v1;
+  _key    = v2;
+  _cb_ss  = std::move(v3);   
+  _mod    = v4;    
+}
+
+void Sr_item::print() {
+  Serial.printf_P(PSTR("[name: %s][key: %s]\n"), _name, _key);
+}
+
+void Sr_item::get_key(const char * & v1)  {v1 = _key;}
+void Sr_item::get_mod(SR_MM & v1)         {v1 = _mod;}
+
+void Sr_item::get_callback(const String & v1, const String & v2){
+  switch (_mod) {
+    case SR_MM::SRMM_SIMPLE: break;
+    case SR_MM::SRMM_KEY: if (_cb_ss) _cb_ss(v1, v2); break;
+    default:break;
+  }
+}
+void Sr_item::get_callback(){
+  switch (_mod) {
+    case SR_MM::SRMM_SIMPLE: if (_cb_v) _cb_v(); break;
+    case SR_MM::SRMM_KEY: break;
+    default:break;
+  }
+}
+
+
+Sr_menu::Sr_menu(){}
+Sr_menu::~Sr_menu(){}
+Sr_item * Sr_menu::add(){
+  _list.add(new Sr_item());
+  uint8_t pos = _list.size()-1;
+  return _list[pos];
+}
+
+void Sr_menu::add(const char* v1, const char* v2, sr_cb_v_f v3, SR_MM v4){
+  _list.add(new Sr_item());
+  uint8_t pos = _list.size()-1;
+  _list[pos]->set(v1, v2, v3, v4);
+}
+void Sr_menu::add(const char* v1, const char* v2, sr_cb_ss_f v3, SR_MM v4){
+  _list.add(new Sr_item());
+  uint8_t pos = _list.size()-1;
+  _list[pos]->set(v1, v2, v3, v4);
+}
+
+void Sr_menu::serialRead(){
+  if(!Serial.available()) return;
+  String str = Serial.readStringUntil('\n');
+  serialReadString(str);
+}
+void Sr_menu::serialReadString(const String & v1){
+  if (v1 == "") return;
+  char        * keyStr = new char[80];
+  uint8_t     size  = _list.size();
+  const char  * key = "";
+  SR_MM       mod;
+  strcpy(keyStr, String(v1[0]).c_str());
+  for(int i = 0; i < size; ++i) {
+    _list[i]->get_key(key);
+    _list[i]->get_mod(mod);
+    if (key == (const char*)"") continue; 
+    switch (mod) {
+      case SR_MM::SRMM_SIMPLE:
+        if ( String((const __FlashStringHelper*) key) == v1 ) {_list[i]->get_callback(); } break;
+      case SR_MM::SRMM_KEY: 
+        if (strcmp(keyStr, key) == 0) {
+          {
+            String cmd    = "";
+            String value  = "";
+            splitText(v1, key, cmd, value);
+            _list[i]->get_callback(cmd, value);
+          }
+        }
+      break;
+      default:break;
+    }
+  }
+  delete keyStr;
+  Serial.flush();
+}
 #endif

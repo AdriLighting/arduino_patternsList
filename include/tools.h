@@ -36,8 +36,8 @@
 
     void AP_debugPrint(const String & msg, const String & file, const String & line, const String & func);
 
-    #define APTRACE_(text)       \
-        {                     \
+    #define APTRACE_(text)  \
+        {                   \
           AP_debugPrint(String(text), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME)); \
         }
     #define APTRACE(parm_a, ...) {  \

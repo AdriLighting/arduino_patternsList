@@ -16,7 +16,7 @@
 - ![LC_baseTools](https://github.com/leftCoast/LC_baseTools.git) 
 ---
 #### ivanseidel    
-- ![LList](https://github.com/DmytroKorniienko/FireLamp_JeeUI/blob/master/include/LList.h) - [download archive](https://drive.google.com/file/d/1BZLGuW0Qv7570ETxc4MnCrJ27n74m-89/view?usp=sharing/)
+- ![LList](https://github.com/DmytroKorniienko/FireLamp_JeeUI/blob/master/include/LinkedList.h) - [download archive](https://drive.google.com/file/d/1BZLGuW0Qv7570ETxc4MnCrJ27n74m-89/view?usp=sharing/)
 ---
 #### Benoit Blanchon  
 - ![ArduinoJson](https://github.com/bblanchon/ArduinoJson) 
@@ -58,7 +58,7 @@ keyboard for serial monitor
 ````c++
 #define DEBUGSERIAL       // include/def.h
 ````
-macro trace
+trace macro 
 ````c++
 #define DEBUG_AP          // include/def.h
 ````
@@ -69,7 +69,7 @@ degug
 #define DEBUG_PLAYLIST    // src/playlist.cpp
 #define DEBUG_TASK        // examples/..._asyncwebserver/TaskScheduler.cpp
 #define DEBUG_WEBSERVER   // examples/..._asyncwebserver/apwebserver.cpp
-#define DEBUG_QUEUE      // examples/..._asyncwebserver/queue.cpp
+#define DEBUG_QUEUE       // examples/..._asyncwebserver/queue.cpp
 ````
 
 </details>

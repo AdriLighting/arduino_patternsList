@@ -5,6 +5,8 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include "TaskScheduler.h"
+#include "queue.h"
+
 // typedef enum {
 //   HTTP_GET     = 0b00000001,
 //   HTTP_POST    = 0b00000010,
@@ -125,4 +127,19 @@ public:
 
 };
 extern Webserver _Webserver;
+
+
+class socketQuee {
+    uint32_t              _last_call = 0;
+    uint32_t              _last_item = 0;
+    boolean               _executeQuee = false;
+public:
+    QueueItemList   * _list;
+    socketQuee();
+    ~socketQuee();
+    void receive(const String &);
+    void quee();
+    void handle();
+};
+
 #endif

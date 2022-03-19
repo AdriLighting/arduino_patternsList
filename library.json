@@ -29,6 +29,11 @@
         "version": "https://github.com/leftCoast/LC_baseTools.git"
     },
     {
+        "owner": "Ivan Seidel",
+        "name": "LinkedList",
+        "version": "https://github.com/AdriLighting/LinkedList.git"
+    },
+    {
         "owner": "Grellard Adrien",
         "name": "AdriLighting_millisTimer",
         "version": "https://github.com/AdriLighting/millisTimer.git"

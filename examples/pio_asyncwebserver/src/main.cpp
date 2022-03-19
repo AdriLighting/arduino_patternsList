@@ -12,18 +12,18 @@ Program       * _Program = nullptr;
 HeapStatu     _HeapStatu;
 HeapStatu     _HeapStatu_2;
 TaskScheduler * _TaskScheduler;
-QueueItemList * _socketQueeItemsList;
-socketQuee * _socketQuee;
+socketQuee    * _socketQuee;
 
 #ifdef DEBUGSERIAL
-    SerialRead * _serial;
+    Sr_menu _Sr_menu;
     void serial_menu_cmd(const String & cmd, const String & value);
 #endif
 void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String &data);
 void _http_get_cb(AsyncWebServerRequest * request, uint8_t pos, const String &data);
 void _socket_cb(const String & s); 
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver);
-
+void _testf_1(float c) {Serial.printf("%.2f\n", c);}
+void _testf_2(int c, int c2) {Serial.printf("%d - %d\n", c, c2);}
 void setup() {
   Serial.begin(115200);
 
@@ -39,24 +39,22 @@ void setup() {
   define_print();
 
   #ifdef DEBUGSERIAL
-    _serial = new SerialRead();
-    _serial->cmd_array(1, 6); 
-    _serial->cmd_item_add(  1,  "menu",               "a", [](const String & cmd, const String & value) { _serial->menu();  });
-    _serial->cmd_item_add(  1,  "ESPreset",           "z", [](const String & cmd, const String & value) { ESP.restart();    });
-    _serial->cmd_item_add(  1,  "freeHeap",           "e", [](const String & cmd, const String & value) { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
-    _serial->cmd_item_add(  1,  "debug prog",         "r", [](const String & cmd, const String & value) { _Program->print(PM_LOOP);  });
-    _serial->cmd_item_add(  1,  "remote action list", "t", [](const String & cmd, const String & value) { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
-    _serial->cmd_item_add(  1,  "lb+allpl",           "y", [](const String & cmd, const String & value) { _Program->print(PM_LB); _Program->print(PM_PL); });
-    _serial->cmd_array(2, 1); 
-    _serial->cmd_item_add(  2, "remote action",       "e", serial_menu_cmd);   
+    _Sr_menu.add("menu",               "a", []() { /*_serial->menu();*/  });
+    _Sr_menu.add("ESPreset",           "z", []() { ESP.restart();    });
+    _Sr_menu.add("freeHeap",           "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
+    _Sr_menu.add("debug prog",         "r", []() { _Program->print(PM_LOOP);  });
+    _Sr_menu.add("remote action list", "t", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
+    _Sr_menu.add("lb+allpl",           "y", []() { _Program->print(PM_LB); _Program->print(PM_PL); });
+    _Sr_menu.add("name_1",             "!", serial_menu_cmd, SR_MM::SRMM_KEY);
+    _Sr_menu.add("name_1",             ":", serial_menu_cmd, SR_MM::SRMM_KEY);
   #endif
 
   boolean fs = FILESYSTEM.begin();
 
   _DeviceWifi = new WifiConnect(
     "hostnameapas",
-    "SSID",
-    "SSIDPASS",
+    "freebox_123_EXT",
+    "phcaadax",
     "adsap1234",
     "adsota1234");
   _DeviceWifi->setFunc_STAinitServer  ( [](){_Webserver.begin();} );
@@ -143,15 +141,20 @@ void setup() {
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str()); 
 
   _socketQuee = new socketQuee();
-
+  _socketQuee->_list->set_task(_TaskScheduler->get_task(3));
+  _socketQuee->_list->set_callback([](const String & v1){_Webserver.socket_send(v1);});
   delay(3000);
+
+
+
+
 
 }
 
 
 void loop() {
   #ifdef DEBUGSERIAL
-    _serial->loop();  
+    _Sr_menu.serialRead();
   #endif
   _TaskScheduler->loop();
   _socketQuee->handle();
@@ -181,13 +184,6 @@ uint32_t _socket_cb_last = 0;
 
 
 
-void _socket_task(uint32_t delay = 250); 
-void _socket_task_start(uint32_t delay) {
-  _TaskScheduler->get_task(3)->set_iteration_max(0);
-  _TaskScheduler->get_task(3)->set_taskDelay(ETD::ETD_DELAY, true, delay, 1);
-  _TaskScheduler->get_task(3)->set_taskDelayEnabled(ETD::ETD_DELAY, true);
-  _TaskScheduler->get_task(3)->set_enabled(true);   
-}
 void _socket_cb(const String & s){
 
   Serial.printf_P(PSTR("[_socket_cb][last: %d]\n"), millis()-_socket_cb_last);
@@ -215,53 +211,14 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
 
   if (!updWebserver) return; 
 
-  String                    rep;
-  DynamicJsonDocument       reply(2048);
-  AP_ApiReply             * _reponse = new AP_ApiReply();
-  _reponse->set_ra(RA::RA_ITEM_NEXT);
-  _reponse->reply_generate(reply);
-  delete _reponse; 
-  serializeJson(reply, rep); 
-  // _Webserver.socket_send(rep);  
-  _socketQuee->receive(rep);
-  // _TaskScheduler->get_task(3)->set_callbackOstart([=](){Serial.printf_P(PSTR(">>>>%d<<<\n"), ESP.getFreeHeap());_Webserver.socket_send(rep);});
-  // _socket_task_start(250);
-}
-
-
-socketQuee::socketQuee() {
-  _list       = new QueueItemList();
-  // _task_quee  = new Task();
-}
-socketQuee::~socketQuee() {
-  delete _list;
-}
-
-void socketQuee::receive(const String & msg) {
-  String gMsg = msg;
-  if (( (_list->get_size() == 0) && (millis()-_last_item) < 250)) {
-      _list->addString(&gMsg);
-      _last_item = millis();
-      return;
-  }
-  _last_item = millis();
-
-  if (_list->get_size() > 0) {
-    _list->addString(&gMsg);
-    return;}
-
-  _TaskScheduler->get_task(3)->set_callbackOstart([=](){_Webserver.socket_send(msg);});
-  _socket_task_start(250);            
-}
-void socketQuee::handle(){
-  // if(_task_quee) {if (_task_quee->isEnabled()) _task_quee->execute();}
-
-  if ( (_list->get_size() == 0) && _executeQuee ) _executeQuee = false;
-  if ( (_list->get_size() > 0) && ((millis()-_last_item) > 500) && !_executeQuee ){
-    _executeQuee = true;
-    _TaskScheduler->get_task(3)->set_callbackOstart([=](){_list->execute();});
-    _socket_task_start(500);   
-  }
+  String                    reply;
+  DynamicJsonDocument       doc(2048);
+  AP_ApiReply             * _ApiReply = new AP_ApiReply();
+  _ApiReply->set_ra(RA::RA_ITEM_NEXT);
+  _ApiReply->reply_generate(doc);
+  delete _ApiReply; 
+  serializeJson(doc, reply); 
+  _socketQuee->receive(reply);
 }
 
 
@@ -270,6 +227,7 @@ void socketQuee::handle(){
 
 #ifdef DEBUGSERIAL
   void serial_menu_cmd(const String & cmd, const String & value){
+  if (cmd=="" || value=="")return;
   Serial.printf_P(PSTR("[serial_menu_cmd] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
   uint8_t p       = value.toInt();
   String  v       = "";
