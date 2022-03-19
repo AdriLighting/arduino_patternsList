@@ -7,7 +7,6 @@
 Program* _Program = nullptr;
 
 #ifdef DEBUGSERIAL
-    Sr_menu _Sr_menu;
     void serial_menu_cmd(const String & cmd, const String & value);
 #endif
 void _Program_handleCallback(const String itemBaseName, const uint16_t& itemBasePos, boolean updWebserver);
@@ -27,13 +26,7 @@ void setup() {
   Serial.setDebugOutput(false);
 
   #ifdef DEBUGSERIAL
-    _Sr_menu.add("menu",               "a", []() { /*_serial->menu();*/  });
-    _Sr_menu.add("ESPreset",           "z", []() { ESP.restart();    });
-    _Sr_menu.add("freeHeap",           "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
-    _Sr_menu.add("debug prog",         "r", []() { _Program->print(PM_LOOP);  });
-    _Sr_menu.add("remote action list", "t", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
-    _Sr_menu.add("lb+allpl",           "y", []() { _Program->print(PM_LB); _Program->print(PM_PL); });
-    _Sr_menu.add("name_1",             "!", serial_menu_cmd, SR_MM::SRMM_KEY);
+    _Sr_menu.add("name_1", "!", serial_menu_cmd, SR_MM::SRMM_KEY);
   #endif
 
   boolean fs = false;

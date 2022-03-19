@@ -35,12 +35,11 @@
 	public:
 		Sr_menu();
 		~Sr_menu();
-		Sr_item * add();
 		void add(const char*, const char*, sr_cb_v_f, SR_MM v4 = SRMM_SIMPLE);
 		void add(const char*, const char*, sr_cb_ss_f, SR_MM v4 = SRMM_SIMPLE);
 		void serialRead();
 		void serialReadString(const String &);
 	};
-
+	extern Sr_menu _Sr_menu;
 #endif // MENU_SERIAL_H
 #endif // MENU_SERIAL_H

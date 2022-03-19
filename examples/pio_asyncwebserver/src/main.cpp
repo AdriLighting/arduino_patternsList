@@ -15,7 +15,6 @@ TaskScheduler * _TaskScheduler;
 socketQuee    * _socketQuee;
 
 #ifdef DEBUGSERIAL
-    Sr_menu _Sr_menu;
     void serial_menu_cmd(const String & cmd, const String & value);
 #endif
 void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String &data);
@@ -39,14 +38,7 @@ void setup() {
   define_print();
 
   #ifdef DEBUGSERIAL
-    _Sr_menu.add("menu",               "a", []() { /*_serial->menu();*/  });
-    _Sr_menu.add("ESPreset",           "z", []() { ESP.restart();    });
-    _Sr_menu.add("freeHeap",           "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
-    _Sr_menu.add("debug prog",         "r", []() { _Program->print(PM_LOOP);  });
-    _Sr_menu.add("remote action list", "t", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
-    _Sr_menu.add("lb+allpl",           "y", []() { _Program->print(PM_LB); _Program->print(PM_PL); });
-    _Sr_menu.add("name_1",             "!", serial_menu_cmd, SR_MM::SRMM_KEY);
-    _Sr_menu.add("name_1",             ":", serial_menu_cmd, SR_MM::SRMM_KEY);
+    _Sr_menu.add("name_1", "!", serial_menu_cmd, SR_MM::SRMM_KEY);
   #endif
 
   boolean fs = FILESYSTEM.begin();
@@ -145,10 +137,6 @@ void setup() {
   _socketQuee->_list->set_callback([](const String & v1){_Webserver.socket_send(v1);});
   delay(3000);
 
-
-
-
-
 }
 
 
@@ -226,7 +214,8 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
 
 
 #ifdef DEBUGSERIAL
-  void serial_menu_cmd(const String & cmd, const String & value){
+ 
+void serial_menu_cmd(const String & cmd, const String & value){
   if (cmd=="" || value=="")return;
   Serial.printf_P(PSTR("[serial_menu_cmd] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
   uint8_t p       = value.toInt();
@@ -255,8 +244,7 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   _Webserver.socket_send(reply);
   // RA action = RAARR[p];
   // _Program->remote_action(action, v.c_str(), "", NULL);    
-}  
-
+} 
 #endif
 
 

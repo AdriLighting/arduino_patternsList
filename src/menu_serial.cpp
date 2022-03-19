@@ -1,8 +1,8 @@
 #include "../include/menu_serial.h"
 
 #ifdef DEBUGSERIAL
-
 #include "../include/tools.h"
+#include "../include/program.h"
 
 namespace {
   void splitText(const String & A_readString, const char* sep, String & cmd, String & value) {
@@ -34,8 +34,12 @@ namespace {
   }
 }
 
+    Sr_menu _Sr_menu;
 
-Sr_item::Sr_item(){}
+
+
+Sr_item::Sr_item(){
+}
 Sr_item::~Sr_item(){}
 
 void Sr_item::set(const char* v1, const char* v2, sr_cb_v_f v3, SR_MM v4) {
@@ -74,20 +78,32 @@ void Sr_item::get_callback(){
 }
 
 
-Sr_menu::Sr_menu(){}
-Sr_menu::~Sr_menu(){}
-Sr_item * Sr_menu::add(){
-  _list.add(new Sr_item());
-  uint8_t pos = _list.size()-1;
-  return _list[pos];
+Sr_menu::Sr_menu(){
+    _Sr_menu.add("menu",               "a", []() { /*_serial->menu();*/  });
+    _Sr_menu.add("ESPreset",           "z", []() { ESP.restart();    });
+    _Sr_menu.add("freeHeap",           "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
+    _Sr_menu.add("debug prog",         "r", []() { ProgramPtrGet()->print(PM_LOOP);  });
+    _Sr_menu.add("remote action list", "t", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
+    _Sr_menu.add("lb+allpl",           "y", []() { ProgramPtrGet()->print(PM_LB); ProgramPtrGet()->print(PM_PL); });  
 }
+Sr_menu::~Sr_menu(){}
 
 void Sr_menu::add(const char* v1, const char* v2, sr_cb_v_f v3, SR_MM v4){
+  const char  * key = "";
+  for(int i = 0; i < _list.size(); ++i) {
+    _list[i]->get_key(key);
+    if (strcmp(v2, key) == 0) {Serial.printf_P(PSTR("[Sr_menu::add | cb void] key %s already registered!\n"), v2);return;}}
+  Serial.printf_P(PSTR("[Sr_menu::add | cb void] adding key: %s\n"), v2);
   _list.add(new Sr_item());
   uint8_t pos = _list.size()-1;
   _list[pos]->set(v1, v2, v3, v4);
 }
 void Sr_menu::add(const char* v1, const char* v2, sr_cb_ss_f v3, SR_MM v4){
+  const char  * key = "";
+  for(int i = 0; i < _list.size(); ++i) {
+    _list[i]->get_key(key);
+    if (strcmp(v2, key) == 0) {Serial.printf_P(PSTR("[Sr_menu::add | cb ss] key %s already registered!\n"), v2);return;}}
+  Serial.printf_P(PSTR("[Sr_menu::add | cb ss] adding key: %s\n"), v2);
   _list.add(new Sr_item());
   uint8_t pos = _list.size()-1;
   _list[pos]->set(v1, v2, v3, v4);
