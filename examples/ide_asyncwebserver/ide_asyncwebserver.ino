@@ -7,23 +7,29 @@
 #include "apwebserver.h"
 #include "TaskScheduler.h"
 
+// region ################################################ GLOBALS
 WifiConnect   * _DeviceWifi;
 Program       * _Program = nullptr;
 HeapStatu     _HeapStatu;
 HeapStatu     _HeapStatu_2;
 TaskScheduler * _TaskScheduler;
 socketQueue   * _socketQueueReply;
-socketQueue   * _socketQueueSetter;
+socketQueue   * _socketQueueSetter;  
+// endregion >>>> 
 
 #ifdef DEBUGSERIAL
     void serial_menu_cmd(const String & cmd, const String & value);
 #endif
+
+// region ################################################ PROTOTYPE
 void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String &data);
 void _http_get_cb(AsyncWebServerRequest * request, uint8_t pos, const String &data);
 void _socket_cb(const String & s); 
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver);
 void _testf_1(float c) {Serial.printf("%.2f\n", c);}
-void _testf_2(int c, int c2) {Serial.printf("%d - %d\n", c, c2);}
+void _testf_2(int c, int c2) {Serial.printf("%d - %d\n", c, c2);}  
+// endregion >>>> 
+
 void setup() {
   Serial.begin(115200);
 
@@ -44,6 +50,7 @@ void setup() {
 
   boolean fs = FILESYSTEM.begin();
 
+  // region ################################################ WIFI
   _DeviceWifi = new WifiConnect(
     "hostnameapas",
     "SSID",
@@ -51,61 +58,64 @@ void setup() {
     "adsap1234",
     "adsota1234");
   _DeviceWifi->setFunc_STAinitServer  ( [](){_Webserver.begin();} );
-  _DeviceWifi->setFunc_APinitServer   ( [](){_Webserver.begin();} );
+  _DeviceWifi->setFunc_APinitServer   ( [](){_Webserver.begin();} );  
+  // endregion >>>> WIFI
 
 
-    _AP_userApi.initialize(2);
-    _AP_userApi.set_request(0, "user", [](const String & v1, DynamicJsonDocument & doc){
-        Serial.printf("[user getter][req: %s]\n", v1.c_str());
-        JsonObject var = doc.createNestedObject(FPSTR(REQ_005));
-        _Program->get_json_jsInit(var);});
+  // region ################################################ WEBSERVER
+  _AP_userApi.initialize(2);
+  _AP_userApi.set_request(0, "user", [](const String & v1, DynamicJsonDocument & doc){
+    Serial.printf("[user getter][req: %s]\n", v1.c_str());
+    JsonObject var = doc.createNestedObject(FPSTR(REQ_005));
+    _Program->get_json_jsInit(var);});
 
+  _Webserver.request_array(3);
+  uint8_t rP = _Webserver.request_new("/api", HTTP_POST, WSTE_APPJSON);
+  Webserver_request * request = _Webserver.get_requestArray(rP);
+  request->set_callback(_http_post_cb);
+  request->set_rType(WSRM_FROMCALLBACK);
 
-    _Webserver.request_array(3);
-    uint8_t rP = _Webserver.request_new("/api", HTTP_POST, WSTE_APPJSON);
-    Webserver_request * request = _Webserver.get_requestArray(rP);
-    request->set_callback(_http_post_cb);
-    request->set_rType(WSRM_FROMCALLBACK);
+  rP = _Webserver.request_new("/api", HTTP_GET, WSTE_APPJSON);
+  request = _Webserver.get_requestArray(rP);
+  request->set_callback(_http_get_cb);
+  request->set_rType(WSRM_FROMCALLBACK); 
 
-    rP = _Webserver.request_new("/api", HTTP_GET, WSTE_APPJSON);
-    request = _Webserver.get_requestArray(rP);
-    request->set_callback(_http_get_cb);
-    request->set_rType(WSRM_FROMCALLBACK); 
-    
-    _Webserver.setup();
-    _Webserver.set_socketCallback(_socket_cb);
+  _Webserver.setup();
+  _Webserver.set_socketCallback(_socket_cb);  
+  // endregion >>>> WEBSERVER
 
-    _Program = new Program(2, fs);
-    _Program->set_fs_pl(false);  
-    _Program->set_callback(_Program_cb);
+  _Program = new Program(2, fs);
+  _Program->set_fs_pl(false);  
+  _Program->set_callback(_Program_cb);
 
-    // LISTEREF_ADD-------------------------------------------------------------------------------
-    Serial.printf_P(PSTR(">>>>%d<<<\n"), ESP.getFreeHeap()); 
-    _Program->initialize_lb(0, "full",  ARRAY_SIZE(LPALLNAMES)          , LPALLNAMES);
-    _Program->initialize_lb(1, "cat",   ARRAY_SIZE(LPALLNAMES_CAT)      , LPALLNAMES_CAT);
-    Serial.printf_P(PSTR(">>>>%d<<<\n"), ESP.getFreeHeap()); 
+  // region ################################################ PROGRAM
+  // LISTEREF_ADD-------------------------------------------------------------------------------
+  Serial.printf_P(PSTR(">>>>%d<<<\n"), ESP.getFreeHeap()); 
+  _Program->initialize_lb(0, "full",  ARRAY_SIZE(LPALLNAMES)          , LPALLNAMES);
+  _Program->initialize_lb(1, "cat",   ARRAY_SIZE(LPALLNAMES_CAT)      , LPALLNAMES_CAT);
+  Serial.printf_P(PSTR(">>>>%d<<<\n"), ESP.getFreeHeap()); 
 
-    // LISTEREF_CREATE
-    _Program->initialize(ARRAY_SIZE(LPALLNAMES),      LPALLNAMES,     "full", SORT_TYPE::ST_BASE);
-    // _Program->print(PM_LB); 
-    // delay(1000);
+  // LISTEREF_CREATE
+  _Program->initialize(ARRAY_SIZE(LPALLNAMES),      LPALLNAMES,     "full", SORT_TYPE::ST_BASE);
+  // _Program->print(PM_LB); 
+  // delay(1000);
 
-    // _Program->initialize(ARRAY_SIZE(LPALLNAMES_CAT),  LPALLNAMES_CAT, "cat",  SORT_TYPE::ST_BASE);
-    // _Program->print(PM_LB); 
-    // _Program->print(PM_LBNAME); 
-    // delay(1000);
-    //--------------------------------------------------------------------------------------------
+  // _Program->initialize(ARRAY_SIZE(LPALLNAMES_CAT),  LPALLNAMES_CAT, "cat",  SORT_TYPE::ST_BASE);
+  // _Program->print(PM_LB); 
+  // _Program->print(PM_LBNAME); 
+  // delay(1000);
+  //--------------------------------------------------------------------------------------------
 
-    // PLAYLIST_INITIALIZE -----------------------------------------------------------------------
-    uint8_t plC     = 5;
-    uint8_t iC[]      = {20,      20,        20,      0,        0       };  // nb items max
-    const char * Ln[] = {"full",  "full",   "full",   "null",   "null"  };
-    _Program->initialize_playlist(plC, iC, Ln);
-    _Program->pl_fs_restore();  
-    // _Program->print(PM_PL); 
-    // delay(1000);
-    //
-    //--------------------------------------------------------------------------------------------
+  // PLAYLIST_INITIALIZE -----------------------------------------------------------------------
+  uint8_t plC     = 5;
+  uint8_t iC[]      = {20,      20,        20,      0,        0       };  // nb items max
+  const char * Ln[] = {"full",  "full",   "full",   "null",   "null"  };
+  _Program->initialize_playlist(plC, iC, Ln);
+  _Program->pl_fs_restore();  
+  // _Program->print(PM_PL); 
+  // delay(1000);
+  //
+  //--------------------------------------------------------------------------------------------
 
 
   // SETUP PROGRAMM LOOP -----------------------------------------------------------------------
@@ -115,9 +125,11 @@ void setup() {
   _Program->remote_action(RA::RA_PLAY_STOP);
   // _Program->print(PM_LOOP);
   // delay(1000);
-  //--------------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------  
+  // endregion >>>> PROGRAM
 
 
+  // region ################################################ TASKS
   _TaskScheduler = new TaskScheduler(5);
   _TaskScheduler->get_task(0)->set_callback([](){ProgramPtrGet()->handle();});
   _TaskScheduler->get_task(1)->set_callback([](){_DeviceWifi->handleConnection();});
@@ -129,16 +141,14 @@ void setup() {
     _TaskScheduler->get_task(i)->set_enabled(true);
   }
 
-  String heap, time;
-  on_timeD(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
-  Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str()); 
-
   _socketQueueReply   = new socketQueueReply();
-  _socketQueueSetter  = new socketQueueSetter();
-
+  _socketQueueSetter  = new socketQueueSetter();  
+  // endregion >>>> 
 
   delay(3000);
-
+  String heap, time;
+  on_timeD(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
+  Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str());
 }
   // Querrry_child _qc;
   // _qc.Querry_1();
