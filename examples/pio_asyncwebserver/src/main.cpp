@@ -31,7 +31,6 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
 
 void setup() {
   Serial.begin(115200);
-
   for(unsigned long const serialBeginTime = millis(); !Serial && (millis() - serialBeginTime > 5000); ) { }
   delay(300);
 

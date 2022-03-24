@@ -3,6 +3,7 @@
 #ifdef DEBUG_KEYBOARD
 #include "../include/tools.h"
 #include "../include/program.h"
+#include "../include/apapi.h"
 
 namespace {
   void splitText(const String & inputString, const char* const & sep, String & cmd, String & value) {
@@ -50,6 +51,7 @@ void Sr_item::print() {
 }
 
 void Sr_item::get_key(const char * & v1)  {v1 = _key;}
+void Sr_item::get_name(const char * & v1) {v1 = _name;}
 void Sr_item::get_mod(SR_MM & v1)         {v1 = _mod;}
 
 void Sr_item::get_callback(const String & v1, const String & v2){
@@ -67,17 +69,37 @@ void Sr_item::get_callback(){
   }
 }
 
-
+void Sr_menu::print(){
+  const char  * key = "";
+  const char  * name = "";
+  SR_MM mod;
+  for(int i = 0; i < _list.size(); ++i) {
+    Sr_item * item = _list.get(i);
+    item->get_key(key);
+    item->get_name(name);
+    item->get_mod(mod);
+    Serial.printf_P(PSTR("[%d][key: %s][mod: %d][name: %s]\n"), i, key, mod, name);
+  }
+}
 Sr_menu::Sr_menu(){
-    _Sr_menu.add("menu",                "a", []() { /*_serial->menu();*/  });
-    _Sr_menu.add("ESPreset",            "z", []() { ESP.restart();    });
-    _Sr_menu.add("freeHeap",            "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
-    _Sr_menu.add("debug prog",          "r", []() { /*ProgramPtrGet()->print(PM_LOOP);*/  });
-    _Sr_menu.add("remote action list",  "t", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
-    _Sr_menu.add("lb+allpl",            "y", []() { /*ProgramPtrGet()->print(PM_LB); ProgramPtrGet()->print(PM_PL);*/ });  
+    _Sr_menu.add("menu",          "a", []() { _Sr_menu.print(); });
+    _Sr_menu.add("ESPreset",      "z", []() { ESP.restart();    });
+    _Sr_menu.add("freeHeap",      "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
+    _Sr_menu.add("getter list",   "r", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
+    _Sr_menu.add("setter list",   "t", []() { uint8_t cnt = ARRAY_SIZE(REQALL); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, REQALL[i]);}});
+    _Sr_menu.add("api getter",    "@", [](const String & v1, const String & v2) {  
+      DynamicJsonDocument doc(1024);
+      JsonArray           arr;
+      arr = doc.createNestedArray(F("set"));  
+      arr = doc.createNestedArray(F("get"));  
+      arr.add(v1);
+      DynamicJsonDocument reply(2048);
+      _AP_Api.parsingRequest(doc, reply, "");
+      serializeJsonPretty(reply, Serial);     
+    }, SR_MM::SRMM_KEY); 
     #ifdef DEBUG_AP
-    _Sr_menu.add("debugregion",         "u", []() { _DebugPrintList.ketboardPrint(); });    
-    _Sr_menu.add("debugset",            ";", [](const String & v1, const String & v2) { 
+    _Sr_menu.add("debugregion", "u", []() { _DebugPrintList.ketboardPrint(); });    
+    _Sr_menu.add("debugset",    ";", [](const String & v1, const String & v2) { 
       _DebugPrintList.keyboardSet(v1,v2); }, SR_MM::SRMM_KEY);    
     #endif
 }

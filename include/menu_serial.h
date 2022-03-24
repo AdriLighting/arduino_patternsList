@@ -25,6 +25,7 @@
 		void set(const char*, const char*, sr_cb_ss_f, SR_MM v4 = SRMM_SIMPLE);
 		void print();
 		void get_key(const char * &);
+		void get_name(const char * &);
 		void get_mod(SR_MM&);
 		void get_callback();
 		void get_callback(const String &, const String&);
@@ -39,6 +40,7 @@
 		void add(const char*, const char*, sr_cb_ss_f, SR_MM v4 = SRMM_SIMPLE);
 		void serialRead();
 		void serialReadString(const String &);
+		void print();
 	};
 	extern Sr_menu _Sr_menu;
 

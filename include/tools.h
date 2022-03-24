@@ -55,22 +55,22 @@
     void AP_debugPrint(const String & msg, const String & file, const String & line, const String & func, const char * ptr  = "", AP_DEBUGLVL_T mod = AP_DEBUGLVL_NORMAL);
 
     #define APTRACE(parm_a, ...) {                                                                            \
-      if (ap_debugBuffer)                                                                                     \
+      if (ap_debugBuffer) {                                                                                    \
         sprintf_P(ap_debugBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__);                                        \
-        AP_debugPrint(String(text), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME));  \
+        AP_debugPrint(String(text), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME));}  \
       } 
 
      #define APTRACEC(ptr, parm_a, ...) {                               \
-      if (ap_debugBuffer)                                               \
+      if (ap_debugBuffer) {                                              \
         sprintf_P(ap_debugBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__);  \
-        AP_debugPrint(String(ap_debugBuffer), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME), ptr); \
+        AP_debugPrint(String(ap_debugBuffer), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME), ptr);} \
       } 
 
 
      #define APTRACEM(ptr, mod, parm_a, ...) {                          \
-      if (ap_debugBuffer)                                               \
+      if (ap_debugBuffer){                                               \
         sprintf_P(ap_debugBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__);  \
-        AP_debugPrint(String(ap_debugBuffer), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME), ptr, mod); \
+        AP_debugPrint(String(ap_debugBuffer), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME), ptr, mod);} \
       } 
 
 /*struct debugGlobal_t {

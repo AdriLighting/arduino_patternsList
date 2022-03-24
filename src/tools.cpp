@@ -442,6 +442,10 @@ void DebugPrintList::ketboardPrintHeader(boolean pNbId){
   Serial.println();          
 }
 void DebugPrintList::ketboardPrint(){
+  Serial.printf_P(PSTR(";&region_id=&setter_id:value\n"));
+  Serial.printf_P(PSTR(";&region_id=&range:start,end,value\n"));
+  Serial.printf_P(PSTR(";&range:start,end=&setter:value\n"));
+  Serial.printf_P(PSTR(";&range:start,end=&range:start,end,value\n"));
   ketboardPrintHeader(true);
   for(uint8_t i = 0; i < _list.size(); ++i) {Serial.printf_P(PSTR("[%3d]"), i);DebugPrintItem * item = _list.get(i);item->print();}
   Serial.println();

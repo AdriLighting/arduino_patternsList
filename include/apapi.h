@@ -46,7 +46,8 @@ public:
 	 * @param[out]	r			reply json in String format
 	 * @param[in]  	upd   parmaeter for send a reply query
 	 */
-	void parsingRequest(DynamicJsonDocument & doc, String & r, const String & upd);
+	void parsingRequest(DynamicJsonDocument &, String &, const String &);
+	void parsingRequest(DynamicJsonDocument &, DynamicJsonDocument &, const String &);
 };
 class AP_ApiReply {
 	RA 			_action;

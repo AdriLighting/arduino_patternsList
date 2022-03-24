@@ -11,7 +11,17 @@
 #include "../include/constants.h"
 #include "../include/program.h"
 #include <functional>
-
+#define DEBUG
+#ifndef DEBUG
+  #ifdef DEBUG_APAPI
+    #define DEBUG
+  #endif
+#endif
+#ifdef DEBUG
+  #define LOG(func, ...) APTRACEC(func, __VA_ARGS__)
+#else
+  #define LOG(func, ...) ;
+#endif
 
 AP_userApi      _AP_userApi;
 AP_Api          _AP_Api;
@@ -32,7 +42,7 @@ void AP_ApiItemList::parsingRequest(const String & v1, DynamicJsonDocument & doc
     if (v1 == ch_toString( _list[i]->_id)){
       // Serial.printf("[AP_ApiItemList::parsingRequest][%s]\n", v1.c_str());
       _list[i]->_generateJson(doc);
-      APTRACEC(DPTT_APAPI,"END [heap: %d]\n", ESP.getFreeHeap());
+      LOG(DPTT_APAPI,"END [heap: %d]\n", ESP.getFreeHeap());
     }
   }
 }
@@ -48,18 +58,18 @@ void apapiItemList_obj(const char * const v1, std::function<void(JsonObject & ob
   func(var_1);
 }
 void apapiItemList_obj(const char * const v1, const char * const v2, std::function<void(JsonObject & obj)> func, DynamicJsonDocument& obj ) {
-    APTRACEC(DPTT_APAPI,"");
+    LOG(DPTT_APAPI,"");
     JsonObject var_1;
     JsonObject var_2;
     if (!obj[FPSTR(v1)]) {
-      APTRACEC(DPTT_APAPI,"");
+      LOG(DPTT_APAPI,"");
       var_1 = obj.createNestedObject(FPSTR(v1));
       if (!obj[FPSTR(v1)][FPSTR(v2)]) {
-         APTRACEC(DPTT_APAPI,"");
+         LOG(DPTT_APAPI,"");
         var_2 = var_1.createNestedObject(FPSTR(v2));
         func(var_2); 
       } else {
-        APTRACEC(DPTT_APAPI,"[heap: %d]\n", ESP.getFreeHeap());
+        LOG(DPTT_APAPI,"[heap: %d]\n", ESP.getFreeHeap());
         // StaticJsonDocument <2048> temp;
         DynamicJsonDocument temp(2048);
         var_2 = temp.to<JsonObject>();
@@ -68,9 +78,9 @@ void apapiItemList_obj(const char * const v1, const char * const v2, std::functi
         temp.clear();        
       }
     } else {
-       APTRACEC(DPTT_APAPI,"");
+       LOG(DPTT_APAPI,"");
       if (!obj[FPSTR(v1)][FPSTR(v2)]) {
-        APTRACEC(DPTT_APAPI,"[heap: %d]\n", ESP.getFreeHeap());
+        LOG(DPTT_APAPI,"[heap: %d]\n", ESP.getFreeHeap());
         // StaticJsonDocument <2048> temp;
         DynamicJsonDocument temp(2048);
         var_2 = temp.to<JsonObject>();
@@ -111,26 +121,26 @@ void AP_ApiItemList_setup(){
   }); 
   // list = lb - cmax: items:[n: cmax:] , pl - cmax: items:[ cmax: cnt: pos: lbl: lref: ]
   _apapiItemList.add(REQ_006, [](DynamicJsonDocument & reply){
-    APTRACEC(DPTT_APAPI,"");
+    LOG(DPTT_APAPI,"");
     JsonObject var;
     if (!reply[FPSTR(REQ_006)]) {
-      APTRACEC(DPTT_APAPI,"");
+      LOG(DPTT_APAPI,"");
       var = reply.createNestedObject(FPSTR(REQ_006));
       apapiItemList_obj(REP_003, std::bind(&Program::get_json_lb_items, ProgramPtrGet(), std::placeholders::_1, false), var);
-      APTRACEC(DPTT_APAPI,"");  
+      LOG(DPTT_APAPI,"");  
       apapiItemList_obj(REP_001, std::bind(&Program::get_json_allpl_items, ProgramPtrGet(), std::placeholders::_1, false, false), var);       
     } else {
-      APTRACEC(DPTT_APAPI,"");
+      LOG(DPTT_APAPI,"");
       
       if (!reply[FPSTR(REQ_006)][FPSTR(REP_003)]) {
-        APTRACEC(DPTT_APAPI,"[heap: %d]\n", ESP.getFreeHeap());
+        LOG(DPTT_APAPI,"[heap: %d]\n", ESP.getFreeHeap());
         DynamicJsonDocument temp(2048);;
         var = temp.to<JsonObject>();        
         apapiItemList_obj(REP_003, std::bind(&Program::get_json_lb_items, ProgramPtrGet(), std::placeholders::_1, false), var); 
         reply[FPSTR(REQ_006)][FPSTR(REP_003)] = temp;
       }
       if (!reply[FPSTR(REQ_006)][FPSTR(REP_001)]) {
-        APTRACEC(DPTT_APAPI,"[heap: %d]\n", ESP.getFreeHeap());
+        LOG(DPTT_APAPI,"[heap: %d]\n", ESP.getFreeHeap());
         DynamicJsonDocument temp(2048);
         var = temp.to<JsonObject>();
         apapiItemList_obj(REP_001, std::bind(&Program::get_json_allpl_items, ProgramPtrGet(), std::placeholders::_1, false, false), var); 
@@ -187,27 +197,27 @@ void AP_ApiItemList_setup(){
   // "get":[{"loop_select":["statu"]}]}
   // loop_select - statu
   _apapiItemList.add(REP_005, [](DynamicJsonDocument & reply){ // loop:{statu:{play: pause: rnd: delay: delaymin: rt:}}
-    APTRACEC(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
+    LOG(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
     apapiItemList_obj(REQ_005, REP_005, std::bind(&Program::get_json_statu, ProgramPtrGet(), std::placeholders::_1), reply);
   });
   // loop_select - pl
   _apapiItemList.add(REP_001, [](DynamicJsonDocument & reply){ // loop:{pl:{set: play: pos: cnt: ib:}} 
-    APTRACEC(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
+    LOG(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
     apapiItemList_obj(REQ_005, REP_001, std::bind(&Program::get_json_pl, ProgramPtrGet(), std::placeholders::_1), reply);
   });
   // loop_select - plt
   _apapiItemList.add(REP_002, [](DynamicJsonDocument & reply){ // loop:{plt:{pos: min: max:}} 
-    APTRACEC(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
+    LOG(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
     apapiItemList_obj(REQ_005, REP_002, std::bind(&Program::get_json_plt, ProgramPtrGet(), std::placeholders::_1), reply);
   });
   // loop_select - lb
   _apapiItemList.add(REP_003, [](DynamicJsonDocument & reply){ // loop:{lb:{name: pos: cnt: iname: icnt: icmax: }}  
-    APTRACEC(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
+    LOG(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
     apapiItemList_obj(REQ_005, REP_003, std::bind(&Program::get_json_lb, ProgramPtrGet(), std::placeholders::_1), reply);
   });
   // loop_select - lbt
   _apapiItemList.add(REP_004, [](DynamicJsonDocument & reply){ // loop:{lbt:{pos: min: max:}} 
-    APTRACEC(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
+    LOG(DPTT_APAPI,"[heap: %d] START\n", ESP.getFreeHeap());
     apapiItemList_obj(REQ_005, REP_004, std::bind(&Program::get_json_lbt, ProgramPtrGet(), std::placeholders::_1), reply);
   });
 
@@ -553,13 +563,18 @@ void AP_ApiReply::reply_generate(DynamicJsonDocument & doc){
  * @param[in]   upd       
  */
 void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const String & upd) {
+  DynamicJsonDocument reply(2048);
+  parsingRequest(doc, reply, upd);
+  serializeJson(reply, rep);
+}
+void AP_Api::parsingRequest(DynamicJsonDocument & doc, DynamicJsonDocument & reply, const String & upd) {
     JsonArray arr;
     uint8_t sizeReponse, posReponse, size;
     Program * pPtr = ProgramPtrGet();
 
     // need to determine size befor
        
-    DynamicJsonDocument       reply(2048);
+    // DynamicJsonDocument       reply(2048);
     AP_ApiReply  * _webserverRequest_reply = nullptr;
 
     /*
@@ -653,7 +668,6 @@ void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const Strin
       delete[] _webserverRequest_reply;
       yield(); 
     }
-    serializeJson(reply, rep);
 
 }
 
