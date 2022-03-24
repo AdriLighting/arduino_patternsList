@@ -19,6 +19,7 @@ socketQueue     * _socketQueueSetter;
    
 
 #ifdef DEBUG_KEYBOARD
+  void keyboard_freeheap();
   void keyboard_apiSetter(const String & cmd, const String & value);
 #endif
 
@@ -31,6 +32,7 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
 
 void setup() {
   Serial.begin(115200);
+
   for(unsigned long const serialBeginTime = millis(); !Serial && (millis() - serialBeginTime > 5000); ) { }
   delay(300);
 
@@ -44,17 +46,17 @@ void setup() {
 
   Serial.printf_P(PSTR("\t[freeheap: %d]\n"), ESP.getFreeHeap());
 
-  _TaskScheduler = new TaskScheduler(9);
 
   #ifdef DEBUG_KEYBOARD
-    _Sr_menu.add("name_1", "!", keyboard_apiSetter, SR_MM::SRMM_KEY);
+    _Sr_menu.add("heaploop", "q", keyboard_freeheap);
+    _Sr_menu.add("api setter", "!", keyboard_apiSetter, SR_MM::SRMM_KEY);
   #endif
 
   boolean fs = FILESYSTEM.begin();
 
   // region ################################################ WIFI
   _DeviceWifi = new WifiConnect(
-    "hostnameapas",
+    "apdebug_1",
     "SSID",
     "SSIDPASS",
     "adsap1234",
@@ -82,7 +84,7 @@ void setup() {
   request->set_callback(_http_get_cb);
   request->set_rType(WSRM_FROMCALLBACK); 
 
-  _Webserver.setup(_TaskScheduler);
+  _Webserver.setup();
   _Webserver.set_socketCallback(_socket_cb);  
   // endregion >>>> WEBSERVER
 
@@ -115,21 +117,24 @@ void setup() {
 
 
   // region ################################################ TASKS
+  _TaskScheduler = new TaskScheduler(9);
   
   _TaskScheduler->get_task(0)->set_callback([](){ProgramPtrGet()->handle();});
   _TaskScheduler->get_task(1)->set_callback([](){_DeviceWifi->handleConnection();});
   _TaskScheduler->get_task(2)->set_callback([](){if (_DeviceWifi->WIFIsetupIsReady())_Webserver.handle();});
-  for (int i = 0; i < 3; ++i) {
+  _TaskScheduler->get_task(3)->set_callback([](){if(_socketQueueReply)_socketQueueReply->handle();;});
+  _TaskScheduler->get_task(4)->set_callback([](){if(_socketQueueSetter)_socketQueueSetter->handle();;});
+  for (int i = 0; i < 5; ++i) {
     _TaskScheduler->get_task(i)->set_taskDelay(ETD::ETD_TIMER, true, 100000);
     _TaskScheduler->get_task(i)->set_iteration_max(-1);
     _TaskScheduler->get_task(i)->setup(true);
     _TaskScheduler->get_task(i)->set_enabled(true);
   }
-  _socketQueueReply   = new socketQueueReply(_TaskScheduler);
-  _socketQueueSetter  = new socketQueueSetter(_TaskScheduler);  
+  _socketQueueReply   = new socketQueueReply  (_TaskScheduler->get_task(5));
+  _socketQueueSetter  = new socketQueueSetter (_TaskScheduler->get_task(6));  
   // endregion >>>> 
 
-  delay(3000);
+  delay(2);
   String heap, time;
   on_time_h(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str());
@@ -141,8 +146,6 @@ void loop() {
     _Sr_menu.serialRead();
   #endif
   _TaskScheduler->loop();
-  _socketQueueReply->handle();
-  _socketQueueSetter->handle();
 }
 
 void _http_get_cb(AsyncWebServerRequest * request, uint8_t pos, const String & data){
@@ -159,11 +162,11 @@ void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String & 
     Serial.printf_P(PSTR("[_http_post_cb][PARSSING ERROR] %s\n"), json.c_str());  
   } else {_AP_Api.parsingRequest(doc, reply, "");} 
   _Webserver.http_send(request, 200, WSTE_APPJSON, reply);
-  _TaskScheduler->get_task(3)->set_callbackOstart([=](){_Webserver.socket_send(reply);});
-  _TaskScheduler->get_task(3)->set_iteration_max(0);
-  _TaskScheduler->get_task(3)->set_taskDelay(ETD::ETD_DELAY, true, 250, 1);
-  _TaskScheduler->get_task(3)->set_taskDelayEnabled(ETD::ETD_DELAY, true);
-  _TaskScheduler->get_task(3)->set_enabled(true); 
+  _TaskScheduler->get_task(7)->set_callbackOstart([=](){_Webserver.socket_send(reply);});
+  _TaskScheduler->get_task(7)->set_iteration_max(0);
+  _TaskScheduler->get_task(7)->set_taskDelay(ETD::ETD_DELAY, true, 250, 1);
+  _TaskScheduler->get_task(7)->set_taskDelayEnabled(ETD::ETD_DELAY, true);
+  _TaskScheduler->get_task(7)->set_enabled(true); 
 }
 
 uint32_t _socket_cb_last = 0;
@@ -186,7 +189,7 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   _HeapStatu.update();_HeapStatu.print(heap);
   APTRACEC("main", "\n");
   APTRACEC("main", "&c:1&s:\t[%d] %s\n", itemBasePos, itemBaseName.c_str());
-  Serial.printf_P(PSTR("\t%s\n"), heap.c_str());
+  APTRACEC("main", "&c:1&s:\t%s\n", heap.c_str());
   if (!updWebserver) return; 
   APTRACEC("main", "UPD WEBSERVER\n");
   String                    reply;
@@ -201,25 +204,33 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
 }
 
 #ifdef DEBUG_KEYBOARD
-void keyboard_apiSetter(const String & cmd, const String & value){
-  Serial.printf_P(PSTR("[keyboard_apiSetter] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
-
-  uint8_t p = cmd.toInt();
-  DynamicJsonDocument doc(1024);
-  JsonArray           arr;
-  JsonObject          var;
-  String              reply;
-  doc[F("op")]    = 0;
-  doc[F("type")]  = "ESP";
-  arr = doc.createNestedArray(F("set"));  
-  var = arr.createNestedObject();
-  var[F("n")] = FPSTR(RAALLNAMES[p]);
-  var[F("v")] = value;
-  arr = doc.createNestedArray(F("get"));  
-  arr.add("loop");
-  _AP_Api.parsingRequest(doc, reply, "");
-  _Webserver.socket_send(reply);
-} 
+  void keyboard_freeheap(){
+    static boolean statu = false;
+    statu = !statu;
+    _TaskScheduler->get_task(8)->set_callback([](){Serial.printf_P(PSTR("%d\n"), ESP.getFreeHeap());});
+    _TaskScheduler->get_task(8)->set_taskDelay(ETD::ETD_TIMER, true, 3, 2);
+    _TaskScheduler->get_task(8)->set_iteration_max(-1);
+    _TaskScheduler->get_task(8)->setup(true);
+    _TaskScheduler->get_task(8)->set_enabled(statu);
+  }
+  void keyboard_apiSetter(const String & cmd, const String & value){
+    Serial.printf_P(PSTR("[keyboard_apiSetter] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
+    uint8_t p = cmd.toInt();
+    DynamicJsonDocument doc(1024);
+    JsonArray           arr;
+    JsonObject          var;
+    String              reply;
+    doc[F("op")]    = 0;
+    doc[F("type")]  = "ESP";
+    arr = doc.createNestedArray(F("set"));  
+    var = arr.createNestedObject();
+    var[F("n")] = FPSTR(RAALLNAMES[p]);
+    var[F("v")] = value;
+    arr = doc.createNestedArray(F("get"));  
+    arr.add("loop");
+    _AP_Api.parsingRequest(doc, reply, "");
+    _Webserver.socket_send(reply);
+  } 
 #endif
 
 

@@ -28,7 +28,8 @@ AsyncWebServer    web_server(80);
 AsyncWebSocket    web_socket("/ws");
 AsyncEventSource  event("/events");
 Webserver         _Webserver;
-Task              * _task_socketCallback = nullptr;
+Task              * _task_socketCallback      = nullptr;
+Task              * _task_socketCleanupClient = nullptr;
 
 extern socketQueueReply * _socketQueueReply;
 extern socketQueue      * _socketQueueSetter;  
@@ -69,7 +70,8 @@ boolean socketQueue::receiveToQueue(const String & msg) {
 }
 void socketQueue::handle(){
   // if(_task) {if (_task->isEnabled()) _task->execute();}
-  if ( (_list->get_size() == 0) && _executeQuee ) _executeQuee = false;
+  if (!_task) return;
+  if ( (_list->get_size() == 0) && _executeQuee ) {_executeQuee = false;_task_socketCleanupClient->set_enabled(true);}
   if ( (_list->get_size() > 0) && ((millis()-_last_item) > _timer_handle) && !_executeQuee ){
     LOG(DPTT_QUEUE, "[socketQueueSetter::handle]\n");
     LOG(DPTT_QUEUE, "&c:1&s:\t[T: %d] QUEUE ETD_DELAY -> %d\n", _task->get_id() , _task_delay);
@@ -82,8 +84,8 @@ void socketQueue::handle(){
   }
 }
 
-socketQueueReply::socketQueueReply(TaskScheduler * scheduler) {
-  _task = scheduler->get_task(7);
+socketQueueReply::socketQueueReply(Task * t) {
+  _task = t;
   _list->set_task(_task);
 
   _list->set_callback([](const String & v1){_Webserver.socket_send(v1);});  
@@ -105,6 +107,10 @@ void socketQueueReply::receive(const String & msg) {
 
   _task->set_callbackOstart([=](){
     _Webserver.socket_send(msg);
+    _task_socketCleanupClient->set_taskDelay(ETD::ETD_DELAY, true, 1, 2);
+    _task_socketCleanupClient->set_taskDelayEnabled(ETD::ETD_DELAY, true);
+    _task_socketCleanupClient->set_taskDelayEnabled(ETD::ETD_TIMER, false);
+    _task_socketCleanupClient->set_enabled(true);   
   });
   _task->set_iteration_max(0);
   _task->set_taskDelay(ETD::ETD_DELAY, true, 180, 1);
@@ -113,8 +119,8 @@ void socketQueueReply::receive(const String & msg) {
 }
 
 
-socketQueueSetter::socketQueueSetter(TaskScheduler * scheduler) {
-  _task = scheduler->get_task(8);
+socketQueueSetter::socketQueueSetter(Task * t) {
+  _task = t;
   _list->set_task(_task);
 
   _list->set_callback([](const String & v1){
@@ -147,6 +153,8 @@ void socketQueueSetter::receive( DynamicJsonDocument & doc) {
   _task->set_taskDelay(ETD::ETD_DELAY, true, 50, 1);
   _task->set_taskDelayEnabled(ETD::ETD_DELAY, true);
   _task->set_enabled(true);  
+
+  
 }
 
 
@@ -214,13 +222,16 @@ void Webserver::request_array(uint8_t v1) {
 
 void Webserver::set_socketIsConnected(boolean v1) {
   _socketIsConnected = v1;
+      
+
 }
 void Webserver::set_socketClient(AsyncWebSocketClient * v1) {_socketClient = v1;}
 void Webserver::set_socketServer(AsyncWebSocket * v1)       {_socketServer = v1;}
 void Webserver::set_socketCallback(callback_function_t f)   {_socketCallback = std::move(f);}
 void Webserver::set_socketCallbackData(const String & v1)   {_socketCallbackData = v1;}
-void Webserver::socketHandle()                              {if (_socketCallback) _socketCallback(_socketCallbackData);}
-
+void Webserver::socketHandle() {
+  if (_socketCallback) _socketCallback(_socketCallbackData);
+}
 void _task_socketHandle()                                   {_Webserver.socketHandle();}
 void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
   if(type == WS_EVT_CONNECT){
@@ -260,6 +271,8 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
       LOG(DPTT_WEBSERVER, "ws <<<[%s][%u] %s-message[%llu]\n\t%s\n", server->url(), client->id(), (info->opcode == WS_TEXT)?"text":"binary", info->len, msg.c_str());
 
       if(info->opcode == WS_TEXT)  {
+
+        _task_socketCleanupClient->set_enabled(false);
 
         delay(2);
 
@@ -357,13 +370,13 @@ void Webserver::httpHandle(){
     }
   }  
 }
-void Webserver::setup(TaskScheduler * scheduler){
-  // if(!_task_httpCallback)   _task_httpCallback              = new Task();
-  // if(!_task_socketCallback) _task_socketCallback            = new Task();
-  // if(!_task_socketCleanupClient) _task_socketCleanupClient  = new Task();
-  if(!_task_httpCallback)         _task_httpCallback              = scheduler->get_task(4);
-  if(!_task_socketCallback)       _task_socketCallback            = scheduler->get_task(5);
-  if(!_task_socketCleanupClient)  _task_socketCleanupClient       = scheduler->get_task(6);
+void Webserver::setup(){
+  if(!_task_httpCallback)   _task_httpCallback              = new Task();
+  if(!_task_socketCallback) _task_socketCallback            = new Task();
+  if(!_task_socketCleanupClient) _task_socketCleanupClient  = new Task();
+  // if(!_task_httpCallback)         _task_httpCallback              = scheduler->get_task(4);
+  // if(!_task_socketCallback)       _task_socketCallback            = scheduler->get_task(5);
+  // if(!_task_socketCleanupClient)  _task_socketCleanupClient       = scheduler->get_task(6);
 
   web_socket.onEvent(socket_event);
   web_server.addHandler(&web_socket);
@@ -448,11 +461,13 @@ void Webserver::setup(TaskScheduler * scheduler){
       LOG(DPTT_WEBSERVER, "BodyEnd: %u\n", total);
   });  
 
-  _task_socketCleanupClient->set_callback([](){web_socket.cleanupClients();});
+  _task_socketCleanupClient->set_callback([](){/*Serial.println("-");*/ web_socket.cleanupClients();});
   _task_socketCleanupClient->set_taskDelay(ETD::ETD_TIMER, true, 500, 1);
+  _task_socketCleanupClient->set_taskDelay(ETD::ETD_DELAY, true, 1, 2);
+  _task_socketCleanupClient->set_taskDelayEnabled(ETD::ETD_DELAY, true);
+  _task_socketCleanupClient->set_taskDelayEnabled(ETD::ETD_TIMER, false);
   _task_socketCleanupClient->set_iteration_max(-1);
-  _task_socketCleanupClient->setup(true);
-  _task_socketCleanupClient->set_enabled(true);  
+  _task_socketCleanupClient->set_enabled(true);   
 } 
 
 void Webserver::begin() {
@@ -460,9 +475,9 @@ void Webserver::begin() {
 }
 void Webserver::handle()  {
   
-  // if(_task_socketCleanupClient) {if (_task_socketCleanupClient->isEnabled()) _task_socketCleanupClient->execute();}
-  // if(_task_httpCallback)    {if (_task_httpCallback->isEnabled())   _task_httpCallback->execute();}
-  // if(_task_socketCallback)  {if (_task_socketCallback->isEnabled()) _task_socketCallback->execute();}
+  if(_task_socketCleanupClient) {if (_task_socketCleanupClient->isEnabled()) _task_socketCleanupClient->execute();}
+  if(_task_httpCallback)    {if (_task_httpCallback->isEnabled())   _task_httpCallback->execute();}
+  if(_task_socketCallback)  {if (_task_socketCallback->isEnabled()) _task_socketCallback->execute();}
 }
 
 

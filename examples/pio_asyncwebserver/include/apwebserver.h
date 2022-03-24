@@ -97,7 +97,6 @@ class Webserver {
   String                  _socketCallbackData  = "";
 
   Task * _task_httpCallback = nullptr;
-  Task * _task_socketCleanupClient = nullptr;
   
 public:
   boolean _httpTrace = true;
@@ -123,7 +122,7 @@ public:
 
 
   void begin();
-  void setup(TaskScheduler *);
+  void setup();
 
   void handle();  
   void httpHandle();
@@ -155,13 +154,13 @@ public:
 
 class socketQueueReply : public socketQueue {
 public:
-    socketQueueReply(TaskScheduler *);
+    socketQueueReply(Task *);
     ~socketQueueReply();
     void receive(const String &) override;
 };
 class socketQueueSetter : public socketQueue {
 public:
-    socketQueueSetter(TaskScheduler *);
+    socketQueueSetter(Task *);
     ~socketQueueSetter();
     void receive(DynamicJsonDocument & d) override ;
 };
