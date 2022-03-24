@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <arduinoPatternList.h>
+
 #include "TaskScheduler.h"
 #include "queue.h"
 
@@ -17,7 +19,6 @@
 //   HTTP_OPTIONS = 0b01000000,
 //   HTTP_ANY     = 0b01111111,
 // } WebRequestMethod;
-
 
 static const char WRMTP_001 [] PROGMEM = "HTTP_GET";
 static const char WRMTP_002 [] PROGMEM = "HTTP_POST";
@@ -96,6 +97,8 @@ class Webserver {
   String                  _socketCallbackData  = "";
 
   Task * _task_httpCallback = nullptr;
+  Task * _task_socketCleanupClient = nullptr;
+  
 public:
   boolean _httpTrace = true;
 
@@ -120,7 +123,7 @@ public:
 
 
   void begin();
-  void setup();
+  void setup(TaskScheduler *);
 
   void handle();  
   void httpHandle();
@@ -131,16 +134,16 @@ extern Webserver _Webserver;
 
 class socketQueue {
 protected:  
-    QueueItemList   * _list;
     boolean         _executeQuee  = false;
 
     uint32_t        _last_item    = 0;
     uint32_t        _timer_handle = 250;
     uint32_t        _timer_item   = 250;
 
-    Task*           _task           = nullptr;
+    Task*           _task         = nullptr;
     uint32_t        _task_delay   = 500;
 public:
+    QueueItemList   * _list;
 
     socketQueue();
     ~socketQueue();
@@ -152,13 +155,13 @@ public:
 
 class socketQueueReply : public socketQueue {
 public:
-    socketQueueReply();
+    socketQueueReply(TaskScheduler *);
     ~socketQueueReply();
     void receive(const String &) override;
 };
 class socketQueueSetter : public socketQueue {
 public:
-    socketQueueSetter();
+    socketQueueSetter(TaskScheduler *);
     ~socketQueueSetter();
     void receive(DynamicJsonDocument & d) override ;
 };

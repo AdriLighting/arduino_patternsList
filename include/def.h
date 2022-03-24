@@ -1,8 +1,8 @@
 #ifndef DEF_H
   #define DEF_H
   #ifndef AP_DEFAULT
-    // #ifndef DEBUGSERIAL
-    //   #define DEBUGSERIAL
+    // #ifndef DEBUG_KEYBOARD
+    //   #define DEBUG_KEYBOARD
     // #endif
     #ifndef FSOK
       #define FSOK

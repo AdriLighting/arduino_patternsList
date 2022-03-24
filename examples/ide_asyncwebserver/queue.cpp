@@ -6,7 +6,6 @@
  * @author    Adrien Grellard
  * @date      17/03/20222
  */
-
 #include "queue.h"
 
 // #define DEBUG
@@ -15,11 +14,12 @@
     #define DEBUG
   #endif
 #endif
-// #ifdef DEBUG
-//   #define LOG(func, ...) Serial.func(__VA_ARGS__)
-// #else
-//   #define LOG(func, ...) ;
-// #endif
+#ifdef DEBUG
+  #define LOG(func, ...) APTRACEC(func, __VA_ARGS__)
+#else
+  #define LOG(func, ...) ;
+#endif
+
 
 QueueItem::QueueItem() {
 }
@@ -40,11 +40,11 @@ void QueueItemList::addString(String* inStr) {
    sprintf(buffer, "%s", inStr->c_str()); 
    addString(buffer); 
    #ifdef DEBUG
-      Serial.printf_P(PSTR("[QueueItemList::addString]\n\t[listSize]: %d\n\t[queue item][%d]: %s\n"), _list.size(), String(buffer).length(), buffer);   
+      LOG(DPTT_QUEUE, "\n\t[listSize]: %d\n\t[queue item][%d]: %s\n", _list.size(), String(buffer).length(), buffer);   
    #endif
 }
 void QueueItemList::addString(char* inStr) {
-  // Serial.printf_P(PSTR("size: %d\n"), _list.size());
+  // LOG(DPTT_QUEUE, "size: %d\n", _list.size());
   _list.add(new QueueItem());
   uint8_t pos = _list.size()-1;
   _list[pos]->add(inStr);
@@ -70,21 +70,30 @@ void QueueItemList::execute_cbTask(){
 
   if (_execute_callback) {
     #ifdef DEBUG
-      Serial.printf_P(PSTR("[QueueItemList::execute_cbTask]\n\t[listSize]: %d\n\t[queue item][%d]\n\t[CALLBACK]\n"), _list.size(), sT.length());   
+      LOG(DPTT_QUEUE, "\n\t[s: %d][e: %d][f: %d]\n\t[listSize]: %d\n\t[queue item][%d]\n\t[CALLBACK]\n", _startHeap, ESP.getFreeHeap(), ESP.getFreeHeap()-_startHeap, _list.size(), sT.length());   
     #endif
     _execute_callback(sT);
   }
 
   delete _list.remove(0);
 
-  if (_list.size() == 0) return;
+  if (_list.size() == 0) {
+
+    // A DELETE
+      #ifdef DEBUG
+        LOG(DPTT_QUEUE, "&c:1&s:\t[QUEUEEND][%d][s: %d][e: %d][f: %d]\n", _id, _startHeap, ESP.getFreeHeap(), ESP.getFreeHeap()-_startHeap);  
+      #endif  
+    //
+
+    return;
+  }
 
   if (!_task) return;
 
   #ifdef DEBUG
     char time[12];
     _timeStamp(micros(), time);    
-    Serial.printf_P(PSTR("\t[TASK RUN][%s]\n"), time);   
+    LOG(DPTT_QUEUE, "&c:1&s:\t[TASK RUN][%s]\n", time);   
   #endif
 
   _task->set_callbackOstart([=](){execute_cbTask();});

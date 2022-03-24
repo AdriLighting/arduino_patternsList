@@ -25,6 +25,14 @@
       uint8_t cnt;
       uint8_t pos;
   } LB_flag;
+  
+  static const char DPTT_APAPI      [] PROGMEM = "apapi";
+  static const char DPTT_PLAYLIST   [] PROGMEM = "playlist";
+  static const char DPTT_PROGRAM    [] PROGMEM = "Program";
+  static const char DPTT_WEBSERVER  [] PROGMEM = "webserver";
+  static const char DPTT_QUEUE      [] PROGMEM = "queue";
+  static const char DPTT_TASK       [] PROGMEM = "task";
+
 
   static const char APPTT_001   [] PROGMEM = "gv";
   static const char APPTT_002   [] PROGMEM = "n";

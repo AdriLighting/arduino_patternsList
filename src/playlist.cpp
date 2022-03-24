@@ -1,12 +1,18 @@
 #include "../include/playlist.h"
 
 #include "../include/constants.h"
+#include "../include/tools.h"
 
 // #define DEBUG
 #ifndef DEBUG
   #ifdef DEBUG_PLAYLIST
     #define DEBUG
   #endif
+#endif
+#ifdef DEBUG
+  #define LOG(func, ...) APTRACEC(func, __VA_ARGS__)
+#else
+  #define LOG(func, ...) ;
 #endif
 
 void Playlist_list::set_listRef     (const char  * const & v1)  {_listRef = v1;}
@@ -47,7 +53,7 @@ void Playlist_list::item_restore(DynamicJsonDocument & doc) {
         JsonObject item = arr[i];
         if (i >= _items_max) {
           #ifdef DEBUG
-            Serial.printf_P(PSTR("\t[LIMITE MAXIMUM ATTEINTE]\n")); 
+            LOG(DPTT_PLAYLIST, "\t[LIMITE MAXIMUM ATTEINTE]\n"); 
           #endif     
           break;
         } else {
@@ -62,7 +68,7 @@ void Playlist_list::item_restore(DynamicJsonDocument & doc) {
 }
 void Playlist_list::item_remove(uint8_t id) {
     #ifdef DEBUG
-      Serial.printf_P(PSTR("[Playlist_list::item_remove][START]\n"));
+      LOG(DPTT_PLAYLIST, "[Playlist_list::item_remove][START]\n");
     #endif
 
     Playlist_item * temp = new Playlist_item[_items_max];
@@ -102,23 +108,23 @@ void Playlist_list::item_remove(uint8_t id) {
     // item_restore();
 
     #ifdef DEBUG
-      Serial.printf_P(PSTR("[Playlist_list::item_remove][DONE]\n"));
+      LOG(DPTT_PLAYLIST, "[Playlist_list::item_remove][DONE]\n");
     #endif
 }
 
 uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg) {
   #ifdef DEBUG
-    Serial.printf_P(PSTR("[Playlist_list::item_toArray][START]\n"));    
-    Serial.printf_P(PSTR("\t[iP][%d]"), iP);   
-    Serial.printf_P(PSTR("[lbl][%s]"), lbl.c_str());   
-    Serial.printf_P(PSTR("[itemBase][%s]"), itemBase.c_str());   
-    Serial.printf_P(PSTR("[itemBaseCfg][%s]\n"), itemBaseCfg.c_str());  
+    LOG(DPTT_PLAYLIST, "[Playlist_list::item_toArray][START]\n");    
+    LOG(DPTT_PLAYLIST, "\t[iP][%d]", iP);   
+    LOG(DPTT_PLAYLIST, "[lbl][%s]", lbl.c_str());   
+    LOG(DPTT_PLAYLIST, "[itemBase][%s]", itemBase.c_str());   
+    LOG(DPTT_PLAYLIST, "[itemBaseCfg][%s]\n", itemBaseCfg.c_str());  
    #endif 
   bool newSav = false;
   if (iP > _items_cnt) {
     if (_items_cnt >= _items_max) {
       #ifdef DEBUG
-        Serial.printf_P(PSTR("\t[LIMITE MAXIMUM ATTEINTE][%d/%d]\n"),_items_cnt, _items_max );
+        LOG(DPTT_PLAYLIST, "\t[LIMITE MAXIMUM ATTEINTE][%d/%d]\n",_items_cnt, _items_max );
       #endif
       return 0;
     }   
@@ -128,7 +134,7 @@ uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String
     _items_cnt++;
     newSav = true;
     #ifdef DEBUG
-      Serial.printf_P(PSTR("\t[new sav]\n")); 
+      LOG(DPTT_PLAYLIST, "\t[new sav]\n"); 
     #endif
   }
 
@@ -151,7 +157,7 @@ uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String
     }
   }
   #ifdef DEBUG
-    Serial.printf_P(PSTR("\t[position : %d]\n"), newNbr);
+    LOG(DPTT_PLAYLIST, "\t[position : %d]\n", newNbr);
   #endif
 
   if (newSav) _Playlist_itemArray[iP].set_id(newNbr);
@@ -163,7 +169,7 @@ uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String
   // item_toTxt(); 
 
   #ifdef DEBUG
-    Serial.printf_P(PSTR("[Playlist_list::item_toArray][DONE]\n"));
+    LOG(DPTT_PLAYLIST, "[Playlist_list::item_toArray][DONE]\n");
   #endif
 
   return newNbr;

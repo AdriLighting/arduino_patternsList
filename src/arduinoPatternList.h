@@ -4,6 +4,6 @@
 #include "../include/program.h"
 #include "../include/tools.h"
 #include "../include/apapi.h"
-#ifdef DEBUGSERIAL
+#ifdef DEBUG_KEYBOARD
 	#include "../include/menu_serial.h"
 #endif

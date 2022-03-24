@@ -1,42 +1,32 @@
 #include "../include/menu_serial.h"
 
-#ifdef DEBUGSERIAL
+#ifdef DEBUG_KEYBOARD
 #include "../include/tools.h"
 #include "../include/program.h"
 
 namespace {
-  void splitText(const String & A_readString, const char* sep, String & cmd, String & value) {
-
-    String  s_command;
-    String  s_valueCommand;
-    String  s_readString = A_readString;
-    char    inputChar[s_readString.length() + 1] ;
-            s_readString.toCharArray(inputChar, s_readString.length() + 1);
+  void splitText(const String & inputString, const char* const & sep, String & cmd, String & value) {
+    char    inputChar[inputString.length() + 1] ;
+    inputString.toCharArray(inputChar, inputString.length() + 1);
     char    * Rcommand  = strtok(inputChar, sep);
-
     while (Rcommand != 0){          
-        char* separator  = strchr(Rcommand, '=');
-        if (separator != 0) {
-            *separator  = 0;            
-            ++separator ;
-            s_command = String(Rcommand);
-            s_valueCommand = String(separator); 
-            
-            if (s_command!=""){
-                value = s_valueCommand;
-                cmd = s_command;
-                break;
-            }
+      char* separator  = strchr(Rcommand, '=');
+      if (separator != 0) {
+        *separator  = 0;            
+        ++separator ;
+        if (String(Rcommand)!=""){
+          value = String(separator);
+          cmd   = String(Rcommand);
+          break;
         }
-        Rcommand = strtok(0, sep); 
+      }
+      Rcommand = strtok(0, sep); 
     }
-
   }
 }
 
-    Sr_menu _Sr_menu;
 
-
+Sr_menu _Sr_menu;
 
 Sr_item::Sr_item(){
 }
@@ -79,12 +69,17 @@ void Sr_item::get_callback(){
 
 
 Sr_menu::Sr_menu(){
-    _Sr_menu.add("menu",               "a", []() { /*_serial->menu();*/  });
-    _Sr_menu.add("ESPreset",           "z", []() { ESP.restart();    });
-    _Sr_menu.add("freeHeap",           "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
-    _Sr_menu.add("debug prog",         "r", []() { ProgramPtrGet()->print(PM_LOOP);  });
-    _Sr_menu.add("remote action list", "t", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
-    _Sr_menu.add("lb+allpl",           "y", []() { ProgramPtrGet()->print(PM_LB); ProgramPtrGet()->print(PM_PL); });  
+    _Sr_menu.add("menu",                "a", []() { /*_serial->menu();*/  });
+    _Sr_menu.add("ESPreset",            "z", []() { ESP.restart();    });
+    _Sr_menu.add("freeHeap",            "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
+    _Sr_menu.add("debug prog",          "r", []() { /*ProgramPtrGet()->print(PM_LOOP);*/  });
+    _Sr_menu.add("remote action list",  "t", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
+    _Sr_menu.add("lb+allpl",            "y", []() { /*ProgramPtrGet()->print(PM_LB); ProgramPtrGet()->print(PM_PL);*/ });  
+    #ifdef DEBUG_AP
+    _Sr_menu.add("debugregion",         "u", []() { _DebugPrintList.ketboardPrint(); });    
+    _Sr_menu.add("debugset",            ";", [](const String & v1, const String & v2) { 
+      _DebugPrintList.keyboardSet(v1,v2); }, SR_MM::SRMM_KEY);    
+    #endif
 }
 Sr_menu::~Sr_menu(){}
 

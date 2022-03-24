@@ -1,6 +1,6 @@
 #include "def.h"
 
-#ifdef DEBUGSERIAL
+#ifdef DEBUG_KEYBOARD
 #ifndef MENU_SERIAL_H
 	#define MENU_SERIAL_H
 
@@ -41,5 +41,7 @@
 		void serialReadString(const String &);
 	};
 	extern Sr_menu _Sr_menu;
+
+
 #endif // MENU_SERIAL_H
 #endif // MENU_SERIAL_H

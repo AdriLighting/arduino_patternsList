@@ -1,5 +1,3 @@
-
-
 #include "../include/program.h"
 
 #ifdef FSOK
@@ -19,6 +17,11 @@
   #ifdef DEBUG_PROGRAM
     #define DEBUG
   #endif
+#endif
+#ifdef DEBUG
+  #define LOG(func, ...) APTRACEC(func, __VA_ARGS__)
+#else
+  #define LOG(func, ...) ;
 #endif
 
 LList<ListSortItems*> ListSortItemsPtr; 
@@ -94,6 +97,31 @@ Program * ProgramPtrGet(){return ProgramPtr;}
 Program::Program(uint8_t nbLB, boolean fs){
   ProgramPtr = this;
 
+  #ifdef DEBUG_AP
+    ap_debugBuffer    = new char[1024];
+
+      _DebugPrintList.add(DPTT_APAPI); 
+
+    #ifdef DEBUG_PLAYLIST
+      _DebugPrintList.add(DPTT_PLAYLIST);    
+    #endif
+    #ifdef DEBUG_PROGRAM
+      _DebugPrintList.add(DPTT_PROGRAM);    
+    #endif
+      
+    #ifdef DEBUG_WEBSERVER
+      _DebugPrintList.add(DPTT_WEBSERVER);    
+    #endif
+    #ifdef DEBUG_QUEUE
+      _DebugPrintList.add(DPTT_QUEUE);    
+    #endif
+    #ifdef DEBUG_TASK
+      _DebugPrintList.add(DPTT_TASK);    
+    #endif
+        
+  #endif
+
+
   #ifdef FSOK
     if (!fs) {
       _fs_setup = FILESYSTEM.begin();
@@ -111,10 +139,12 @@ Program::Program(uint8_t nbLB, boolean fs){
   _lbStatu.cnt          = nbLB;
   _lbStatu.pos          = 0;  
   _LBnames = new LBnames[nbLB];
+
+  AP_ApiItemList_setup();
 }
 Program::~Program(){
 #ifdef DEBUG
-   Serial.printf("Program::destructor\n");  
+   LOG(DPTT_PROGRAM, "Program::destructor\n");  
  #endif 
   delete[] _Playlists;    
   delete[] _LBnames;    
@@ -135,7 +165,7 @@ void Program::lb_print() {
   Serial.printf_P(PSTR("[Program::lb_print][%d]]\n"), _lbStatu.cnt);
   for(uint8_t i=0; i<_lbStatu.cnt; i++) {_LBnames[i].print(i); }
 }
-void Program::get_json_lb_items(JsonObject & doc, uint8_t p, boolean pItems) {
+void Program::get_json_slectedlb_items(JsonObject & doc, uint8_t p, boolean pItems) {
   doc[F("n")]     = _LBnames[p]._name;
   doc[F("cmax")]  = _LBnames[p]._cnt;
   if (!pItems) return;
@@ -148,10 +178,11 @@ void Program::get_json_lb_items(JsonObject & doc, boolean pItems) {
   for(uint8_t i=0; i<_lbStatu.cnt; i++) {
     // JsonObject var = doc.createNestedObject(String(i));
     JsonObject var = arr.createNestedObject();    
-    get_json_lb_items(var, i, pItems); 
+    get_json_slectedlb_items(var, i, pItems); 
   }
 }
 
+/*
 void Program::print(PRINT_MOD mod){
   const char * pN;
   uint16_t pC, pCmax;
@@ -204,6 +235,7 @@ void Program::print(PRINT_MOD mod){
   }  
   yield();
 }
+*/
 
 void Program::get_json_statu(JsonObject & obj){
   uint32_t tR, del;
@@ -221,7 +253,8 @@ void Program::get_json_statu(JsonObject & obj){
   obj[F("rnd")]       = tRnd;
   obj[F("delay")]     = del;
   obj[F("delaymin")]  = delMin;
-  obj[F("rt")]        = tR;  
+
+  obj[F("rt")]        = (tPlay)?tR:0;  
 }
 void Program::get_json_pl(JsonObject & obj){
   String iplNiRef;
@@ -279,7 +312,7 @@ void Program::get_json_jsInit(JsonObject & doc){
 }
 void Program::initialize(const uint16_t & maxCnt, const char* const* arr, const char  * const & n, SORT_TYPE t){
 #ifdef DEBUG
-  Serial.printf("Program::initialize\n");  
+  LOG(DPTT_PROGRAM, "Program::initialize\n");  
 #endif
 
   Listbase::initialize(maxCnt, n);
@@ -374,7 +407,7 @@ void Program::set_callback(callback_function_t f)  {_callback = std::move(f);}
 
 void Program::remote_action(RA action, const char * const & key, const char * const & val){
   #ifdef DEBUG
-    Serial.printf_P(PSTR("RA %-4d[%-20s]: "), action, RAALLNAMES[action]);  
+    LOG(DPTT_PROGRAM, "RA %-4d[%-20s]\n", action, RAALLNAMES[action]);  
   #endif
   // char *key = NULL, *val = NULL, *key_val = NULL;
   // va_list prm;
@@ -385,9 +418,8 @@ void Program::remote_action(RA action, const char * const & key, const char * co
   // }
   // va_end(prm);
   #ifdef DEBUG
-    Serial.println("");  
-    if(String(key) != "") Serial.printf_P( PSTR("\t[key: %s]\n"), key);  
-    if(String(val) != "") Serial.printf_P( PSTR("\t[val: %s]\n"), val);  
+    if(String(key) != "") LOG(DPTT_PROGRAM, "\t[key: %s]\n", key);  
+    if(String(val) != "") LOG(DPTT_PROGRAM, "\t[val: %s]\n", val);  
   #endif
 
   const char * pN;
@@ -398,9 +430,9 @@ void Program::remote_action(RA action, const char * const & key, const char * co
     case RA::RA_ITEM_PREV:        set_itemPrev();   break;
     case RA::RA_ITEM_RND:         set_itemRnd();    break;
 
-    case RA::RA_PLAY_START:       start();  print(PM_LL);   break;
-    case RA::RA_PLAY_STOP:        stop();   print(PM_LL);   break;
-    case RA::RA_PLAY_PAUSE:       pause();  print(PM_LL);   break;
+    case RA::RA_PLAY_START:       start();  /*print(PM_LL);*/   break;
+    case RA::RA_PLAY_STOP:        stop();   /*print(PM_LL);*/   break;
+    case RA::RA_PLAY_PAUSE:       pause();  /*print(PM_LL);*/   break;
     case RA::RA_PLAY_TOGGLE:      (isPlaying()) ? pause(): start(); break;
     case RA::RA_PLAY_DELAY:       if(String(key)!="") set_delayCurrent((uint8_t)atoi(key)); break;
     case RA::RA_PLAY_DELAYMIN:    set_delayMin();                                     break;
@@ -477,7 +509,7 @@ boolean Program::pl_set_listPos(uint8_t pos, const char * currentList){
 
   if (pos >= _plStatu.cnt) {
     #ifdef DEBUG
-      Serial.printf_P(PSTR("[Program::list_pos][EROR postion][requete: %d >= %d]\n"),pos ,_plStatu.cnt);  
+      LOG(DPTT_PROGRAM, "[EROR postion][requete: %d >= %d]\n",pos ,_plStatu.cnt);  
     #endif
     _plStatu.isPlaying =false; 
     _plStatu.isSet =false; 
@@ -485,7 +517,7 @@ boolean Program::pl_set_listPos(uint8_t pos, const char * currentList){
   }
   if (sLref != currentList) {
     #ifdef DEBUG
-      Serial.printf_P(PSTR("[Program::list_pos][EROR listeBase][pos: %d][requete: %s <> %s]\n"),pos, sLref ,currentList);  
+      LOG(DPTT_PROGRAM, "[EROR listeBase][pos: %d][requete: %s <> %s]\n",pos, sLref ,currentList);  
     #endif
     _plStatu.isPlaying =false; 
     _plStatu.isSet =false; 
@@ -497,7 +529,7 @@ boolean Program::pl_set_listPos(uint8_t pos, const char * currentList){
 
   if (pC == 0) {
     #ifdef DEBUG
-      Serial.printf_P(PSTR("[Program::list_pos][EROR nb of item low: %d]\n"),pC);  
+      LOG(DPTT_PROGRAM, "[EROR nb of item low: %d]\n",pC);  
     #endif
     _plStatu.isPlaying =false; 
     _plStatu.isSet =false; 
@@ -527,7 +559,7 @@ void Program::pl_item_new(uint8_t pP) {
   DynamicJsonDocument reply(2048);
   reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
-  get_json_pl_items(pP, root, true);
+  get_json_selectedpl_items(pP, root, true);
   reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
@@ -549,7 +581,7 @@ void Program::pl_item_new(uint8_t pP, uint8_t iP) {
   DynamicJsonDocument reply(2048);
   reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
-  get_json_pl_items(pP, root, true);
+  get_json_selectedpl_items(pP, root, true);
   reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
@@ -569,7 +601,7 @@ void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
   DynamicJsonDocument reply(2048);
   reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
-  get_json_pl_items(pP, root, true);
+  get_json_selectedpl_items(pP, root, true);
   reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
@@ -593,7 +625,7 @@ void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & reply
   DynamicJsonDocument temp(2048);
   reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
-  get_json_pl_items(pP, root, true);
+  get_json_selectedpl_items(pP, root, true);
   reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
@@ -615,7 +647,7 @@ void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & re
   DynamicJsonDocument temp(2048);
   reply.createNestedObject(FPSTR(REP_007));
   root = temp.to<JsonObject>();   
-  get_json_pl_items(pP, root, true);
+  get_json_selectedpl_items(pP, root, true);
   reply[FPSTR(REP_007)] = temp;
 
   #ifdef FSOK
@@ -672,7 +704,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     File f=FILESYSTEM.open(path,"w");
     if (!f) {
       #ifdef DEBUG
-        Serial.printf_P(PSTR("[Program::pl_fs][Error open /w]\n\t%s\n"), path.c_str());  
+        LOG(DPTT_PROGRAM, "[Error open /w]\n\t%s\n", path.c_str());  
       #endif
       return;
     }
@@ -681,7 +713,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     JsonObject          root = temp.to<JsonObject>();   
 
     doc.createNestedObject(FPSTR(REP_007));
-    get_json_pl_items(_plStatu.pos, root, true);
+    get_json_selectedpl_items(_plStatu.pos, root, true);
     doc[FPSTR(REP_007)] = temp; 
 
     temp.clear();
@@ -695,24 +727,26 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     if (!_fs_setup) return;
 
     #ifdef DEBUG
-      Serial.printf_P(PSTR("[Program::pl_fs][%d]\n"), pP);   
+      LOG(DPTT_PROGRAM, "[%d]\n", pP);   
     #endif
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pP) + (String)FPSTR(FNEXT_PLAYLIST) ;
     File f=FILESYSTEM.open(path,"w");
     if (!f) {
       #ifdef DEBUG
-        Serial.printf_P(PSTR("[Program::pl_fs][Error open /w]\n\t%s\n"), path.c_str());  
+        LOG(DPTT_PROGRAM, "&c:1&s:\t[Error open /w]\n\t%s\n", path.c_str());  
       #endif
       return;
     }
-    uint32_t tNow = millis();
+    #ifdef DEBUG
+      uint32_t tNow = millis();  
+    #endif
 
     DynamicJsonDocument doc(3072);
     DynamicJsonDocument temp(2048);
     JsonObject          root = temp.to<JsonObject>();   
 
     doc.createNestedObject(FPSTR(REP_007));
-    get_json_pl_items(pP, root, true);
+    get_json_selectedpl_items(pP, root, true);
     doc[FPSTR(REP_007)] = temp;  
 
     temp.clear();
@@ -721,8 +755,10 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     f.close();  
     delay(2);
 
+  #ifdef DEBUG
     uint32_t tDif = millis() - tNow;
-    Serial.printf("[duration: %d]\n", tDif);
+    LOG(DPTT_PROGRAM, "&c:1&s:\t[duration: %d]\n", tDif);  
+  #endif
   }
   void Program::pl_fs(uint8_t pPos, DynamicJsonDocument & doc){
     if (!_fs_setup) return;
@@ -732,7 +768,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     File f=FILESYSTEM.open(path,"w");
     if (!f) {
       #ifdef DEBUG
-        Serial.printf_P(PSTR("[Program::pl_fs][Error open /w]\n\t%s\n"), path.c_str());     
+        LOG(DPTT_PROGRAM, "[Error open /w]\n\t%s\n", path.c_str());     
       #endif
       return;
     }
@@ -744,7 +780,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     delay(1);  
     #ifdef DEBUG
       uint32_t tDif = millis() - tNow;
-      Serial.printf("[duration: %d]\n", tDif);   
+      LOG(DPTT_PROGRAM, "&c:1&s:\t[duration: %d]\n", tDif);   
     #endif   
   }
 
@@ -757,7 +793,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     sprintf(buffer, "%s", path.c_str());    
     if (!AP_deserializeFile(doc, buffer)) {
       #ifdef DEBUG
-        Serial.printf_P(PSTR("[Program::pl_fs_restore][Error open /r]\n\t%s\n"), path.c_str());     
+        LOG(DPTT_PROGRAM, "[Error open /r]\n\t%s\n", path.c_str());     
       #endif
       return;       
     }  
@@ -775,13 +811,13 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
 
 void Program::get_json_pl_items(JsonObject & doc, boolean pI) {
   #ifdef DEBUG
-    Serial.printf_P(PSTR("[Program::get_json_pl_items][%d][%d]\n"),pI,_plStatu.pos);   
+    LOG(DPTT_PROGRAM, "[%d][%d]\n",pI,_plStatu.pos);   
   #endif
   _Playlists[_plStatu.pos].item_json(doc, pI);
 }
-void Program::get_json_pl_items(uint8_t p, JsonObject & doc, boolean pI) {
+void Program::get_json_selectedpl_items(uint8_t p, JsonObject & doc, boolean pI) {
   #ifdef DEBUG
-    Serial.printf_P(PSTR("[Program::get_json_pl_items][%d]\n"), p);  
+    LOG(DPTT_PROGRAM, "[%d]\n", p);  
   #endif
   _Playlists[p].item_json(doc, pI);
 }

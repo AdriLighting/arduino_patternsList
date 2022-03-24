@@ -9,19 +9,15 @@
 #include <ESPAsyncTCP.h>
 #endif
 #include <ESPAsyncWebServer.h>
-#include <arduinoPatternList.h>
-
 #include <functional>
-
-
 
 #ifndef DEBUG
   #ifdef DEBUG_WEBSERVER
     #define DEBUG
   #endif
 #endif
- #ifdef DEBUG
-  #define LOG(func, ...) Serial.func(__VA_ARGS__)
+#ifdef DEBUG
+  #define LOG(func, ...) APTRACEC(func, __VA_ARGS__)
 #else
   #define LOG(func, ...) ;
 #endif
@@ -35,6 +31,8 @@ Webserver         _Webserver;
 Task              * _task_socketCallback = nullptr;
 
 extern socketQueueReply * _socketQueueReply;
+extern socketQueue      * _socketQueueSetter;  
+
 
 void not_found_server(AsyncWebServerRequest * request);
 
@@ -43,8 +41,8 @@ void not_found_server(AsyncWebServerRequest * request);
 
 socketQueue::socketQueue() {
   _list = new QueueItemList();
-  if(!_task) _task = new Task();
-  _list->set_task(_task);
+  // if(!_task) _task = new Task();
+  // _list->set_task(_task);
   
 }
 socketQueue::~socketQueue() {
@@ -53,6 +51,10 @@ socketQueue::~socketQueue() {
 boolean socketQueue::receiveToQueue(const String & msg) {
   String gMsg = msg;
   if (( (_list->get_size() == 0) && (millis()-_last_item) < _timer_item)) {
+
+      _socketQueueSetter->_list->_startHeap = ESP.getFreeHeap();
+      // Serial.printf_P(PSTR("\n\n[%d]\n\n\n"), ESP.getFreeHeap());
+      
       _list->addString(&gMsg);
       _last_item = millis();
       return false;
@@ -66,9 +68,11 @@ boolean socketQueue::receiveToQueue(const String & msg) {
   return true;         
 }
 void socketQueue::handle(){
-  if(_task) {if (_task->isEnabled()) _task->execute();}
+  // if(_task) {if (_task->isEnabled()) _task->execute();}
   if ( (_list->get_size() == 0) && _executeQuee ) _executeQuee = false;
   if ( (_list->get_size() > 0) && ((millis()-_last_item) > _timer_handle) && !_executeQuee ){
+    LOG(DPTT_QUEUE, "[socketQueueSetter::handle]\n");
+    LOG(DPTT_QUEUE, "&c:1&s:\t[T: %d] QUEUE ETD_DELAY -> %d\n", _task->get_id() , _task_delay);
     _executeQuee = true;
     _task->set_callbackOstart([=](){_list->execute_cbTask();});
     _task->set_iteration_max(0);
@@ -78,11 +82,17 @@ void socketQueue::handle(){
   }
 }
 
-socketQueueReply::socketQueueReply() {
+socketQueueReply::socketQueueReply(TaskScheduler * scheduler) {
+  _task = scheduler->get_task(7);
+  _list->set_task(_task);
+
   _list->set_callback([](const String & v1){_Webserver.socket_send(v1);});  
   _timer_item   = 250;    
   _task_delay   = 500;  
   _timer_handle = 500;    
+
+  _list->_id = 1;
+
 }
 socketQueueReply::~socketQueueReply() {
 }
@@ -90,7 +100,12 @@ void socketQueueReply::receive(const String & msg) {
 
   if (!receiveToQueue(msg)) return;
 
-  _task->set_callbackOstart([=](){_Webserver.socket_send(msg);});
+  LOG(DPTT_QUEUE, "[socketQueueReply::receive]\n");
+  LOG(DPTT_QUEUE, "&c:1&s:\t[T: %d] W/ QUEUE ETD_DELAY -> 180\n", _task->get_id());
+
+  _task->set_callbackOstart([=](){
+    _Webserver.socket_send(msg);
+  });
   _task->set_iteration_max(0);
   _task->set_taskDelay(ETD::ETD_DELAY, true, 180, 1);
   _task->set_taskDelayEnabled(ETD::ETD_DELAY, true);
@@ -98,7 +113,10 @@ void socketQueueReply::receive(const String & msg) {
 }
 
 
-socketQueueSetter::socketQueueSetter() {
+socketQueueSetter::socketQueueSetter(TaskScheduler * scheduler) {
+  _task = scheduler->get_task(8);
+  _list->set_task(_task);
+
   _list->set_callback([](const String & v1){
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, v1);
@@ -116,12 +134,14 @@ socketQueueSetter::~socketQueueSetter() {
 void socketQueueSetter::receive( DynamicJsonDocument & doc) {
   String s;
   serializeJson(doc, s);
-
+    
   if (!receiveToQueue(s)) return;
+
+  LOG(DPTT_QUEUE, "[socketQueueSetter::receive]\n");
+  LOG(DPTT_QUEUE, "&c:1&s:\t[T: %d] W/ QUEUE ETD_DELAY -> 50\n", _task->get_id());
 
   String reply;
   _AP_Api.parsingRequest(doc, reply, "");
-
   _task->set_callbackOstart([=](){_socketQueueReply->receive(reply); });
   _task->set_iteration_max(0);
   _task->set_taskDelay(ETD::ETD_DELAY, true, 50, 1);
@@ -204,34 +224,28 @@ void Webserver::socketHandle()                              {if (_socketCallback
 void _task_socketHandle()                                   {_Webserver.socketHandle();}
 void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
   if(type == WS_EVT_CONNECT){
-   LOG(printf_P, PSTR("ws[%s][%u] connect\n"), server->url(), client->id());
+   LOG(DPTT_WEBSERVER, "ws[%s][%u] connect\n", server->url(), client->id());
     _Webserver.set_socketClient(client);
     _Webserver.set_socketServer(server);
     _Webserver.set_socketIsConnected(true);
     // client->printf_P(PSTR("Hello Client %u :)"), client->id());
-    client->ping();
+    // client->ping();
     delay(2);
 
   } else if(type == WS_EVT_DISCONNECT){
-   LOG(printf_P, PSTR("ws[%s][%u] disconnect\n"), server->url(), client->id());
+   LOG(DPTT_WEBSERVER, "ws[%s][%u] disconnect\n", server->url(), client->id());
     _Webserver.set_socketIsConnected(false);
      delay(2);
 
   } else if(type == WS_EVT_ERROR){
-   LOG(printf_P, PSTR("ws[%s][%u] error(%u): %s\n"), server->url(), client->id(), *((uint16_t*)arg), (char*)data);
+   LOG(DPTT_WEBSERVER, "ws[%s][%u] error(%u): %s\n", server->url(), client->id(), *((uint16_t*)arg), (char*)data);
   } else if(type == WS_EVT_PONG){
-   LOG(printf_P, PSTR("ws[%s][%u] pong[%u]: %s\n"), server->url(), client->id(), len, (len)?(char*)data:"");
+   LOG(DPTT_WEBSERVER, "ws[%s][%u] pong[%u]: %s\n", server->url(), client->id(), len, (len)?(char*)data:"");
   } else if(type == WS_EVT_DATA){
     AwsFrameInfo * info = (AwsFrameInfo*)arg;
     String msg = "";
     if(info->final && info->index == 0 && info->len == len){
       //the whole message is in a single frame and we got all of it's data
-      #ifdef DEBUG
-        char time[12];
-        _timeStamp(micros(), time);  
-      #endif      
-      LOG(printf_P, PSTR("ws <<<[%s][%u][%s] %s-message[%llu]: "), server->url(), client->id(), time, (info->opcode == WS_TEXT)?"text":"binary", info->len);
-
       if(info->opcode == WS_TEXT){
         for(size_t i=0; i < info->len; i++) {
           msg += (char) data[i];
@@ -243,7 +257,7 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
           msg += buff ;
         }
       }
-      LOG(printf, "%s\n",msg.c_str());
+      LOG(DPTT_WEBSERVER, "ws <<<[%s][%u] %s-message[%llu]\n\t%s\n", server->url(), client->id(), (info->opcode == WS_TEXT)?"text":"binary", info->len, msg.c_str());
 
       if(info->opcode == WS_TEXT)  {
 
@@ -263,11 +277,9 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
       //message is comprised of multiple frames or the frame is split into multiple packets
       if(info->index == 0){
         if(info->num == 0)
-         LOG(printf_P, PSTR("ws[%s][%u] %s-message start\n"), server->url(), client->id(), (info->message_opcode == WS_TEXT)?"text":"binary");
-       LOG(printf_P, PSTR("ws[%s][%u] frame[%u] start[%llu]\n"), server->url(), client->id(), info->num, info->len);
+         LOG(DPTT_WEBSERVER, "ws[%s][%u] %s-message start\n", server->url(), client->id(), (info->message_opcode == WS_TEXT)?"text":"binary");
+       LOG(DPTT_WEBSERVER, "ws[%s][%u] frame[%u] start[%llu]\n", server->url(), client->id(), info->num, info->len);
       }
-
-     LOG(printf_P, PSTR("ws[%s][%u] frame[%u] %s[%llu - %llu]: "), server->url(), client->id(), info->num, (info->message_opcode == WS_TEXT)?"text":"binary", info->index, info->index + len);
 
       if(info->opcode == WS_TEXT){
         for(size_t i=0; i < len; i++) {
@@ -280,12 +292,12 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
           msg += buff ;
         }
       }
-      LOG(printf, "%s\n",msg.c_str());
+      LOG(DPTT_WEBSERVER, "ws[%s][%u] frame[%u] %s[%llu - %llu]: %s\n", server->url(), client->id(), info->num, (info->message_opcode == WS_TEXT)?"text":"binary", info->index, info->index + len, msg.c_str());
 
       if((info->index + len) == info->len){
-       LOG(printf_P, PSTR("ws[%s][%u] frame[%u] end[%llu]\n"), server->url(), client->id(), info->num, info->len);
+       LOG(DPTT_WEBSERVER, "ws[%s][%u] frame[%u] end[%llu]\n", server->url(), client->id(), info->num, info->len);
         if(info->final){
-         LOG(printf_P, PSTR("ws[%s][%u] %s-message end\n"), server->url(), client->id(), (info->message_opcode == WS_TEXT)?"text":"binary");
+         LOG(DPTT_WEBSERVER, "ws[%s][%u] %s-message end\n", server->url(), client->id(), (info->message_opcode == WS_TEXT)?"text":"binary");
           // if(info->message_opcode == WS_TEXT)
             // client->text("I got your text message");
           // else
@@ -305,9 +317,7 @@ void Webserver::socket_send(const String & message) {
 
     if (_socketTrace) {  
       #ifdef DEBUG
-        char time[12];
-        _timeStamp(micros(), time);  
-        LOG(printf_P, PSTR("ws >>>[%s][%u][%s] message[%d]: %s\n"), _socketServer->url(), _socketClient->id(), time, message.length(), message.c_str());
+        LOG(DPTT_WEBSERVER, "ws >>>[%s][%u] message[%d]\n\t%s\n", _socketServer->url(), _socketClient->id(), message.length(), message.c_str());
       #endif 
     }
     
@@ -315,8 +325,8 @@ void Webserver::socket_send(const String & message) {
   else
   {
     if (_socketTrace) {
-      if (!_socketIsConnected)  {LOG(printf, "[Webserver::socket_send] Socket msg not sent, no socket connected\n");}
-      if (_socketClient==NULL)  {LOG(printf, "[Webserver::socket_send] Socket msg not sent, no socket client available\n");}
+      if (!_socketIsConnected)  {LOG(DPTT_WEBSERVER, "[ERROR] no socket connected\n");}
+      if (_socketClient==NULL)  {LOG(DPTT_WEBSERVER, "[ERROR] no socket client available\n");}
     }
   }
 }
@@ -325,10 +335,8 @@ void Webserver::http_send(AsyncWebServerRequest * request, const int & code, ENU
   request->send(code, FPSTR(WSTP_ARR[ct]), data); 
 
   #ifdef DEBUG
-    char time[12];
-    _timeStamp(micros(), time);  
-    LOG(printf_P, PSTR("http >>>[%s][%s][%s] %s-message[%d]: %s\n"), 
-      request->host().c_str(), request->url().c_str(), time, WSTP_ARR[ct], data.length(), data.c_str());    
+    LOG(DPTT_WEBSERVER, "http >>>[%s][%s] %s-message[%d]\n\t%s\n", 
+      request->host().c_str(), request->url().c_str(), WSTP_ARR[ct], data.length(), data.c_str());    
   #endif   
   
 }
@@ -349,9 +357,13 @@ void Webserver::httpHandle(){
     }
   }  
 }
-void Webserver::setup(){
-  if(!_task_httpCallback)   _task_httpCallback      = new Task();
-  if(!_task_socketCallback) _task_socketCallback = new Task();
+void Webserver::setup(TaskScheduler * scheduler){
+  // if(!_task_httpCallback)   _task_httpCallback              = new Task();
+  // if(!_task_socketCallback) _task_socketCallback            = new Task();
+  // if(!_task_socketCleanupClient) _task_socketCleanupClient  = new Task();
+  if(!_task_httpCallback)         _task_httpCallback              = scheduler->get_task(4);
+  if(!_task_socketCallback)       _task_socketCallback            = scheduler->get_task(5);
+  if(!_task_socketCleanupClient)  _task_socketCleanupClient       = scheduler->get_task(6);
 
   web_socket.onEvent(socket_event);
   web_server.addHandler(&web_socket);
@@ -375,7 +387,7 @@ void Webserver::setup(){
     _requestArray[i].get_contentType(contentType);
     _requestArray[i].get_rType(rType);
 
-    LOG(printf_P, PSTR("[%d][New request]\n\t[method: %d][name: %s]\n\t[content-type: %s][reponse-type: %d]\n"),
+    LOG(DPTT_WEBSERVER, "[%d][New request]\n\t[method: %d][name: %s]\n\t[content-type: %s][reponse-type: %d]\n",
      i, method, requestName, contentType, rType);
 
     if (method== HTTP_POST) { 
@@ -386,10 +398,8 @@ void Webserver::setup(){
           for (size_t i = 0; i < len; i++) {_httpCallbackData += (char) data[i];}
           _httpCallbackData.replace("\r\n", "");
           #ifdef DEBUG
-            char time[12];
-            _timeStamp(micros(), time);  
-            LOG(printf_P, PSTR("http <<<[%s][%s][%s][%s] %s-message[%d]: %s\n"), 
-            request->host().c_str(), request->url().c_str(), WRMTP_ARR[request->method()-1], time, request->contentType().c_str(), _httpCallbackData.length(), _httpCallbackData.c_str());    
+            LOG(DPTT_WEBSERVER, "http <<<[%s][%s][%s] %s-message[%d]\n\t%s\n", 
+            request->host().c_str(), request->url().c_str(), WRMTP_ARR[request->method()-1], request->contentType().c_str(), _httpCallbackData.length(), _httpCallbackData.c_str());    
           #endif                 
           _task_httpCallback->set_callbackOstart(std::bind(&Webserver::httpHandle, this));
           _task_httpCallback->set_iteration_max(0);
@@ -403,10 +413,8 @@ void Webserver::setup(){
       web_server.on(requestName, HTTP_GET, [=](AsyncWebServerRequest *request){
         if (_requestArray[i]._callback) {
           #ifdef DEBUG
-            char time[12];
-            _timeStamp(micros(), time);
-            LOG(printf_P, PSTR("http <<<[%s][%s][%s][%s] %s\n"), 
-              request->host().c_str(), request->url().c_str(), WRMTP_ARR[request->method()-1], time, request->contentType().c_str());                   
+            LOG(DPTT_WEBSERVER, "http <<<[%s][%s][%s] %s\n", 
+              request->host().c_str(), request->url().c_str(), WRMTP_ARR[request->method()-1], request->contentType().c_str());                   
           #endif               
           _httpCallbackRequest  = request;
           _task_httpCallback->set_callbackOstart(std::bind(&Webserver::httpHandle, this));
@@ -427,62 +435,68 @@ void Webserver::setup(){
 
   web_server.onFileUpload([](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final){
     if(!index)
-      LOG(printf, "UploadStart: %s\n", filename.c_str());
-    LOG(printf, "%s", (const char*)data);
+      LOG(DPTT_WEBSERVER, "UploadStart: %s\n", filename.c_str());
+    LOG(DPTT_WEBSERVER, "%s", (const char*)data);
     if(final)
-      LOG(printf, "UploadEnd: %s (%u)\n", filename.c_str(), index+len);
+      LOG(DPTT_WEBSERVER, "UploadEnd: %s (%u)\n", filename.c_str(), index+len);
   });
   web_server.onRequestBody([](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
     if(!index)
-      LOG(printf, "BodyStart: %u\n", total);
-    LOG(printf, "%s", (const char*)data);
+      LOG(DPTT_WEBSERVER, "BodyStart: %u\n", total);
+    LOG(DPTT_WEBSERVER, "%s", (const char*)data);
     if(index + len == total)
-      LOG(printf, "BodyEnd: %u\n", total);
+      LOG(DPTT_WEBSERVER, "BodyEnd: %u\n", total);
   });  
+
+  _task_socketCleanupClient->set_callback([](){web_socket.cleanupClients();});
+  _task_socketCleanupClient->set_taskDelay(ETD::ETD_TIMER, true, 500, 1);
+  _task_socketCleanupClient->set_iteration_max(-1);
+  _task_socketCleanupClient->setup(true);
+  _task_socketCleanupClient->set_enabled(true);  
 } 
 
 void Webserver::begin() {
   web_server.begin();
 }
 void Webserver::handle()  {
-  web_socket.cleanupClients();
-  if(_task_httpCallback)    {if (_task_httpCallback->isEnabled())   _task_httpCallback->execute();}
-  if(_task_socketCallback)  {if (_task_socketCallback->isEnabled()) _task_socketCallback->execute();}
+  
+  // if(_task_socketCleanupClient) {if (_task_socketCleanupClient->isEnabled()) _task_socketCleanupClient->execute();}
+  // if(_task_httpCallback)    {if (_task_httpCallback->isEnabled())   _task_httpCallback->execute();}
+  // if(_task_socketCallback)  {if (_task_socketCallback->isEnabled()) _task_socketCallback->execute();}
 }
 
 
 void not_found_server(AsyncWebServerRequest * request){
     if (_Webserver._httpTrace){
-      LOG(printf, "NOT_FOUND: ");
-      if (request->method() == HTTP_GET)          {LOG(printf, "GET");}
-      else if(request->method() == HTTP_POST)     {LOG(printf, "POST");}
-      else if(request->method() == HTTP_DELETE)   {LOG(printf, "DELETE");}
-      else if(request->method() == HTTP_PUT)      {LOG(printf, "PUT");}
-      else if(request->method() == HTTP_PATCH)    {LOG(printf, "PATCH");}
-      else if(request->method() == HTTP_HEAD)     {LOG(printf, "HEAD");}
-      else if(request->method() == HTTP_OPTIONS)  {LOG(printf, "OPTIONS");}
-      else                                        {LOG(printf, "UNKNOWN");}
-
-      LOG(printf_P, PSTR(" http://%s%s\n"), request->host().c_str(), request->url().c_str());
+      String result = "";
+      if (request->method() == HTTP_GET)          {result = "GET";}
+      else if(request->method() == HTTP_POST)     {result = "POST";}
+      else if(request->method() == HTTP_DELETE)   {result = "DELETE";}
+      else if(request->method() == HTTP_PUT)      {result = "PUT";}
+      else if(request->method() == HTTP_PATCH)    {result = "PATCH";}
+      else if(request->method() == HTTP_HEAD)     {result = "HEAD";}
+      else if(request->method() == HTTP_OPTIONS)  {result = "OPTIONS";}
+      else                                        {result = "UNKNOWN";}
+      LOG(DPTT_WEBSERVER, "%s http://%s%s\n", result.c_str(), request->host().c_str(), request->url().c_str());
 
       if(request->contentLength()){
-        LOG(printf_P, PSTR("_CONTENT_TYPE: %s\n"), request->contentType().c_str());
-        LOG(printf_P, PSTR("_CONTENT_LENGTH: %u\n"), request->contentLength());
+        LOG(DPTT_WEBSERVER, "&c:1&s:\t_CONTENT_TYPE: %s\n", request->contentType().c_str());
+        LOG(DPTT_WEBSERVER, "&c:1&s:\t_CONTENT_LENGTH: %u\n", request->contentLength());
       }
 
       int headers = request->headers();
       int i;
       for(i=0;i<headers;i++){
         AsyncWebHeader * h = request->getHeader(i);
-        LOG(printf_P, PSTR("_HEADER[%s]: %s\n"), h->name().c_str(), h->value().c_str());
+        LOG(DPTT_WEBSERVER, "&c:1&s:\t_HEADER[%s]: %s\n", h->name().c_str(), h->value().c_str());
       }
 
       int params = request->params();
       for(i=0;i<params;i++){
         AsyncWebParameter* p = request->getParam(i);
-        if (p->isFile())      {LOG(printf_P, PSTR("_FILE[%s]: %s, size: %u\n"), p->name().c_str(), p->value().c_str(), p->size());} 
-        else if(p->isPost())  {LOG(printf_P, PSTR("_POST[%s]: %s\n"), p->name().c_str(), p->value().c_str());} 
-        else                  {LOG(printf_P, PSTR("_GET[%s]: %s\n"), p->name().c_str(), p->value().c_str());}
+        if (p->isFile())      {LOG(DPTT_WEBSERVER, "&c:1&s:\t_FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());} 
+        else if(p->isPost())  {LOG(DPTT_WEBSERVER, "&c:1&s:\t_POST[%s]: %s\n", p->name().c_str(), p->value().c_str());} 
+        else                  {LOG(DPTT_WEBSERVER, "&c:1&s:\t_GET[%s]: %s\n", p->name().c_str(), p->value().c_str());}
       }
     }
 

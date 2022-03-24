@@ -22,7 +22,7 @@ uint8_t Task_unique_id = 0;
   #endif
 #endif
 #ifdef DEBUG
-  #define LOG(func, ...) Serial.func(__VA_ARGS__)
+  #define LOG(func, ...) APTRACEC(func, __VA_ARGS__)
 #else
   #define LOG(func, ...) ;
 #endif
@@ -117,7 +117,7 @@ void Task::execute(){
   if (!_timer->isEnabled()) {return;}
 
   if (execute(_timerEnd)) {
-    LOG(printf_P, PSTR("[ID: %d][Task::execute] [_timerEnd]\n"), _ID);
+    LOG(DPTT_TASK, "[ID: %d][_timerEnd]\n", _ID);
     if (_timer) _timer->set_enabled(false);
     _timerEnd->set_enabled(false);
     if (_callbackOend) _callbackOend();
@@ -153,18 +153,18 @@ void Task::execute(){
 }
 void Task::setup(boolean v1){
   if (!_delay) {
-    LOG(printf_P, PSTR("[ID: %d][Task::setup]\n"), _ID);
+    LOG(DPTT_TASK, "[ID: %d]\n", _ID);
     setup_timer("[NODELAY]", v1);
   }
 }
 void Task::setup_timer(const String & v1, boolean v2){
   char time[12];
   _timeStamp(micros(), time);
-  LOG(printf_P, PSTR("[ID: %d][Task::setup_timer] %s\n\t[_iteration_max: %d]\n\t[%s]\n"), 
+  LOG(DPTT_TASK, "[ID: %d]%s[S]\n\t[_iteration_max: %d]\n\t[%s]\n", 
     _ID, v1.c_str(), _iteration_max, time);
   if (_iteration_max == 0 ) {
     if (v2){
-      LOG(printf, "\t[oneshot]\n");
+      LOG(DPTT_TASK, "&c:1&s:\t[oneshot]\n");
       switch (_osMode) {
         case ETO_S:   if (_callbackOstart)  _callbackOstart();  break;
         case ETO_C:   if (_callback)        _callback();        break;
@@ -175,7 +175,7 @@ void Task::setup_timer(const String & v1, boolean v2){
         default: break;
       }         
       if (_timer && _timer->isEnabled()) {
-        LOG(printf, "\t[_timer: stop]\n");
+        LOG(DPTT_TASK, "[_timer: stop]\n");
         _timer->set_enabled(false);
       }
     }
@@ -183,18 +183,18 @@ void Task::setup_timer(const String & v1, boolean v2){
   else  {
     if (_callbackOstart)_callbackOstart();
     if (_delay) {
-      LOG(printf_P, PSTR("\t[_delay: instanced][starting: %d]\n"), v2);
+      LOG(DPTT_TASK, "&c:1&s:\t[_delay: instanced][starting: %d]\n", v2);
       _delay->set_enabled(v2);
       _delay->reset();
     } else {
-      LOG(printf, "\t[_delay: not instanced]\n");
+      LOG(DPTT_TASK, "&c:1&s:\t[_delay: not instanced]\n");
     }       
     if (_timer) {
-      LOG(printf_P, PSTR("\t[_timer: instanced][starting: %d]\n"), v2);
+      LOG(DPTT_TASK, "&c:1&s:\t[_timer: instanced][starting: %d]\n", v2);
       _timer->set_enabled(v2);
       _timer->reset();
     } else {
-      LOG(printf, "\t[_timer: not instanced]\n");
+      LOG(DPTT_TASK, "&c:1&s:\t[_timer: not instanced]\n");
     }
     if (_timerEnd) {
       char t[12];
@@ -203,14 +203,14 @@ void Task::setup_timer(const String & v1, boolean v2){
       _timerEnd->get_delay(duration);
       _timeStamp(_TASK_TIME_FUNCTION()+(duration), t);
       _timeStamp(_TASK_TIME_FUNCTION(), t2);
-      LOG(printf_P, PSTR("\t[_timerEnd: instanced][starting: %d][%s -> %s]\n"), v2, t2, t);
+      LOG(DPTT_TASK, "&c:1&s:\t[_timerEnd: instanced][starting: %d][%s -> %s]\n", v2, t2, t);
       _timerEnd->set_enabled(v2);
       _timerEnd->reset();
     } else {
-      LOG(printf, "\t[_timerEnd: not instanced]\n");
+      LOG(DPTT_TASK, "&c:1&s:\t[_timerEnd: not instanced]\n");
     }       
   }
-  LOG(println, "---");
+  LOG(DPTT_TASK, "&c:1&s:\t[E]\n");
 }
 
 void Task::set_callbackOstart(TaskCallback v1){_callbackOstart = std::move(v1);}

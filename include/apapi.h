@@ -2,7 +2,37 @@
 #define APAPI_H
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <LinkedList.h>
 #include "constants.h"
+#include "tools.h"
+
+void AP_ApiItemList_setup();
+
+typedef std::function<void(DynamicJsonDocument & reply)> _apapiItem_f;
+
+class AP_ApiItem
+{
+
+public:
+	const char 		* _id = "";
+	_apapiItem_f 	_generateJson;
+
+	AP_ApiItem(const char * const v1, _apapiItem_f v2);
+	~AP_ApiItem();
+};
+class AP_ApiItemList
+{
+	LList<AP_ApiItem *> _list;
+	
+public:
+	AP_ApiItemList();
+	~AP_ApiItemList();
+	void add (const char * const v1, _apapiItem_f v2);
+	void parsingRequest(const String &, DynamicJsonDocument & );
+};
+extern AP_ApiItemList _apapiItemList;
+
+
 
 class AP_Api {
 public:
@@ -30,13 +60,15 @@ public:
 };
 extern AP_Api _AP_Api;
 
+
+
 typedef enum _WSRM {WSURM_GETTER, WSURM_SETTER} WSURM;
 typedef std::function<void(const String & v1, DynamicJsonDocument & doc)> _wsur_cb_f;
 
 class AP_userApiItem {
-	WSURM				_mod 				= WSURM_GETTER;
-	const char 	* _id 			= "";
-	_wsur_cb_f 	_reply 		= nullptr;
+	WSURM				_mod		= WSURM_GETTER;
+	const char 	* _id		= "";
+	_wsur_cb_f 	_reply	= nullptr;
 public:
 	AP_userApiItem();
 	~AP_userApiItem(){};
@@ -48,11 +80,10 @@ public:
 	boolean isEnabled();
 	boolean cb(const String &, DynamicJsonDocument &);
 };
-
 class AP_userApi {
-	AP_userApiItem		* _array 				= nullptr;
-  uint8_t                 _arrayCnt     	= 0;
-  uint8_t                 _arrayCntMax   	= 0;	
+	AP_userApiItem	* _array			= nullptr;
+  uint8_t					_arrayCnt			= 0;
+  uint8_t					_arrayCntMax	= 0;	
 public:
 	AP_userApi();
 	~AP_userApi(){};

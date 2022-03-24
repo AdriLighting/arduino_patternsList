@@ -18,7 +18,7 @@ Program* _Program = nullptr;
 HeapStatu _HeapStatu;
 HeapStatu _HeapStatu_2;
 
-#ifdef DEBUGSERIAL
+#ifdef DEBUG_KEYBOARD
     void serial_menu_cmd(const String & cmd, const String & value);
 #endif
 void _Program_handleCallback(const String itemBaseName, const uint16_t& itemBasePos, boolean updWebserver);
@@ -41,7 +41,7 @@ void setup() {
 
   Serial.setDebugOutput(false);
 
-  #ifdef DEBUGSERIAL
+  #ifdef DEBUG_KEYBOARD
     _Sr_menu.add("name_1",             "!", serial_menu_cmd, SR_MM::SRMM_KEY);
   #endif
   boolean fs = FILESYSTEM.begin();
@@ -107,7 +107,7 @@ void setup() {
 
 void loop() {
 
-#ifdef DEBUGSERIAL
+#ifdef DEBUG_KEYBOARD
   _Sr_menu.serialRead();
 #endif
 
@@ -178,7 +178,7 @@ void webserver_parsingRequest(String s) {
 
 
 
-#ifdef DEBUGSERIAL
+#ifdef DEBUG_KEYBOARD
 void serial_menu_cmd(const String& cmd, const String& value) {
   Serial.printf_P(PSTR("[serial_menu_cmd] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
   uint8_t p = value.toInt();

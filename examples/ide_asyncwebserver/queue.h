@@ -4,9 +4,8 @@
     #include <ArduinoJson.h>
     #include <resizeBuff.h>
     #include <LinkedList.h>
+    #include <arduinoPatternList.h>
     #include "TaskScheduler.h"
-
-
 
     class QueueItem {
         char* _mStr;
@@ -28,6 +27,11 @@
 
       _execute_callback_f _execute_callback = nullptr;
     public:
+      // 
+      uint32_t  _startHeap = 0; // A DELETE
+      uint8_t   _id = 0;        // A DELETE
+      //
+
       QueueItemList(){};
       ~QueueItemList(){
         while (_list.size()) {

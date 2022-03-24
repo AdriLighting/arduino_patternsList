@@ -2,6 +2,7 @@
 #define _TASKSCHEDULER_H
 #include <Arduino.h>
 #include <functional>
+#include <arduinoPatternList.h>
 
 #define _TASK_MICRO_RES
 
@@ -21,12 +22,28 @@
 
 #endif  // _TASK_MICRO_RES
 
-
 void _timeStamp(uint32_t timestamp, char * time);
 
+/**
+ * type d'edittion du timer voulue
+ */
+typedef enum : uint8_t {
+  ETD_TIMER=0,  /**< timer infinie */
+  ETD_DELAY,    /**< compte a rebour avant declanchement */
+  ETD_TIMEREND  /**< timer de fin */
+} ETD;          
 
-typedef enum : uint8_t {ETD_TIMER=0, ETD_DELAY, ETD_TIMEREND} ETD; 
-typedef enum : uint8_t {ETO_S=0, ETO_C, ETO_SC, ETO_SCE, ETO_SE, ETO_CE} ETO; 
+/**
+ * mode d'execution callback quand la tache est oneshot
+ */
+typedef enum : uint8_t {
+  ETO_S=0,    /**< cb_os */
+  ETO_C,      /**< cb */
+  ETO_SC,     /**< cb_os + cb */
+  ETO_SCE,    /**< cb_os + cb + cb_e */
+  ETO_SE,     /**< cb_os + cb_e */
+  ETO_CE      /**< cb + _cb_e */
+} ETO; 
 
 
 class TaskDelay
@@ -106,6 +123,7 @@ public:
   void set_taskDelayEnabled(TaskDelay *& ptr, boolean v1 = true);
   void set_taskDelayEnabled(ETD mod, boolean v1 = true);
 
+  uint8_t get_id(){return _ID;}
 };
 
 

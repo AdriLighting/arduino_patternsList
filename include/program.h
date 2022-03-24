@@ -107,10 +107,10 @@
     #endif
 
     void get_json_allpl_items(JsonObject & doc, boolean pI = true, boolean lRef = false); // array of all pl items
-    void get_json_pl_items(uint8_t p, JsonObject & doc, boolean pI = true); // array of selcted pl items
+    void get_json_selectedpl_items(uint8_t p, JsonObject & doc, boolean pI = true); // array of selcted pl items
     void get_json_pl_items(JsonObject & doc, boolean pI = true); // array of current selcted pl items
     void get_json_lb_items(JsonObject & doc, boolean pI = true) ; 
-    void get_json_lb_items(JsonObject & doc, uint8_t p, boolean pI = true) ;
+    void get_json_slectedlb_items(JsonObject & doc, uint8_t p, boolean pI = true) ;
     void get_json_jsInit(JsonObject & doc); 
     void get_json_statu(JsonObject &);  // obj: statu
     void get_json_pl(JsonObject &);     // obj: pl
@@ -123,11 +123,13 @@
     void handle();
     void set_callback(callback_function_t);
 
-    void print(PRINT_MOD mod) ;
+    // void print(PRINT_MOD mod) ;
 
     void remote_action(RA action,  const char * const & v1 = "",  const char * const & v2 = "");
 
     // boolean get_pl_itemIdByArrayPos(uint8_t aP); 
+
+    void apapiItemList_initialize();
   };
 
   Program * ProgramPtrGet();

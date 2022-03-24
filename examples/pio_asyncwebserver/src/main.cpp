@@ -8,26 +8,25 @@
 #include "TaskScheduler.h"
 
 // region ################################################ GLOBALS
-WifiConnect   * _DeviceWifi;
-Program       * _Program = nullptr;
-HeapStatu     _HeapStatu;
-HeapStatu     _HeapStatu_2;
-TaskScheduler * _TaskScheduler;
-socketQueue   * _socketQueueReply;
-socketQueue   * _socketQueueSetter;  
+WifiConnect     * _DeviceWifi;
+Program         * _Program = nullptr;
+HeapStatu       _HeapStatu;
+HeapStatu       _HeapStatu_2;
+TaskScheduler   * _TaskScheduler;
+socketQueue     * _socketQueueReply;
+socketQueue     * _socketQueueSetter;  
 // endregion >>>> 
+   
 
-#ifdef DEBUGSERIAL
-    void serial_menu_cmd(const String & cmd, const String & value);
+#ifdef DEBUG_KEYBOARD
+  void keyboard_apiSetter(const String & cmd, const String & value);
 #endif
 
-// region ################################################ PROTOTYPE
+// region ################################################ PROTOTYPE 
 void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String &data);
 void _http_get_cb(AsyncWebServerRequest * request, uint8_t pos, const String &data);
 void _socket_cb(const String & s); 
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver);
-void _testf_1(float c) {Serial.printf("%.2f\n", c);}
-void _testf_2(int c, int c2) {Serial.printf("%d - %d\n", c, c2);}  
 // endregion >>>> 
 
 void setup() {
@@ -38,14 +37,18 @@ void setup() {
 
   HeapStatu::setupHeap_v1();
 
+  #ifdef DEBUG_AP
+    _DebugPrintList.add("main");  
+  #endif
+
   Serial.println(F("\n##################################################\n"));
 
   Serial.printf_P(PSTR("\t[freeheap: %d]\n"), ESP.getFreeHeap());
 
-  define_print();
+  _TaskScheduler = new TaskScheduler(9);
 
-  #ifdef DEBUGSERIAL
-    _Sr_menu.add("name_1", "!", serial_menu_cmd, SR_MM::SRMM_KEY);
+  #ifdef DEBUG_KEYBOARD
+    _Sr_menu.add("name_1", "!", keyboard_apiSetter, SR_MM::SRMM_KEY);
   #endif
 
   boolean fs = FILESYSTEM.begin();
@@ -80,57 +83,40 @@ void setup() {
   request->set_callback(_http_get_cb);
   request->set_rType(WSRM_FROMCALLBACK); 
 
-  _Webserver.setup();
+  _Webserver.setup(_TaskScheduler);
   _Webserver.set_socketCallback(_socket_cb);  
   // endregion >>>> WEBSERVER
 
-  _Program = new Program(2, fs);
-  _Program->set_fs_pl(false);  
-  _Program->set_callback(_Program_cb);
 
   // region ################################################ PROGRAM
+  // 
+  _Program = new Program(1, fs);
+  _Program->set_fs_pl(false);  
+  _Program->set_callback(_Program_cb);
+  //
   // LISTEREF_ADD-------------------------------------------------------------------------------
-  Serial.printf_P(PSTR(">>>>%d<<<\n"), ESP.getFreeHeap()); 
-  _Program->initialize_lb(0, "full",  ARRAY_SIZE(LPALLNAMES)          , LPALLNAMES);
-  _Program->initialize_lb(1, "cat",   ARRAY_SIZE(LPALLNAMES_CAT)      , LPALLNAMES_CAT);
-  Serial.printf_P(PSTR(">>>>%d<<<\n"), ESP.getFreeHeap()); 
-
+  _Program->initialize_lb(0, "full", ARRAY_SIZE(LPALLNAMES) , LPALLNAMES);
   // LISTEREF_CREATE
-  _Program->initialize(ARRAY_SIZE(LPALLNAMES),      LPALLNAMES,     "full", SORT_TYPE::ST_BASE);
-  // _Program->print(PM_LB); 
-  // delay(1000);
-
-  // _Program->initialize(ARRAY_SIZE(LPALLNAMES_CAT),  LPALLNAMES_CAT, "cat",  SORT_TYPE::ST_BASE);
-  // _Program->print(PM_LB); 
-  // _Program->print(PM_LBNAME); 
-  // delay(1000);
+  _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_BASE);
   //--------------------------------------------------------------------------------------------
-
   // PLAYLIST_INITIALIZE -----------------------------------------------------------------------
-  uint8_t plC     = 5;
+  uint8_t plC       = 5;
   uint8_t iC[]      = {20,      20,        20,      0,        0       };  // nb items max
   const char * Ln[] = {"full",  "full",   "full",   "null",   "null"  };
   _Program->initialize_playlist(plC, iC, Ln);
   _Program->pl_fs_restore();  
-  // _Program->print(PM_PL); 
-  // delay(1000);
-  //
   //--------------------------------------------------------------------------------------------
-
-
   // SETUP PROGRAMM LOOP -----------------------------------------------------------------------
   _Program->remote_action(RA::RA_LSET_PL, "0");
   _Program->remote_action(RA::RA_PLAY_LB);
   _Program->remote_action(RA::RA_PLAY_DELAY, "10");
   _Program->remote_action(RA::RA_PLAY_STOP);
-  // _Program->print(PM_LOOP);
-  // delay(1000);
   //--------------------------------------------------------------------------------------------  
   // endregion >>>> PROGRAM
 
 
   // region ################################################ TASKS
-  _TaskScheduler = new TaskScheduler(5);
+  
   _TaskScheduler->get_task(0)->set_callback([](){ProgramPtrGet()->handle();});
   _TaskScheduler->get_task(1)->set_callback([](){_DeviceWifi->handleConnection();});
   _TaskScheduler->get_task(2)->set_callback([](){if (_DeviceWifi->WIFIsetupIsReady())_Webserver.handle();});
@@ -140,23 +126,19 @@ void setup() {
     _TaskScheduler->get_task(i)->setup(true);
     _TaskScheduler->get_task(i)->set_enabled(true);
   }
-
-  _socketQueueReply   = new socketQueueReply();
-  _socketQueueSetter  = new socketQueueSetter();  
+  _socketQueueReply   = new socketQueueReply(_TaskScheduler);
+  _socketQueueSetter  = new socketQueueSetter(_TaskScheduler);  
   // endregion >>>> 
 
   delay(3000);
   String heap, time;
-  on_timeD(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
+  on_time_h(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str());
 }
-  // Querrry_child _qc;
-  // _qc.Querry_1();
-  // _qc.Querry_2();
 
 
 void loop() {
-  #ifdef DEBUGSERIAL
+  #ifdef DEBUG_KEYBOARD
     _Sr_menu.serialRead();
   #endif
   _TaskScheduler->loop();
@@ -184,38 +166,30 @@ void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String & 
   _TaskScheduler->get_task(3)->set_taskDelayEnabled(ETD::ETD_DELAY, true);
   _TaskScheduler->get_task(3)->set_enabled(true); 
 }
+
 uint32_t _socket_cb_last = 0;
-
-
-
 void _socket_cb(const String & s){
 
-  Serial.printf_P(PSTR("[_socket_cb][last: %d]\n"), millis()-_socket_cb_last);
-
+  APTRACEC("main", "[last: %d]\n", millis()-_socket_cb_last);
+  
   _socket_cb_last = millis();
 
   DynamicJsonDocument doc(1024);  
   DeserializationError error = deserializeJson(doc, s);
   if (error) {      
-    Serial.printf_P(PSTR("[_socket_cb][deserializeJson ERROR: %d]\nstring:\n\t%s"), error, s.c_str());  
+    APTRACEC("main", "[deserializeJson ERROR: %d]\nstring:\n\t%s", error, s.c_str());  
   } else {
-    // String reply;
-    // _AP_Api.parsingRequest(doc, reply, "");
     _socketQueueSetter->receive(doc);
-    // _socketQueueReply->receive(reply);
   }
 }  
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
-
-  String heap, time;
-  on_timeD(time);
+  String heap;
   _HeapStatu.update();_HeapStatu.print(heap);
-  Serial.printf_P(PSTR("[user_callback]\n\t[%d] %s\n\t%-15s%s\n"), 
-  itemBasePos, itemBaseName.c_str(), time.c_str(), heap.c_str());
-  ProgramPtrGet()->print(PM_LLI);
-
+  APTRACEC("main", "\n");
+  APTRACEC("main", "&c:1&s:\t[%d] %s\n", itemBasePos, itemBaseName.c_str());
+  Serial.printf_P(PSTR("\t%s\n"), heap.c_str());
   if (!updWebserver) return; 
-
+  APTRACEC("main", "UPD WEBSERVER\n");
   String                    reply;
   DynamicJsonDocument       doc(2048);
   AP_ApiReply             * _ApiReply = new AP_ApiReply();
@@ -223,45 +197,29 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   _ApiReply->reply_generate(doc);
   delete _ApiReply; 
   serializeJson(doc, reply); 
-  
+  doc.clear();
   _socketQueueReply->receive(reply);
 }
 
+#ifdef DEBUG_KEYBOARD
+void keyboard_apiSetter(const String & cmd, const String & value){
+  Serial.printf_P(PSTR("[keyboard_apiSetter] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
 
-
-
-
-#ifdef DEBUGSERIAL
- 
-void serial_menu_cmd(const String & cmd, const String & value){
-  if (cmd=="" || value=="")return;
-  Serial.printf_P(PSTR("[serial_menu_cmd] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
-  uint8_t p       = value.toInt();
-  String  v       = "";
-  int     rSize   = 0;
-  String  * arg   = AP_explode(value, ',', rSize) ;
-  if (rSize>0) {v = arg[1];}
-
+  uint8_t p = cmd.toInt();
   DynamicJsonDocument doc(1024);
   JsonArray           arr;
   JsonObject          var;
   String              reply;
-
   doc[F("op")]    = 0;
   doc[F("type")]  = "ESP";
-
   arr = doc.createNestedArray(F("set"));  
   var = arr.createNestedObject();
   var[F("n")] = FPSTR(RAALLNAMES[p]);
-  var[F("v")] = v;
-
+  var[F("v")] = value;
   arr = doc.createNestedArray(F("get"));  
   arr.add("loop");
-
   _AP_Api.parsingRequest(doc, reply, "");
   _Webserver.socket_send(reply);
-  // RA action = RAARR[p];
-  // _Program->remote_action(action, v.c_str(), "", NULL);    
 } 
 #endif
 
