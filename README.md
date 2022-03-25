@@ -150,11 +150,11 @@ loading one of the basic list
  * @param      <unnamed>  id of basic list
  * @param[in]  t          classification type
  */
-void Program::initialize(const uint16_t & , const char* const* arr, const char  * const &, SORT_TYPE t = ST_BASE); 
+void Program::initialize(const uint16_t & , const char* const* arr, const char  * const &, apListSortType_t t = ST_BASE); 
 ```
 ```c++ 
 // examples: 
-_Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_AB);   
+_Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", apListSortType_t::ST_AB);   
 ```
 
 <hr>
@@ -264,7 +264,7 @@ void setup() {
   _AP_userApi.initialize(2);
   _AP_userApi.set_request(0, "user", [](const String & v1, DynamicJsonDocument & doc){
     Serial.printf("[user getter][req: %s]\n", v1.c_str());
-    JsonObject var = doc.createNestedObject(FPSTR(REQ_005));
+    JsonObject var = doc.createNestedObject(FPSTR(APPT_REQ_005));
     _Program->get_json_jsInit(var);});
 }
 ```
@@ -281,35 +281,35 @@ void setup() {
 <br>
 
 ```c++
-void Program::remote_action(RA action,  const char * const & v1 = "",  const char * const & v2 = "");  
+void Program::remote_action(apSetter_t action,  const char * const & v1 = "",  const char * const & v2 = "");  
 ```
 **`function used for control general list, items, etc...`**
 ```c++
 // examples: 
-_Program->remote_action(RA::RA_ITEM,              "0");
-_Program->remote_action(RA::RA_ITEM_NEXT,         );
-_Program->remote_action(RA::RA_ITEM_PREV,         );
-_Program->remote_action(RA::RA_ITEM_RND,          );
+_Program->remote_action(apSetter_t::APSET_ITEM,              "0");
+_Program->remote_action(apSetter_t::APSET_ITEM_NEXT,         );
+_Program->remote_action(apSetter_t::APSET_ITEM_PREV,         );
+_Program->remote_action(apSetter_t::APSET_ITEM_RND,          );
 
-_Program->remote_action(RA::RA_PLAY_START,        );
-_Program->remote_action(RA::RA_PLAY_STOP,         );
-_Program->remote_action(RA::RA_PLAY_PAUSE,        );
-_Program->remote_action(RA::RA_PLAY_TOGGLE,       );
-_Program->remote_action(RA::RA_PLAY_DELAY,        "10");
-_Program->remote_action(RA::RA_PLAY_DELAYMIN,     );
-_Program->remote_action(RA::RA_PLAY_DELAYMINON,   );
-_Program->remote_action(RA::RA_PLAY_DELAYMINOFF,  );
-_Program->remote_action(RA::RA_PLAY_RND,          );
+_Program->remote_action(apSetter_t::APSET_PLAY_START,        );
+_Program->remote_action(apSetter_t::APSET_PLAY_STOP,         );
+_Program->remote_action(apSetter_t::APSET_PLAY_PAUSE,        );
+_Program->remote_action(apSetter_t::APSET_PLAY_TOGGLE,       );
+_Program->remote_action(apSetter_t::APSET_PLAY_DELAY,        "10");
+_Program->remote_action(apSetter_t::APSET_PLAY_DELAYMIN,     );
+_Program->remote_action(apSetter_t::APSET_PLAY_DELAYMINON,   );
+_Program->remote_action(apSetter_t::APSET_PLAY_DELAYMINOFF,  );
+_Program->remote_action(apSetter_t::APSET_PLAY_RND,          );
 
-_Program->remote_action(RA::RA_PLAY_PL,           );
-_Program->remote_action(RA::RA_PLAY_LB,           );
-_Program->remote_action(RA::RA_PLAY_LT,           );
+_Program->remote_action(apSetter_t::APSET_PLAY_PL,           );
+_Program->remote_action(apSetter_t::APSET_PLAY_LB,           );
+_Program->remote_action(apSetter_t::APSET_PLAY_LT,           );
 
-_Program->remote_action(RA::RA_LSET_PL,           "0");
-_Program->remote_action(RA::RA_PLI_NEW,           "0");
-_Program->remote_action(RA::RA_PLI_REP,           "0", "0");
-_Program->remote_action(RA::RA_PLI_REM,           "0", "0");
-_Program->remote_action(RA::RA_PL_TOFS,           "0");
+_Program->remote_action(apSetter_t::APSET_LSET_PL,           "0");
+_Program->remote_action(apSetter_t::APSET_PLI_NEW,           "0");
+_Program->remote_action(apSetter_t::APSET_PLI_REP,           "0", "0");
+_Program->remote_action(apSetter_t::APSET_PLI_REM,           "0", "0");
+_Program->remote_action(apSetter_t::APSET_PL_TOFS,           "0");
 ```
 <hr>
 </details>
@@ -340,7 +340,7 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   DynamicJsonDocument       reply(2048);
   AP_ApiReply  * _webserverRequest_reply = new AP_ApiReply[1];
 
-  _webserverRequest_reply[0].set_ra(RA::RA_ITEM_NEXT);
+  _webserverRequest_reply[0].set_ra(apSetter_t::APSET_ITEM_NEXT);
   _webserverRequest_reply[0].reply_generate(reply);
   serializeJson(reply, rep); 
 
@@ -460,8 +460,8 @@ HTTP_POST, UDP, SOCKET
 {"op":0,"cli":"","set":[{"n":"1","v":"1"}, {"n":"2","v":"2"}],"get":["list",{"loop_select":["statu", "lb"]}]}   
 {"op":0,"cli":"","set":[],"get":[{"gv":{"n":"list_pld","v":"1"}}]}       
   {"op":0,"cli":"HTTP_POST","set":[],"get":["loop"]}   
-  {"op":0,"cli":"SOKCET","set":[{"n":"RA_ITEM_NEXT","v":""}],"get":[]}       
-  {"op":0,"cli":"SOKCET","set":[{"n":"RA_PLAY_DELAY","v":"35"}],"get":[]}       
+  {"op":0,"cli":"SOKCET","set":[{"n":"APSET_ITEM_NEXT","v":""}],"get":[]}       
+  {"op":0,"cli":"SOKCET","set":[{"n":"APSET_PLAY_DELAY","v":"35"}],"get":[]}       
 ```
 </details>
 <details>
@@ -470,7 +470,7 @@ HTTP_POST, UDP, SOCKET
 ```html
 curl  --location --request POST 'http://192.168.0.157/api'  \
       --header 'Content-Type: application/json'             \
-      --data-raw '{"op":0,"type":"HTTP_POST","set":[{"n":"RA_PLAY_DELAY","v":"35"}],"get":["loop","list_pl",""]}'
+      --data-raw '{"op":0,"type":"HTTP_POST","set":[{"n":"APSET_PLAY_DELAY","v":"35"}],"get":["loop","list_pl",""]}'
 ```
 <hr>  
 </details>  
@@ -501,7 +501,7 @@ function api_request(op, type, oS, oG){
   
   return JSON.stringify(json) ;;
 }
-console.log(api_request(0, "SOKCET", [{"n":"RA_PLAY_DELAY", "v":10},{"n":"RA_PLAY_START", "v":""}],["loop", "list_pl"])
+console.log(api_request(0, "SOKCET", [{"n":"APSET_PLAY_DELAY", "v":10},{"n":"APSET_PLAY_START", "v":""}],["loop", "list_pl"])
 ```
 <hr>  
 </details> 
@@ -544,72 +544,72 @@ xhr.send(data);
 <summary>id with reply</summary>
 
 ```html
-RA_ITEM:             arg1: position of items list array
+APSET_ITEM:             arg1: position of items list array
   loop        
     pl, plt || lb, lbt
-RA_ITEM_NEXT: 
+APSET_ITEM_NEXT: 
   loop        
     pl, plt || lb, lbt
-RA_ITEM_PREV:
+APSET_ITEM_PREV:
   loop        
     pl, plt || lb, lbt
-RA_ITEM_RND:          
+APSET_ITEM_RND:          
   loop        
     pl, plt || lb, lbt
 
-RA_PLAY_START:   
+APSET_PLAY_START:   
   loop
     statu
-RA_PLAY_STOP: 
+APSET_PLAY_STOP: 
   loop
     statu
-RA_PLAY_PAUSE:  
+APSET_PLAY_PAUSE:  
   loop
     statu
-RA_PLAY_TOGGLE:  
+APSET_PLAY_TOGGLE:  
   loop
     statu
-RA_PLAY_DELAY:       arg1: value of delay
+APSET_PLAY_DELAY:       arg1: value of delay
   loop
     statu
-RA_PLAY_DELAYMIN:    
+APSET_PLAY_DELAYMIN:    
   loop
     statu
-RA_PLAY_DELAYMINON:  
+APSET_PLAY_DELAYMINON:  
   loop
     statu
-RA_PLAY_DELAYMINOFF: 
+APSET_PLAY_DELAYMINOFF: 
   loop
     statu
-RA_PLAY_RND:         
+APSET_PLAY_RND:         
   loop
     statu
 
-RA_PLAY_PL:   
+APSET_PLAY_PL:   
    loop
     pl, plt
               
-RA_PLAY_LB:   
+APSET_PLAY_LB:   
   loop
     lb, lbt
 
-RA_PLAY_LT:  
+APSET_PLAY_LT:  
   loop        
     pl, plt || lb, lbt
 
-RA_LSET_PL:         arg1: position of playlist list array
+APSET_LSET_PL:         arg1: position of playlist list array
 
-RA_LGET_PL:
+APSET_LGET_PL:
   pld = pl_currentJson(uint8_t p, JsonObject & doc, boolean pI = true);
     similaire au getter "list_pl" mais possibilité de choisir la playlist et retourne avec un nom d'objet different    
 
-RA_PLI_NEW:         arg1 
+APSET_PLI_NEW:         arg1 
   list_allpl      
-RA_PLI_REP:         arg1, arg2 
+APSET_PLI_REP:         arg1, arg2 
   list_allpl
-RA_PLI_REM:         arg1, arg2  
+APSET_PLI_REM:         arg1, arg2  
   list_allpl    
-RA_PL_TOFS:         arg1: position of playlist list array
+APSET_PL_TOFS:         arg1: position of playlist list array
 ```
 <hr>
 </details>

@@ -21,37 +21,37 @@ void ListLoop::set_delayManual(boolean v)           {_delayManual = v;}
 void ListLoop::set_delayMin(boolean v)              {_delayMin = v;}
 void ListLoop::set_delayMin()                       {_delayMin = !_delayMin;}
 void ListLoop::set_rnd()                            {_random = !_random;}
-void ListLoop::set_pos(LL_flag * flag, const uint16_t & v) {reset(flag, v);}
+void ListLoop::set_pos(apListLoopFlag_t * flag, const uint16_t & v) {reset(flag, v);}
 
-void ListLoop::loop_next(LL_flag * flag){
+void ListLoop::loop_next(apListLoopFlag_t * flag){
   if (_random)  rnd(flag);
   else          next(flag);
 }
-void ListLoop::loop_prev(LL_flag * flag){
+void ListLoop::loop_prev(apListLoopFlag_t * flag){
   if (_random)  rnd(flag);
   else          prev(flag);
 }
-void ListLoop::next(LL_flag * flag){
+void ListLoop::next(apListLoopFlag_t * flag){
   flag->_pos++;
   if (flag->_pos > flag->_posMax) flag->_pos = flag->_posMin;
 }
-void ListLoop::prev(LL_flag * flag){
+void ListLoop::prev(apListLoopFlag_t * flag){
   flag->_pos--;
   if (flag->_pos < flag->_posMin) flag->_pos = flag->_posMax;
 }
-void ListLoop::rnd(LL_flag * flag){
+void ListLoop::rnd(apListLoopFlag_t * flag){
   flag->_pos = random(flag->_posMin, flag->_posMax);
   if (flag->_pos > flag->_posMax) flag->_pos = flag->_posMin;
 }
-void ListLoop::setup(LL_flag * flag, const uint16_t & v){
+void ListLoop::setup(apListLoopFlag_t * flag, const uint16_t & v){
   flag->_pos        = 0;
   flag->_posMax     = v;
 }
-void ListLoop::updatePos(LL_flag * flag, const uint16_t & v){
+void ListLoop::updatePos(apListLoopFlag_t * flag, const uint16_t & v){
   flag->_posMax = v;
   if (flag->_pos > flag->_posMax) flag->_pos = flag->_posMax;
 }
-void ListLoop::reset(LL_flag * flag, int v){
+void ListLoop::reset(apListLoopFlag_t * flag, int v){
   flag->_pos        = v;
   _timer->reset();    
 }

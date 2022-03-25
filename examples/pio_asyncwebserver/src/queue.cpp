@@ -40,11 +40,11 @@ void QueueItemList::addString(String* inStr) {
    sprintf(buffer, "%s", inStr->c_str()); 
    addString(buffer); 
    #ifdef DEBUG
-      LOG(DPTT_QUEUE, "\n\t[listSize]: %d\n\t[queue item][%d]: %s\n", _list.size(), String(buffer).length(), buffer);   
+      LOG(APPT_DEBUGREGION_QUEUE, "\n\t[listSize]: %d\n\t[queue item][%d]: %s\n", _list.size(), String(buffer).length(), buffer);   
    #endif
 }
 void QueueItemList::addString(char* inStr) {
-  // LOG(DPTT_QUEUE, "size: %d\n", _list.size());
+  // LOG(APPT_DEBUGREGION_QUEUE, "size: %d\n", _list.size());
   _list.add(new QueueItem());
   uint8_t pos = _list.size()-1;
   _list[pos]->add(inStr);
@@ -70,7 +70,7 @@ void QueueItemList::execute_cbTask(){
 
   if (_execute_callback) {
     #ifdef DEBUG
-      LOG(DPTT_QUEUE, "\n\t[s: %d][e: %d][f: %d]\n\t[listSize]: %d\n\t[queue item][%d]\n\t[CALLBACK]\n", _startHeap, ESP.getFreeHeap(), ESP.getFreeHeap()-_startHeap, _list.size(), sT.length());   
+      LOG(APPT_DEBUGREGION_QUEUE, "\n\t[s: %d][e: %d][f: %d]\n\t[listSize]: %d\n\t[queue item][%d]\n\t[CALLBACK]\n", _startHeap, ESP.getFreeHeap(), ESP.getFreeHeap()-_startHeap, _list.size(), sT.length());   
     #endif
     _execute_callback(sT);
   }
@@ -81,7 +81,7 @@ void QueueItemList::execute_cbTask(){
 
     // A DELETE
       #ifdef DEBUG
-        LOG(DPTT_QUEUE, "&c:1&s:\t[QUEUEEND][%d][s: %d][e: %d][f: %d]\n", _id, _startHeap, ESP.getFreeHeap(), ESP.getFreeHeap()-_startHeap);  
+        LOG(APPT_DEBUGREGION_QUEUE, "&c:1&s:\t[QUEUEEND][%d][s: %d][e: %d][f: %d]\n", _id, _startHeap, ESP.getFreeHeap(), ESP.getFreeHeap()-_startHeap);  
       #endif  
     //
 
@@ -93,7 +93,7 @@ void QueueItemList::execute_cbTask(){
   #ifdef DEBUG
     char time[12];
     _timeStamp(micros(), time);    
-    LOG(DPTT_QUEUE, "&c:1&s:\t[TASK RUN][%s]\n", time);   
+    LOG(APPT_DEBUGREGION_QUEUE, "&c:1&s:\t[TASK RUN][%s]\n", time);   
   #endif
 
   _task->set_callbackOstart([=](){execute_cbTask();});

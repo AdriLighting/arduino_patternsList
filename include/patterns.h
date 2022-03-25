@@ -44,7 +44,7 @@
     void jsonObject(JsonObject & root);
 
         
-    // void loop(mod_pattern_loop & mod, String & v1, boolean delayInMin);
+    // void loop(apPatternloppMod_t & mod, String & v1, boolean delayInMin);
   };
   Listbase * ListbasePtrGet();
 

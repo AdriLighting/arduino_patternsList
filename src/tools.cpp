@@ -390,7 +390,7 @@ void DebugPrintItem::print(){
       is_file(), 
       is_func(), 
       is_crmsg(),
-      FPSTR(DPTT_ML_ALL[_lvl])
+      FPSTR(APPT_DEBUGREGIONML_ALL[_lvl])
       );
 }
 
@@ -435,9 +435,9 @@ DebugPrintItem * DebugPrintList::get_item(const char *  v1){
 void DebugPrintList::ketboardPrintHeader(boolean pNbId){
   if (!pNbId)   Serial.printf_P(PSTR("[%12s]"), "_id");
   else          Serial.printf_P(PSTR("[%3s][%12s]"), "nb", "_id");
-  uint8_t size = ARRAY_SIZE(DPTT_MS_ALL);
+  uint8_t size = ARRAY_SIZE(APPT_DEBUGREGIONMS_ALL);
   for(uint8_t i = 0; i < size; ++i) {
-    Serial.printf_P(PSTR("[%d %5s]"),i, FPSTR(DPTT_MS_ALL[i]) );
+    Serial.printf_P(PSTR("[%d %5s]"),i, FPSTR(APPT_DEBUGREGIONMS_ALL[i]) );
   }   
   Serial.println();          
 }
@@ -481,7 +481,7 @@ void  DebugPrintList::keyboardSet(const String & cmd, const String & value){
 
   splitText(cmd, "&",  ':', &_SplitItem);
   for(int i = 0; i < _SplitItem.size(); ++i) {
-    if (_SplitItem[i]->_cmd == FPSTR(DPTT_MC_001)) {
+    if (_SplitItem[i]->_cmd == FPSTR(APPT_DEBUGREGIONMC_001)) {
       String arg[2];
       AP_explode(_SplitItem[i]->_value, ',', rSize, arg) ;
       ketboardPrintHeader();
@@ -516,7 +516,7 @@ void DebugPrintList::keyboardSet(DebugPrintItem * item, const String & value){
 
   for(int i = 0; i < _SplitItem.size(); ++i) {
     // if (_SplitItem[i]->_cmd == "set") {
-      if (_SplitItem[i]->_cmd == FPSTR(DPTT_MC_001)) {
+      if (_SplitItem[i]->_cmd == FPSTR(APPT_DEBUGREGIONMC_001)) {
         AP_explode(_SplitItem[i]->_value, ',', rSize, nullptr) ;  
         if (rSize < 3) continue;
         String arg[rSize+1];

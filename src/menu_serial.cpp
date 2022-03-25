@@ -85,8 +85,8 @@ Sr_menu::Sr_menu(){
     _Sr_menu.add("menu",          "a", []() { _Sr_menu.print(); });
     _Sr_menu.add("ESPreset",      "z", []() { ESP.restart();    });
     _Sr_menu.add("freeHeap",      "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
-    _Sr_menu.add("getter list",   "r", []() { uint8_t cnt = ARRAY_SIZE(RAALLNAMES); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, RAALLNAMES[i]);}});
-    _Sr_menu.add("setter list",   "t", []() { uint8_t cnt = ARRAY_SIZE(REQALL); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, REQALL[i]);}});
+    _Sr_menu.add("getter list",   "r", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, APPT_SETTER_ARRAY[i]);}});
+    _Sr_menu.add("setter list",   "t", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, APPT_REQ_ARRAY[i]);}});
     _Sr_menu.add("api getter",    "@", [](const String & v1, const String & v2) {  
       DynamicJsonDocument doc(1024);
       JsonArray           arr;

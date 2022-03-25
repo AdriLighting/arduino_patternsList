@@ -50,12 +50,12 @@ public:
 	void parsingRequest(DynamicJsonDocument &, DynamicJsonDocument &, const String &);
 };
 class AP_ApiReply {
-	RA 			_action;
+	apSetter_t 			_action;
 	String 	_value = "";
 public:
 	AP_ApiReply(){};
 	~AP_ApiReply(){};
-	void set_ra(RA action);
+	void set_ra(apSetter_t action);
 	void set_value(const String & v1);
 	void reply_generate(DynamicJsonDocument & doc);
 };

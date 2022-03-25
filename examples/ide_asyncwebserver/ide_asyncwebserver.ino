@@ -57,8 +57,8 @@ void setup() {
   // region ################################################ WIFI
   _DeviceWifi = new WifiConnect(
     "apdebug_1",
-    "SSID",
-    "SSIDPASS",
+    "freebox_123_EXT",
+    "phcaadax",
     "adsap1234",
     "adsota1234");
   _DeviceWifi->setFunc_STAinitServer  ( [](){_Webserver.begin();} );
@@ -70,7 +70,7 @@ void setup() {
   _AP_userApi.initialize(2);
   _AP_userApi.set_request(0, "user", [](const String & v1, DynamicJsonDocument & doc){
     Serial.printf("[user getter][req: %s]\n", v1.c_str());
-    JsonObject var = doc.createNestedObject(FPSTR(REQ_005));
+    JsonObject var = doc.createNestedObject(FPSTR(APPT_REQ_005));
     _Program->get_json_jsInit(var);});
 
   _Webserver.request_array(3);
@@ -98,7 +98,7 @@ void setup() {
   // LISTEREF_ADD-------------------------------------------------------------------------------
   _Program->initialize_lb(0, "full", ARRAY_SIZE(LPALLNAMES) , LPALLNAMES);
   // LISTEREF_CREATE
-  _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_BASE);
+  _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", apListSortType_t::ST_BASE);
   //--------------------------------------------------------------------------------------------
   // PLAYLIST_INITIALIZE -----------------------------------------------------------------------
   uint8_t plC       = 5;
@@ -108,10 +108,10 @@ void setup() {
   _Program->pl_fs_restore();  
   //--------------------------------------------------------------------------------------------
   // SETUP PROGRAMM LOOP -----------------------------------------------------------------------
-  _Program->remote_action(RA::RA_LSET_PL, "0");
-  _Program->remote_action(RA::RA_PLAY_LB);
-  _Program->remote_action(RA::RA_PLAY_DELAY, "10");
-  _Program->remote_action(RA::RA_PLAY_STOP);
+  _Program->remote_action(apSetter_t::APSET_LSET_PL, "0");
+  _Program->remote_action(apSetter_t::APSET_PLAY_LB);
+  _Program->remote_action(apSetter_t::APSET_PLAY_DELAY, "10");
+  _Program->remote_action(apSetter_t::APSET_PLAY_STOP);
   //--------------------------------------------------------------------------------------------  
   // endregion >>>> PROGRAM
 
@@ -195,7 +195,7 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   String                    reply;
   DynamicJsonDocument       doc(2048);
   AP_ApiReply             * _ApiReply = new AP_ApiReply();
-  _ApiReply->set_ra(RA::RA_ITEM_NEXT);
+  _ApiReply->set_ra(apSetter_t::APSET_ITEM_NEXT);
   _ApiReply->reply_generate(doc);
   delete _ApiReply; 
   serializeJson(doc, reply); 
@@ -224,7 +224,7 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
     doc[F("type")]  = "ESP";
     arr = doc.createNestedArray(F("set"));  
     var = arr.createNestedObject();
-    var[F("n")] = FPSTR(RAALLNAMES[p]);
+    var[F("n")] = FPSTR(APPT_SETTER_ARRAY[p]);
     var[F("v")] = value;
     arr = doc.createNestedArray(F("get"));  
     arr.add("loop");

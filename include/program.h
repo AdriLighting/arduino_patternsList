@@ -50,7 +50,7 @@
     // typedef std::function<void(const String & v1)> callback_error;
 
     LBnames             * _LBnames    = nullptr;  
-    LB_flag             _lbStatu;
+    apBasiclistFlag_t             _lbStatu;
 
     Playlist_list       * _Playlists  = nullptr;
 
@@ -80,9 +80,9 @@
     Program (uint8_t nbLb , boolean fs );
     ~Program ();
 
-    PL_flag _plStatu;
+    apPlaylistFlag_t _plStatu;
 
-    void initialize(const uint16_t & , const char* const* arr, const char  * const &, SORT_TYPE t = ST_BASE);
+    void initialize(const uint16_t & , const char* const* arr, const char  * const &, apListSortType_t t = ST_BASE);
     void initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
     void initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
 
@@ -125,7 +125,7 @@
 
     // void print(PRINT_MOD mod) ;
 
-    void remote_action(RA action,  const char * const & v1 = "",  const char * const & v2 = "");
+    void remote_action(apSetter_t action,  const char * const & v1 = "",  const char * const & v2 = "");
 
     // boolean get_pl_itemIdByArrayPos(uint8_t aP); 
 

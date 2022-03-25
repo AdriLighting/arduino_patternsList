@@ -25,19 +25,19 @@
 #endif
 
 LList<ListSortItems*> ListSortItemsPtr; 
-void ListSortItems_sort(SORT_TYPE _effSort) {
+void ListSortItems_sort(apListSortType_t _effSort) {
   switch(_effSort){
-    case SORT_TYPE::ST_BASE :
+    case apListSortType_t::ST_BASE :
       ListSortItemsPtr.sort([](ListSortItems *&a, ListSortItems *&b){ return (((a->_id&0xFF) - (b->_id&0xFF))<<8) + (((a->_id&0xFF00) - (b->_id&0xFF00))>>8);});
     break;
-    case SORT_TYPE::ST_END :
+    case apListSortType_t::ST_END :
       ListSortItemsPtr.sort([](ListSortItems *&a, ListSortItems *&b){ return b->_id - a->_id;}); 
     break;
-    case SORT_TYPE::ST_IDX :
+    case apListSortType_t::ST_IDX :
       // ListSortItemsPtr.sort([](ListSortItems *&a, ListSortItems *&b){ return (int)(a->getMS() - b->getMS());});
     break;
-    case SORT_TYPE::ST_AB2 :
-    case SORT_TYPE::ST_AB :
+    case apListSortType_t::ST_AB2 :
+    case apListSortType_t::ST_AB :
     break;
     default:
     break;
@@ -100,23 +100,23 @@ Program::Program(uint8_t nbLB, boolean fs){
   #ifdef DEBUG_AP
     ap_debugBuffer    = new char[1024];
 
-      _DebugPrintList.add(DPTT_APAPI); 
+      _DebugPrintList.add(APPT_DEBUGREGION_APAPI); 
 
     #ifdef DEBUG_PLAYLIST
-      _DebugPrintList.add(DPTT_PLAYLIST);    
+      _DebugPrintList.add(APPT_DEBUGREGION_PLAYLIST);    
     #endif
     #ifdef DEBUG_PROGRAM
-      _DebugPrintList.add(DPTT_PROGRAM);    
+      _DebugPrintList.add(APPT_DEBUGREGION_PROGRAM);    
     #endif
       
     #ifdef DEBUG_WEBSERVER
-      _DebugPrintList.add(DPTT_WEBSERVER);    
+      _DebugPrintList.add(APPT_DEBUGREGION_WEBSERVER);    
     #endif
     #ifdef DEBUG_QUEUE
-      _DebugPrintList.add(DPTT_QUEUE);    
+      _DebugPrintList.add(APPT_DEBUGREGION_QUEUE);    
     #endif
     #ifdef DEBUG_TASK
-      _DebugPrintList.add(DPTT_TASK);    
+      _DebugPrintList.add(APPT_DEBUGREGION_TASK);    
     #endif
         
   #endif
@@ -144,7 +144,7 @@ Program::Program(uint8_t nbLB, boolean fs){
 }
 Program::~Program(){
 #ifdef DEBUG
-   LOG(DPTT_PROGRAM, "Program::destructor\n");  
+   LOG(APPT_DEBUGREGION_PROGRAM, "Program::destructor\n");  
  #endif 
   delete[] _Playlists;    
   delete[] _LBnames;    
@@ -319,9 +319,9 @@ void Program::get_json_jsInit(JsonObject & doc){
   get_json_lbt(obj);
 
 }
-void Program::initialize(const uint16_t & maxCnt, const char* const* arr, const char  * const & n, SORT_TYPE t){
+void Program::initialize(const uint16_t & maxCnt, const char* const* arr, const char  * const & n, apListSortType_t t){
 #ifdef DEBUG
-  LOG(DPTT_PROGRAM, "Program::initialize\n");  
+  LOG(APPT_DEBUGREGION_PROGRAM, "Program::initialize\n");  
 #endif
 
   Listbase::initialize(maxCnt, n);
@@ -329,7 +329,7 @@ void Program::initialize(const uint16_t & maxCnt, const char* const* arr, const 
   stringList aStringList;   // An instance of the stringList class we created above.
 
   switch (t) {
-      case SORT_TYPE::ST_AB:
+      case apListSortType_t::ST_AB:
         for (int i = 0; i < maxCnt; ++i) {
           String s = FPSTR(arr[i]);
           aStringList.addString(&s);
@@ -414,9 +414,9 @@ void Program::handle(){
 }
 void Program::set_callback(callback_function_t f)  {_callback = std::move(f);}
 
-void Program::remote_action(RA action, const char * const & key, const char * const & val){
+void Program::remote_action(apSetter_t action, const char * const & key, const char * const & val){
   #ifdef DEBUG
-    LOG(DPTT_PROGRAM, "RA %-4d[%-20s]\n", action, RAALLNAMES[action]);  
+    LOG(APPT_DEBUGREGION_PROGRAM, "&c:1&s:\tapSetter_t %-4d[%-20s]\n", action, APPT_SETTER_ARRAY[action]);  
   #endif
   // char *key = NULL, *val = NULL, *key_val = NULL;
   // va_list prm;
@@ -427,42 +427,42 @@ void Program::remote_action(RA action, const char * const & key, const char * co
   // }
   // va_end(prm);
   #ifdef DEBUG
-    if(String(key) != "") LOG(DPTT_PROGRAM, "\t[key: %s]\n", key);  
-    if(String(val) != "") LOG(DPTT_PROGRAM, "\t[val: %s]\n", val);  
+    if(String(key) != "") LOG(APPT_DEBUGREGION_PROGRAM, "\t[key: %s]\n", key);  
+    if(String(val) != "") LOG(APPT_DEBUGREGION_PROGRAM, "\t[val: %s]\n", val);  
   #endif
 
   const char * pN;
 
   switch (action) { 
-    case RA::RA_ITEM:             if(String(key)!="") set_itemPos((uint16_t)atoi(key)); break;;
-    case RA::RA_ITEM_NEXT:        set_itemNext();   break;
-    case RA::RA_ITEM_PREV:        set_itemPrev();   break;
-    case RA::RA_ITEM_RND:         set_itemRnd();    break;
+    case apSetter_t::APSET_ITEM:             if(String(key)!="") set_itemPos((uint16_t)atoi(key)); break;;
+    case apSetter_t::APSET_ITEM_NEXT:        set_itemNext();   break;
+    case apSetter_t::APSET_ITEM_PREV:        set_itemPrev();   break;
+    case apSetter_t::APSET_ITEM_RND:         set_itemRnd();    break;
 
-    case RA::RA_PLAY_START:       start();  /*print(PM_LL);*/   break;
-    case RA::RA_PLAY_STOP:        stop();   /*print(PM_LL);*/   break;
-    case RA::RA_PLAY_PAUSE:       pause();  /*print(PM_LL);*/   break;
-    case RA::RA_PLAY_TOGGLE:      (isPlaying()) ? pause(): start(); break;
-    case RA::RA_PLAY_DELAY:       if(String(key)!="") set_delayCurrent((uint8_t)atoi(key)); break;
-    case RA::RA_PLAY_DELAYMIN:    set_delayMin();                                     break;
-    case RA::RA_PLAY_DELAYMINON:  set_delayMin(true);                                 break;
-    case RA::RA_PLAY_DELAYMINOFF: set_delayMin(false);                                break;
-    case RA::RA_PLAY_RND:         set_rnd();                                          break;
+    case apSetter_t::APSET_PLAY_START:       start();  /*print(PM_LL);*/   break;
+    case apSetter_t::APSET_PLAY_STOP:        stop();   /*print(PM_LL);*/   break;
+    case apSetter_t::APSET_PLAY_PAUSE:       pause();  /*print(PM_LL);*/   break;
+    case apSetter_t::APSET_PLAY_TOGGLE:      (isPlaying()) ? pause(): start(); break;
+    case apSetter_t::APSET_PLAY_DELAY:       if(String(key)!="") set_delayCurrent((uint8_t)atoi(key)); break;
+    case apSetter_t::APSET_PLAY_DELAYMIN:    set_delayMin();                                     break;
+    case apSetter_t::APSET_PLAY_DELAYMINON:  set_delayMin(true);                                 break;
+    case apSetter_t::APSET_PLAY_DELAYMINOFF: set_delayMin(false);                                break;
+    case apSetter_t::APSET_PLAY_RND:         set_rnd();                                          break;
 
-    case RA::RA_PLAY_PL:          if (_plStatu.isSet) _plStatu.isPlaying = true;      break;
-    case RA::RA_PLAY_LB:          _plStatu.isPlaying = false;                         break;
-    case RA::RA_PLAY_LT:          _plStatu.isPlaying = !_plStatu.isPlaying ;          break;
+    case apSetter_t::APSET_PLAY_PL:          if (_plStatu.isSet) _plStatu.isPlaying = true;      break;
+    case apSetter_t::APSET_PLAY_LB:          _plStatu.isPlaying = false;                         break;
+    case apSetter_t::APSET_PLAY_LT:          _plStatu.isPlaying = !_plStatu.isPlaying ;          break;
   
-    case RA::RA_LSET_PL:
+    case apSetter_t::APSET_LSET_PL:
       if(String(key) != ""){
         get_name(pN);
         pl_set_listPos((uint8_t)atoi(key), pN);
         reset();}
     break;
-    case RA::RA_PLI_NEW: if (String(key) != "") pl_item_new((uint8_t)atoi(key)); break;    
-    case RA::RA_PLI_REP: if ((String(key) != "") && (String(val) != "")) pl_item_new(     (uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
-    case RA::RA_PLI_REM: if ((String(key) != "") && (String(val) != "")) pl_item_remove(  (uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
-    case RA::RA_PL_TOFS:
+    case apSetter_t::APSET_PLI_NEW: if (String(key) != "") pl_item_new((uint8_t)atoi(key)); break;    
+    case apSetter_t::APSET_PLI_REP: if ((String(key) != "") && (String(val) != "")) pl_item_new(     (uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
+    case apSetter_t::APSET_PLI_REM: if ((String(key) != "") && (String(val) != "")) pl_item_remove(  (uint8_t)atoi(key), (uint8_t)atoi(val)); break;    
+    case apSetter_t::APSET_PL_TOFS:
       #ifdef FSOK
         if(String(key) != "") pl_fs((uint8_t)atoi(key)); 
       #endif
@@ -473,10 +473,10 @@ void Program::remote_action(RA action, const char * const & key, const char * co
 
   // USER CALLBACK
   switch (action) { 
-    case RA::RA_ITEM:       ;
-    case RA::RA_ITEM_NEXT:  ;
-    case RA::RA_ITEM_PREV:  ;
-    case RA::RA_ITEM_RND:   
+    case apSetter_t::APSET_ITEM:       ;
+    case apSetter_t::APSET_ITEM_NEXT:  ;
+    case apSetter_t::APSET_ITEM_PREV:  ;
+    case apSetter_t::APSET_ITEM_RND:   
     {
       if(_callback) {
         String    name;
@@ -518,7 +518,7 @@ boolean Program::pl_set_listPos(uint8_t pos, const char * currentList){
 
   if (pos >= _plStatu.cnt) {
     #ifdef DEBUG
-      LOG(DPTT_PROGRAM, "[EROR postion][requete: %d >= %d]\n",pos ,_plStatu.cnt);  
+      LOG(APPT_DEBUGREGION_PROGRAM, "[EROR postion][requete: %d >= %d]\n",pos ,_plStatu.cnt);  
     #endif
     _plStatu.isPlaying =false; 
     _plStatu.isSet =false; 
@@ -526,7 +526,7 @@ boolean Program::pl_set_listPos(uint8_t pos, const char * currentList){
   }
   if (sLref != currentList) {
     #ifdef DEBUG
-      LOG(DPTT_PROGRAM, "[EROR listeBase][pos: %d][requete: %s <> %s]\n",pos, sLref ,currentList);  
+      LOG(APPT_DEBUGREGION_PROGRAM, "[EROR listeBase][pos: %d][requete: %s <> %s]\n",pos, sLref ,currentList);  
     #endif
     _plStatu.isPlaying =false; 
     _plStatu.isSet =false; 
@@ -538,7 +538,7 @@ boolean Program::pl_set_listPos(uint8_t pos, const char * currentList){
 
   if (pC == 0) {
     #ifdef DEBUG
-      LOG(DPTT_PROGRAM, "[EROR nb of item low: %d]\n",pC);  
+      LOG(APPT_DEBUGREGION_PROGRAM, "[EROR nb of item low: %d]\n",pC);  
     #endif
     _plStatu.isPlaying =false; 
     _plStatu.isSet =false; 
@@ -566,10 +566,10 @@ void Program::pl_item_new(uint8_t pP) {
   JsonObject root;
   DynamicJsonDocument temp(2048);
   DynamicJsonDocument reply(2048);
-  reply.createNestedObject(FPSTR(REP_007));
+  reply.createNestedObject(FPSTR(APPT_REP_007));
   root = temp.to<JsonObject>();   
   get_json_selectedpl_items(pP, root, true);
-  reply[FPSTR(REP_007)] = temp;
+  reply[FPSTR(APPT_REP_007)] = temp;
 
   #ifdef FSOK
     // pl_fs(pP, reply);  
@@ -588,10 +588,10 @@ void Program::pl_item_new(uint8_t pP, uint8_t iP) {
   JsonObject root;
   DynamicJsonDocument temp(2048);
   DynamicJsonDocument reply(2048);
-  reply.createNestedObject(FPSTR(REP_007));
+  reply.createNestedObject(FPSTR(APPT_REP_007));
   root = temp.to<JsonObject>();   
   get_json_selectedpl_items(pP, root, true);
-  reply[FPSTR(REP_007)] = temp;
+  reply[FPSTR(APPT_REP_007)] = temp;
 
   #ifdef FSOK
     // pl_fs(pP, reply);  
@@ -608,10 +608,10 @@ void Program::pl_item_remove(uint8_t pP, uint8_t aP) {
   JsonObject root;
   DynamicJsonDocument temp(2048);
   DynamicJsonDocument reply(2048);
-  reply.createNestedObject(FPSTR(REP_007));
+  reply.createNestedObject(FPSTR(APPT_REP_007));
   root = temp.to<JsonObject>();   
   get_json_selectedpl_items(pP, root, true);
-  reply[FPSTR(REP_007)] = temp;
+  reply[FPSTR(APPT_REP_007)] = temp;
 
   #ifdef FSOK
     // pl_fs(pP, reply);  
@@ -632,10 +632,10 @@ void Program::pl_item_new(DynamicJsonDocument & doc, DynamicJsonDocument & reply
   ListLoop::updatePos(&_pltFlag, pC-1);
   JsonObject root;
   DynamicJsonDocument temp(2048);
-  reply.createNestedObject(FPSTR(REP_007));
+  reply.createNestedObject(FPSTR(APPT_REP_007));
   root = temp.to<JsonObject>();   
   get_json_selectedpl_items(pP, root, true);
-  reply[FPSTR(REP_007)] = temp;
+  reply[FPSTR(APPT_REP_007)] = temp;
 
   #ifdef FSOK
     // pl_fs(pP, reply); 
@@ -654,10 +654,10 @@ void Program::pl_item_remove(DynamicJsonDocument & doc, DynamicJsonDocument & re
 
   JsonObject root;
   DynamicJsonDocument temp(2048);
-  reply.createNestedObject(FPSTR(REP_007));
+  reply.createNestedObject(FPSTR(APPT_REP_007));
   root = temp.to<JsonObject>();   
   get_json_selectedpl_items(pP, root, true);
-  reply[FPSTR(REP_007)] = temp;
+  reply[FPSTR(APPT_REP_007)] = temp;
 
   #ifdef FSOK
     // pl_fs(pP, reply);  
@@ -713,7 +713,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     File f=FILESYSTEM.open(path,"w");
     if (!f) {
       #ifdef DEBUG
-        LOG(DPTT_PROGRAM, "[Error open /w]\n\t%s\n", path.c_str());  
+        LOG(APPT_DEBUGREGION_PROGRAM, "[Error open /w]\n\t%s\n", path.c_str());  
       #endif
       return;
     }
@@ -721,9 +721,9 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     DynamicJsonDocument temp(2048);
     JsonObject          root = temp.to<JsonObject>();   
 
-    doc.createNestedObject(FPSTR(REP_007));
+    doc.createNestedObject(FPSTR(APPT_REP_007));
     get_json_selectedpl_items(_plStatu.pos, root, true);
-    doc[FPSTR(REP_007)] = temp; 
+    doc[FPSTR(APPT_REP_007)] = temp; 
 
     temp.clear();
     serializeJson(doc, f);     
@@ -736,13 +736,13 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     if (!_fs_setup) return;
 
     #ifdef DEBUG
-      LOG(DPTT_PROGRAM, "[%d]\n", pP);   
+      LOG(APPT_DEBUGREGION_PROGRAM, "[%d]\n", pP);   
     #endif
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pP) + (String)FPSTR(FNEXT_PLAYLIST) ;
     File f=FILESYSTEM.open(path,"w");
     if (!f) {
       #ifdef DEBUG
-        LOG(DPTT_PROGRAM, "&c:1&s:\t[Error open /w]\n\t%s\n", path.c_str());  
+        LOG(APPT_DEBUGREGION_PROGRAM, "&c:1&s:\t[Error open /w]\n\t%s\n", path.c_str());  
       #endif
       return;
     }
@@ -754,9 +754,9 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     DynamicJsonDocument temp(2048);
     JsonObject          root = temp.to<JsonObject>();   
 
-    doc.createNestedObject(FPSTR(REP_007));
+    doc.createNestedObject(FPSTR(APPT_REP_007));
     get_json_selectedpl_items(pP, root, true);
-    doc[FPSTR(REP_007)] = temp;  
+    doc[FPSTR(APPT_REP_007)] = temp;  
 
     temp.clear();
     serializeJson(doc, f);
@@ -766,7 +766,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
 
   #ifdef DEBUG
     uint32_t tDif = millis() - tNow;
-    LOG(DPTT_PROGRAM, "&c:1&s:\t[duration: %d]\n", tDif);  
+    LOG(APPT_DEBUGREGION_PROGRAM, "&c:1&s:\t[duration: %d]\n", tDif);  
   #endif
   }
   void Program::pl_fs(uint8_t pPos, DynamicJsonDocument & doc){
@@ -777,7 +777,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     File f=FILESYSTEM.open(path,"w");
     if (!f) {
       #ifdef DEBUG
-        LOG(DPTT_PROGRAM, "[Error open /w]\n\t%s\n", path.c_str());     
+        LOG(APPT_DEBUGREGION_PROGRAM, "[Error open /w]\n\t%s\n", path.c_str());     
       #endif
       return;
     }
@@ -789,7 +789,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     delay(1);  
     #ifdef DEBUG
       uint32_t tDif = millis() - tNow;
-      LOG(DPTT_PROGRAM, "&c:1&s:\t[duration: %d]\n", tDif);   
+      LOG(APPT_DEBUGREGION_PROGRAM, "&c:1&s:\t[duration: %d]\n", tDif);   
     #endif   
   }
 
@@ -802,7 +802,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
     sprintf(buffer, "%s", path.c_str());    
     if (!AP_deserializeFile(doc, buffer)) {
       #ifdef DEBUG
-        LOG(DPTT_PROGRAM, "[Error open /r]\n\t%s\n", path.c_str());     
+        LOG(APPT_DEBUGREGION_PROGRAM, "[Error open /r]\n\t%s\n", path.c_str());     
       #endif
       return;       
     }  
@@ -820,13 +820,13 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
 
 void Program::get_json_pl_items(JsonObject & doc, boolean pI) {
   #ifdef DEBUG
-    LOG(DPTT_PROGRAM, "[%d][%d]\n",pI,_plStatu.pos);   
+    LOG(APPT_DEBUGREGION_PROGRAM, "[%d][%d]\n",pI,_plStatu.pos);   
   #endif
   _Playlists[_plStatu.pos].item_json(doc, pI);
 }
 void Program::get_json_selectedpl_items(uint8_t p, JsonObject & doc, boolean pI) {
   #ifdef DEBUG
-    LOG(DPTT_PROGRAM, "[%d]\n", p);  
+    LOG(APPT_DEBUGREGION_PROGRAM, "[%d]\n", p);  
   #endif
   _Playlists[p].item_json(doc, pI);
 }

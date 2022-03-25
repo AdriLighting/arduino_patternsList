@@ -36,12 +36,12 @@
 
     extern char * ap_debugBuffer;
 
-    static const char DPTT_ML_001   [] PROGMEM = "HIGHT";
-    static const char DPTT_ML_002   [] PROGMEM = "MEDIUM";
-    static const char DPTT_ML_003   [] PROGMEM = "LOW";
-    static const char DPTT_ML_004   [] PROGMEM = "NORMAL";
-    static const char* const DPTT_ML_ALL[] PROGMEM = {
-      DPTT_ML_001, DPTT_ML_002, DPTT_ML_003, DPTT_ML_004
+    static const char APPT_DEBUGREGIONML_001   [] PROGMEM = "HIGHT";
+    static const char APPT_DEBUGREGIONML_002   [] PROGMEM = "MEDIUM";
+    static const char APPT_DEBUGREGIONML_003   [] PROGMEM = "LOW";
+    static const char APPT_DEBUGREGIONML_004   [] PROGMEM = "NORMAL";
+    static const char* const APPT_DEBUGREGIONML_ALL[] PROGMEM = {
+      APPT_DEBUGREGIONML_001, APPT_DEBUGREGIONML_002, APPT_DEBUGREGIONML_003, APPT_DEBUGREGIONML_004
     };
     typedef enum : uint8_t  {
       AP_DEBUGLVL_HIGHT = 0, 
@@ -92,18 +92,18 @@
   boolean changed = false;            // Value change (between 2 debug handle call)
   boolean updateOldValue = false;         // Update old value ? (in debug handle call)
 };*/
-  static const char DPTT_MC_001   [] PROGMEM = "range";
+  static const char APPT_DEBUGREGIONMC_001   [] PROGMEM = "range";
 
-  static const char DPTT_MS_001   [] PROGMEM = "macro";
-  static const char DPTT_MS_002   [] PROGMEM = "time";
-  static const char DPTT_MS_003   [] PROGMEM = "heap";
-  static const char DPTT_MS_004   [] PROGMEM = "line";
-  static const char DPTT_MS_005   [] PROGMEM = "file";
-  static const char DPTT_MS_006   [] PROGMEM = "func";
-  static const char DPTT_MS_007   [] PROGMEM = "crmsg";
-  static const char DPTT_MS_008   [] PROGMEM = "lvl";
-  static const char* const DPTT_MS_ALL[] PROGMEM = {
-  DPTT_MS_001, DPTT_MS_002, DPTT_MS_003, DPTT_MS_004, DPTT_MS_005, DPTT_MS_006, DPTT_MS_007, DPTT_MS_008
+  static const char APPT_DEBUGREGIONMS_001   [] PROGMEM = "macro";
+  static const char APPT_DEBUGREGIONMS_002   [] PROGMEM = "time";
+  static const char APPT_DEBUGREGIONMS_003   [] PROGMEM = "heap";
+  static const char APPT_DEBUGREGIONMS_004   [] PROGMEM = "line";
+  static const char APPT_DEBUGREGIONMS_005   [] PROGMEM = "file";
+  static const char APPT_DEBUGREGIONMS_006   [] PROGMEM = "func";
+  static const char APPT_DEBUGREGIONMS_007   [] PROGMEM = "crmsg";
+  static const char APPT_DEBUGREGIONMS_008   [] PROGMEM = "lvl";
+  static const char* const APPT_DEBUGREGIONMS_ALL[] PROGMEM = {
+  APPT_DEBUGREGIONMS_001, APPT_DEBUGREGIONMS_002, APPT_DEBUGREGIONMS_003, APPT_DEBUGREGIONMS_004, APPT_DEBUGREGIONMS_005, APPT_DEBUGREGIONMS_006, APPT_DEBUGREGIONMS_007, APPT_DEBUGREGIONMS_008
   };
     class DebugPrintItem {
       boolean _p_macro     = true;

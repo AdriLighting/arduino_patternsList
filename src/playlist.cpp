@@ -48,12 +48,12 @@ void Playlist_list::item_df() {
   }
 }
 void Playlist_list::item_restore(DynamicJsonDocument & doc) { 
-    JsonArray arr = doc[FPSTR(REP_007)][F("items")].as<JsonArray>();
+    JsonArray arr = doc[FPSTR(APPT_REP_007)][F("items")].as<JsonArray>();
     for (size_t i = 0; i < arr.size(); i++) {
         JsonObject item = arr[i];
         if (i >= _items_max) {
           #ifdef DEBUG
-            LOG(DPTT_PLAYLIST, "\t[LIMITE MAXIMUM ATTEINTE]\n"); 
+            LOG(APPT_DEBUGREGION_PLAYLIST, "\t[LIMITE MAXIMUM ATTEINTE]\n"); 
           #endif     
           break;
         } else {
@@ -68,7 +68,7 @@ void Playlist_list::item_restore(DynamicJsonDocument & doc) {
 }
 void Playlist_list::item_remove(uint8_t id) {
     #ifdef DEBUG
-      LOG(DPTT_PLAYLIST, "[Playlist_list::item_remove][START]\n");
+      LOG(APPT_DEBUGREGION_PLAYLIST, "[Playlist_list::item_remove][START]\n");
     #endif
 
     Playlist_item * temp = new Playlist_item[_items_max];
@@ -108,23 +108,23 @@ void Playlist_list::item_remove(uint8_t id) {
     // item_restore();
 
     #ifdef DEBUG
-      LOG(DPTT_PLAYLIST, "[Playlist_list::item_remove][DONE]\n");
+      LOG(APPT_DEBUGREGION_PLAYLIST, "[Playlist_list::item_remove][DONE]\n");
     #endif
 }
 
 uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg) {
   #ifdef DEBUG
-    LOG(DPTT_PLAYLIST, "[Playlist_list::item_toArray][START]\n");    
-    LOG(DPTT_PLAYLIST, "\t[iP][%d]", iP);   
-    LOG(DPTT_PLAYLIST, "[lbl][%s]", lbl.c_str());   
-    LOG(DPTT_PLAYLIST, "[itemBase][%s]", itemBase.c_str());   
-    LOG(DPTT_PLAYLIST, "[itemBaseCfg][%s]\n", itemBaseCfg.c_str());  
+    LOG(APPT_DEBUGREGION_PLAYLIST, "[Playlist_list::item_toArray][START]\n");    
+    LOG(APPT_DEBUGREGION_PLAYLIST, "\t[iP][%d]", iP);   
+    LOG(APPT_DEBUGREGION_PLAYLIST, "[lbl][%s]", lbl.c_str());   
+    LOG(APPT_DEBUGREGION_PLAYLIST, "[itemBase][%s]", itemBase.c_str());   
+    LOG(APPT_DEBUGREGION_PLAYLIST, "[itemBaseCfg][%s]\n", itemBaseCfg.c_str());  
    #endif 
   bool newSav = false;
   if (iP > _items_cnt) {
     if (_items_cnt >= _items_max) {
       #ifdef DEBUG
-        LOG(DPTT_PLAYLIST, "\t[LIMITE MAXIMUM ATTEINTE][%d/%d]\n",_items_cnt, _items_max );
+        LOG(APPT_DEBUGREGION_PLAYLIST, "\t[LIMITE MAXIMUM ATTEINTE][%d/%d]\n",_items_cnt, _items_max );
       #endif
       return 0;
     }   
@@ -134,7 +134,7 @@ uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String
     _items_cnt++;
     newSav = true;
     #ifdef DEBUG
-      LOG(DPTT_PLAYLIST, "\t[new sav]\n"); 
+      LOG(APPT_DEBUGREGION_PLAYLIST, "\t[new sav]\n"); 
     #endif
   }
 
@@ -157,7 +157,7 @@ uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String
     }
   }
   #ifdef DEBUG
-    LOG(DPTT_PLAYLIST, "\t[position : %d]\n", newNbr);
+    LOG(APPT_DEBUGREGION_PLAYLIST, "\t[position : %d]\n", newNbr);
   #endif
 
   if (newSav) _Playlist_itemArray[iP].set_id(newNbr);
@@ -169,7 +169,7 @@ uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String
   // item_toTxt(); 
 
   #ifdef DEBUG
-    LOG(DPTT_PLAYLIST, "[Playlist_list::item_toArray][DONE]\n");
+    LOG(APPT_DEBUGREGION_PLAYLIST, "[Playlist_list::item_toArray][DONE]\n");
   #endif
 
   return newNbr;

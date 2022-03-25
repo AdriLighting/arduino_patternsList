@@ -22,8 +22,8 @@
   protected:
     adri_timer  * _timer;
 
-    LL_flag _pltFlag;
-    LL_flag _lbtFlag;
+    apListLoopFlag_t _pltFlag;
+    apListLoopFlag_t _lbtFlag;
 
     void get_remainingTime(uint32_t & v);
     void get_delay(uint32_t&v) {v=_delayCurrent;}
@@ -38,17 +38,17 @@
     void set_delayCurrent(const uint32_t &);
     void set_delay(const uint32_t &);
     void set_delayManual(boolean);
-    void set_pos(LL_flag * flag, const uint16_t &);
+    void set_pos(apListLoopFlag_t * flag, const uint16_t &);
 
-    void loop_next(LL_flag * flag);
-    void loop_prev(LL_flag * flag);
-    void next(LL_flag * flag);
-    void prev(LL_flag * flag);
-    void rnd(LL_flag * flag); 
+    void loop_next(apListLoopFlag_t * flag);
+    void loop_prev(apListLoopFlag_t * flag);
+    void next(apListLoopFlag_t * flag);
+    void prev(apListLoopFlag_t * flag);
+    void rnd(apListLoopFlag_t * flag); 
 
-    void updatePos(LL_flag * flag, const uint16_t & v);
-    void setup(LL_flag * flag, const uint16_t & v);
-    void reset(LL_flag * flag, int v);
+    void updatePos(apListLoopFlag_t * flag, const uint16_t & v);
+    void setup(apListLoopFlag_t * flag, const uint16_t & v);
+    void reset(apListLoopFlag_t * flag, int v);
     void reset();
 
     void start();

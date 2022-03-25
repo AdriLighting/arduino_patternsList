@@ -21,7 +21,7 @@ HeapStatu _HeapStatu_2;
 #ifdef DEBUG_KEYBOARD
     void serial_menu_cmd(const String & cmd, const String & value);
 #endif
-void _Program_handleCallback(const String itemBaseName, const uint16_t& itemBasePos, boolean updWebserver);
+void _Program_cb(const String itemBaseName, const uint16_t& itemBasePos, boolean updWebserver);
 void webserver_parsingRequest(String s);
 
 
@@ -59,48 +59,35 @@ void setup() {
   clientServer.setup(true);
   Socketserver._parse = webserver_parsingRequest;
 
-  _Program = new Program(2, fs);
-  _Program->set_fs_pl(true);
-  _Program->set_callback(_Program_handleCallback);
-
+  _Program = new Program(1, fs);
+  _Program->set_fs_pl(fs);  
+  _Program->set_callback(_Program_cb);
+  //
   // LISTEREF_ADD-------------------------------------------------------------------------------
-  Serial.printf_P(PSTR(">>>>%d<<<\n"), ESP.getFreeHeap());
-  _Program->initialize_lb(0, "full", ARRAY_SIZE(LPALLNAMES), LPALLNAMES);
-  _Program->initialize_lb(1, "cat", ARRAY_SIZE(LPALLNAMES_CAT), LPALLNAMES_CAT);
-  Serial.printf_P(PSTR(">>>>%d<<<\n"), ESP.getFreeHeap());
-
+  _Program->initialize_lb(0, "full", ARRAY_SIZE(LPALLNAMES) , LPALLNAMES);
   // LISTEREF_CREATE
-  _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", SORT_TYPE::ST_BASE);
-  _Program->print(PM_LB);
-
-  // _Program->initialize(ARRAY_SIZE(LPALLNAMES_CAT),  LPALLNAMES_CAT, "cat",  SORT_TYPE::ST_BASE);
-  // _Program->print(PM_LB); 
-  _Program->print(PM_LBNAME);
+  _Program->initialize(ARRAY_SIZE(LPALLNAMES), LPALLNAMES, "full", apListSortType_t::ST_BASE);
   //--------------------------------------------------------------------------------------------
-
   // PLAYLIST_INITIALIZE -----------------------------------------------------------------------
   uint8_t plC       = 5;
-  uint8_t iC[]      = { 10,      5,        4,        3,        2 };  // nb items max
-  const char* Ln[]  = { "full",  "full",   "full",   "null",   "null" };
+  uint8_t iC[]      = { 10,      5,        0,        0,        0      };  // nb items max
+  const char* Ln[]  = { "full",  "full",   "null",   "null",   "null" };
   _Program->initialize_playlist(plC, iC, Ln);
-  _Program->pl_fs_restore();
-  _Program->print(PM_PL);
-
+  #ifdef FSOK
+    _Program->pl_fs_restore();
+  #endif
   //
   //--------------------------------------------------------------------------------------------
-
-
   // SETUP PROGRAMM LOOP -----------------------------------------------------------------------
-  _Program->remote_action(RA::RA_LSET_PL, "0");
-  _Program->remote_action(RA::RA_PLAY_LB);
-  _Program->remote_action(RA::RA_PLAY_DELAY, "10");
-  _Program->remote_action(RA::RA_PLAY_STOP);
-  _Program->print(PM_LOOP);
+  _Program->remote_action(apSetter_t::APSET_LSET_PL, "0");
+  _Program->remote_action(apSetter_t::APSET_PLAY_LB);
+  _Program->remote_action(apSetter_t::APSET_PLAY_DELAY, "10");
+  _Program->remote_action(apSetter_t::APSET_PLAY_STOP);
   //--------------------------------------------------------------------------------------------
 
 
   String heap, time;
-  on_timeD(time); _HeapStatu_2.setupHeap_v2(); _HeapStatu_2.update(); _HeapStatu_2.print(heap);
+  on_time_h(time); _HeapStatu_2.setupHeap_v2(); _HeapStatu_2.update(); _HeapStatu_2.print(heap);
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str());
 }
 
@@ -141,13 +128,12 @@ void loop() {
 
 }
 
-void _Program_handleCallback(const String itemBaseName, const uint16_t& itemBasePos, boolean updWebserver) {
+void _Program_cb(const String itemBaseName, const uint16_t& itemBasePos, boolean updWebserver) {
 
   String heap, time;
-  on_timeD(time);
+  on_time_h(time);
   _HeapStatu.update(); _HeapStatu.print(heap);
   Serial.printf_P(PSTR("[user_callback]\n\t[%d] %s\n\t%-15s%s\n"), itemBasePos, itemBaseName.c_str(), time.c_str(), heap.c_str());
-  ProgramPtrGet()->print(PM_LLI);
 
   if (!updWebserver) return;
 
@@ -155,7 +141,7 @@ void _Program_handleCallback(const String itemBaseName, const uint16_t& itemBase
   DynamicJsonDocument       reply(2048);
   AP_ApiReply* _webserverRequest_reply = new AP_ApiReply[1];
 
-  _webserverRequest_reply[0].set_ra(RA::RA_ITEM_NEXT);
+  _webserverRequest_reply[0].set_ra(apSetter_t::APSET_ITEM_NEXT);
   _webserverRequest_reply[0].reply_generate(reply);
   serializeJson(reply, rep);
 
@@ -197,7 +183,7 @@ void serial_menu_cmd(const String& cmd, const String& value) {
 
   arr = doc.createNestedArray(F("set"));
   var = arr.createNestedObject();
-  var[F("n")] = FPSTR(RAALLNAMES[p]);
+  var[F("n")] = FPSTR(APPT_SETTER_ARRAY[p]);
   var[F("v")] = v;
 
   arr = doc.createNestedArray(F("get"));
@@ -205,7 +191,7 @@ void serial_menu_cmd(const String& cmd, const String& value) {
 
   _AP_Api.parsingRequest(doc, reply, "");
   Socketserver.sendTXT(0, reply);
-  // RA action = RAARR[p];
+  // apSetter_t action = RAARR[p];
   // _Program->remote_action(action, v.c_str(), "", NULL);    
 }
 #endif
