@@ -108,7 +108,6 @@ Program::Program(uint8_t nbLB, boolean fs){
     #ifdef DEBUG_PROGRAM
       _DebugPrintList.add(APPT_DEBUGREGION_PROGRAM);    
     #endif
-      
     #ifdef DEBUG_WEBSERVER
       _DebugPrintList.add(APPT_DEBUGREGION_WEBSERVER);    
     #endif
@@ -416,6 +415,7 @@ void Program::set_callback(callback_function_t f)  {_callback = std::move(f);}
 
 void Program::remote_action(apSetter_t action, const char * const & key, const char * const & val){
   #ifdef DEBUG
+    LOG(APPT_DEBUGREGION_PROGRAM, "");
     LOG(APPT_DEBUGREGION_PROGRAM, "&c:1&s:\tapSetter_t %-4d[%-20s]\n", action, APPT_SETTER_ARRAY[action]);  
   #endif
   // char *key = NULL, *val = NULL, *key_val = NULL;

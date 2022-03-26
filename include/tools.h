@@ -54,24 +54,24 @@
     void AP_debugPrint(const String & msg, const String & file, const String & line, const String & func);
     void AP_debugPrint(const String & msg, const String & file, const String & line, const String & func, const char * ptr  = "", AP_DEBUGLVL_T mod = AP_DEBUGLVL_NORMAL);
 
-    #define APTRACE(parm_a, ...) {                                                                            \
-      if (ap_debugBuffer) {                                                                                    \
-        sprintf_P(ap_debugBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__);                                        \
-        AP_debugPrint(String(text), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME));}  \
+    #define APTRACE(parm_a, ...) { \
+      if (ap_debugBuffer) { \
+        sprintf_P(ap_debugBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__); \
+        AP_debugPrint(String(ap_debugBuffer), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME));}  \
       } 
 
-     #define APTRACEC(ptr, parm_a, ...) {                               \
-      if (ap_debugBuffer) {                                              \
-        sprintf_P(ap_debugBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__);  \
+    #define APTRACEC(ptr, parm_a, ...) { \
+      if (ap_debugBuffer) { \
+        sprintf_P(ap_debugBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__); \
         AP_debugPrint(String(ap_debugBuffer), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME), ptr);} \
-      } 
+    } 
 
 
-     #define APTRACEM(ptr, mod, parm_a, ...) {                          \
-      if (ap_debugBuffer){                                               \
-        sprintf_P(ap_debugBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__);  \
+    #define APTRACEM(ptr, mod, parm_a, ...) { \
+      if (ap_debugBuffer){ \
+        sprintf_P(ap_debugBuffer, (PGM_P)PSTR(parm_a), ##__VA_ARGS__); \
         AP_debugPrint(String(ap_debugBuffer), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME), ptr, mod);} \
-      } 
+    } 
 
 /*struct debugGlobal_t {
   const char* name = 0;             // Name
@@ -105,6 +105,8 @@
   static const char* const APPT_DEBUGREGIONMS_ALL[] PROGMEM = {
   APPT_DEBUGREGIONMS_001, APPT_DEBUGREGIONMS_002, APPT_DEBUGREGIONMS_003, APPT_DEBUGREGIONMS_004, APPT_DEBUGREGIONMS_005, APPT_DEBUGREGIONMS_006, APPT_DEBUGREGIONMS_007, APPT_DEBUGREGIONMS_008
   };
+
+
     class DebugPrintItem {
       boolean _p_macro     = true;
       boolean _p_timeStamp = true;
@@ -167,10 +169,6 @@
   #endif
 
 
-
-
-
-
   class HeapStatu {
     uint32_t initHeap;
     int tcnt    = 0;
@@ -191,18 +189,22 @@
 
   };
 
-
   class SplitItem {
-  private:
-    /* data */
   public:
     SplitItem(const String  & v1, const String  & v2) {
-      _cmd    = v1;  
-      _value  = v2;
+      if (_cmd)   {delete _cmd;_cmd = nullptr;}
+      if (_value) {delete _value;_value = nullptr;}
+      _cmd    = new char[v1.length()+1];
+      _value  = new char[v2.length()+1];
+      strcpy(_cmd,    v1.c_str());
+      strcpy(_value,  v2.c_str());
     };
-
-    String _cmd   = "";
-    String _value = "";
+    ~SplitItem(){
+      if (_cmd)   {delete _cmd;}
+      if (_value) {delete _value;}      
+    }
+     char* _cmd   = nullptr;
+     char* _value = nullptr;
 
   };
   void splitText(const String & inputString, const char* const & arg,  char sep, LList<SplitItem * > * ptr);
@@ -211,8 +213,24 @@
   String ch_toString(const char * c);
   void define_print();
   void on_time_h(String & result);
-  void AP_explode(String s, char sep, int & rSize, String * list = nullptr);
-
+/*
+  int rSize = 0;
+  AP_explode(func, '(', rSize, nullptr) ;
+  String split[rSize+1];
+  AP_explode(func, '(', rSize, split) ;
+*/
+  void AP_explode(const String & s, char sep, int & rSize, String * list);
+/*
+  https://stackoverflow.com/questions/16982015/getting-const-char-array-from-function
+  String split = "s1,s2,s3";
+  int splitSize;
+  const char** list = AP_explode(split, ',', splitSize);
+  Serial.printf("\n");
+  for(int i = 0; i < splitSize; ++i) {Serial.printf("[%d] %s\n", i, list[i]);}
+  delete[] list;
+*/  
+  const char** AP_explode(const String & s, char sep, int & rSize);
+  // const char** _AP_explode(String s, char sep, int & rSize);
 /*
   class Node {
   public:

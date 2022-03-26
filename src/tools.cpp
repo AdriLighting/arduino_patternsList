@@ -1,3 +1,7 @@
+/*
+https://stackoverflow.com/questions/16982015/getting-const-char-array-from-function
+*/
+
 #include "../include/tools.h"
 #include "../include/constants.h"
 
@@ -79,6 +83,33 @@ String ch_toString(const char * c){
   return String((const __FlashStringHelper*) c);
 }
 
+uint32_t HeapStatu::pInitHeap(0);
+
+HeapStatu::HeapStatu() {mod = true;};
+
+void HeapStatu::update(){
+  if (mod)  {if (pInitHeap  > ESP.getFreeHeap()) tused = (pInitHeap - ESP.getFreeHeap());}
+  else      {if (initHeap   > ESP.getFreeHeap()) tused = (initHeap  - ESP.getFreeHeap());}
+
+  tcnt++;
+  if (tused > 0) ttot+=tused;  
+}
+void HeapStatu::print(String & ret){
+  char buffer[255];
+  uint32_t heap;
+  if (mod)  heap = pInitHeap;
+  else      heap = initHeap;
+  sprintf(buffer, "heap-used:%7d |%d/%d|%d| init:%7d free:%7d mod: %d",
+    tused,
+    ttot,
+    tcnt,
+    ((ttot/tcnt)>0)?ttot/tcnt:0,
+    heap,
+    ESP.getFreeHeap(),
+    mod
+  );
+  ret = String(buffer);   
+} 
 
 
 /**
@@ -90,7 +121,8 @@ String ch_toString(const char * c){
  *
  * @return     array of split values
  */
-void AP_explode(String s, char sep, int & rSize, String * list) {
+void AP_explode(const String & s, char sep, int & rSize, String * list) {
+          rSize       = -1;
   String  t           = s + sep;
   int     str_index   = 0;
   int     list_index  = 0;
@@ -98,28 +130,71 @@ void AP_explode(String s, char sep, int & rSize, String * list) {
   String  sub;
   int     size        = t.length();
 
-  while (str_index < size ) {
-    j=t.indexOf(sep,str_index);
-    if (j!=-1) {
-        list_index++;
-        str_index=j+1;
-    }
-  }
-
   str_index   =0;
   list_index  =0;
   while (str_index < size ) {
-    j=t.indexOf(sep,str_index);
-    if (j!=-1) {
-      sub=t.substring(str_index, j);
-      if (list) list[list_index]=sub;
-      list_index++;
-      str_index=j+1;
-    }
+
+    j = t.indexOf(sep,str_index);
+    if (j == -1) continue;
+
+    sub = t.substring(str_index, j);
+    if (sub == s) break;
+
+    if (list) list[list_index]=sub;
+
+    list_index++;
+    str_index = j + 1;
   }
 
   if (list) list[list_index] = "";
   rSize = list_index;
+}
+const char** AP_explode(const String & s, char sep, int & rSize) {
+          rSize       = -1;
+  String  t           = s + sep;
+  int     str_index   = 0;
+  int     list_index  = 0;
+  int     size        = t.length();
+  int     j;
+  String  sub;
+   
+  while (str_index < size ) {
+    j = t.indexOf(sep,str_index);
+    if (j == -1) continue;
+    if (t.substring(str_index, j) == s) break;
+    list_index++;
+    str_index = j + 1;
+  }
+  if (list_index == 0) {
+    rSize = -1;
+    return nullptr;
+  }
+
+  const char** list = new const char*[list_index+1]; 
+  str_index   = 0;
+  list_index  = 0;
+
+  while (str_index < size ) {
+
+    j = t.indexOf(sep,str_index);
+    if (j == -1) continue;
+
+    sub = t.substring(str_index, j);
+
+    char * buff = new char[sub.length()+1];
+    strcpy(buff, sub.c_str());
+
+    list[list_index]  = strdup(buff);
+    str_index         = j + 1;
+    list_index++;
+
+    delete buff;
+  }
+
+  list[list_index]  = "";
+  rSize             = list_index;
+
+  return list;
 }
 
 void millis2time_m(const uint32_t & s, char * time){
@@ -188,33 +263,21 @@ bool AP_deserializeFile(DynamicJsonDocument& doc, const char* filepath){
 
 
 
-uint32_t HeapStatu::pInitHeap(0);
 
-HeapStatu::HeapStatu() {mod = true;};
 
-void HeapStatu::update(){
-  if (mod)  {if (pInitHeap  > ESP.getFreeHeap()) tused = (pInitHeap - ESP.getFreeHeap());}
-  else      {if (initHeap   > ESP.getFreeHeap()) tused = (initHeap  - ESP.getFreeHeap());}
-
-  tcnt++;
-  if (tused > 0) ttot+=tused;  
-}
-void HeapStatu::print(String & ret){
-  char buffer[255];
-  uint32_t heap;
-  if (mod)  heap = pInitHeap;
-  else      heap = initHeap;
-  sprintf(buffer, "heap-used:%7d |%d/%d|%d| init:%7d free:%7d mod: %d",
-    tused,
-    ttot,
-    tcnt,
-    ((ttot/tcnt)>0)?ttot/tcnt:0,
-    heap,
-    ESP.getFreeHeap(),
-    mod
-  );
-  ret = String(buffer);   
-}   
+  /*  
+    LList<SplitItem *>  _SplitItem;
+    splitText("&c1:v1&c2:v2", "&",  ':', &_SplitItem);
+    for(int i = 0; i < _SplitItem.size(); ++i) {
+      SplitItem * ptr = _SplitItem.get(i);
+      Serial.printf("[%d][c: %s][v: %s]", i, ptr->_cmd, ptr->_value);
+    }
+    while (_SplitItem.size()) {
+      SplitItem *ptr = _SplitItem.shift();
+      delete ptr;
+    }
+    _SplitItem.clear();     
+  */
   void splitText(const String & inputString, const char* const & arg,  char sep, LList<SplitItem * > * ptr) {
     char inputChar[inputString.length() + 1] ;
     inputString.toCharArray(inputChar, inputString.length() + 1);
@@ -225,14 +288,11 @@ void HeapStatu::print(String & ret){
       if (separator != 0) {
         *separator  = 0;            
         ++separator ;
-        // const char * cmd = command;
-        // const char * val = separator;
         ptr->add( new SplitItem(String(command), String(separator)));
       }
       command = strtok(0, arg); 
     }
   }
-
 #ifdef DEBUG_AP
 
 char * ap_debugBuffer = nullptr;
@@ -259,11 +319,11 @@ void AP_debugPrint(const String & msg, const String & file, const String & line,
     LList<SplitItem *>  _SplitItem;
     splitText(pMsg, "&",  ':', &_SplitItem);
     if (_SplitItem.size()>0) {
-      if (_SplitItem[0]->_value == "1") {
-        Serial.printf_P(PSTR("%s"), _SplitItem[1]->_value.c_str()); 
+      if (strcmp( _SplitItem[0]->_value, "1") == 0) {
+        Serial.printf_P(PSTR("%s"), _SplitItem[1]->_value); 
         while (_SplitItem.size()) {
-          SplitItem *eff = _SplitItem.shift();
-          delete eff;
+          SplitItem *ptr = _SplitItem.shift();
+          delete ptr;
         }
         _SplitItem.clear();            
         return; 
@@ -299,25 +359,36 @@ void AP_debugPrint(const String & msg, const String & file, const String & line,
 
   char * b_func = nullptr;
   if (ptr->is_func()) {
-    int rSize = 0;
-    AP_explode(func, '(', rSize) ;
-    String split[rSize+1];
-    AP_explode(func, '(', rSize, split) ;
-    // Serial.println("A");
-    // for(int i = 0; i < rSize; ++i) {Serial.printf("%d - %s\n", i, split[i].c_str());}
-    String funcName = split[0];
-    AP_explode(funcName, ' ', rSize) ;
-    String split2[rSize+1];
-    AP_explode(funcName, ' ', rSize, split2) ;
-    // Serial.println("B");
-    // for(int i = 0; i < rSize; ++i) {Serial.printf("%d - %s\n", i, split2[i].c_str());}
-    if (rSize > 0) {
-      funcName = split2[1];
-    } else if (rSize == 0) {
-      funcName = split2[0];
+
+    String  funcName = "";
+    int     rSize = 0;
+
+    const char** split = AP_explode(func, '(', rSize);
+    if (split) {
+
+      funcName = ch_toString(split[0]);
+      for(int i = 0; i < rSize; ++i) {
+        delete split[i];
+      }
+      delete[] split;
+      split = nullptr;
+
+      split = AP_explode(funcName, ',', rSize);
+      if (split) {
+        if (rSize > 0) {
+          funcName = split[1];
+        } else if (rSize == 0) {
+          funcName = split[0];
+        }
+        for(int i = 0; i < rSize; ++i) {
+          delete split[i];
+        }
+        delete[] split;
+      }
+
+      b_func = new char[funcName.length()+1];
+      sprintf_P(b_func, PSTR("%s"), funcName.c_str());      
     }
-    b_func = new char[funcName.length()+1];
-    sprintf_P(b_func, PSTR("%s"), funcName.c_str());
   }
 
   char * full = new char[1024];
@@ -328,12 +399,11 @@ void AP_debugPrint(const String & msg, const String & file, const String & line,
 
   if (b_heap) {strcat(full, "["); strcat(full, b_heap); strcat(full, "]"); strcat(full, " ");}
 
-  strcat(full, "[");
+  if (b_line || b_file) strcat(full, "[");
   if (b_line) strcat(full, b_line);
   if (b_file && b_line) strcat(full, ":");
   if (b_file) strcat(full, b_file);
-  strcat(full, "]");
-  if (b_file || b_line) strcat(full, " ");
+  if (b_line || b_file) {strcat(full, "]");strcat(full, " ");}
 
   if (b_file)       delete b_file;
   if (b_line)       delete b_line;
@@ -401,8 +471,8 @@ void DebugPrintItem::set_line(boolean v1)       {_p_line        = v1;}
 void DebugPrintItem::set_file(boolean v1)       {_p_file        = v1;}
 void DebugPrintItem::set_func(boolean v1)       {_p_func        = v1;}
 // void DebugPrintItem::set_arg(boolean v1)        {_p_arg         = v1;}
-void DebugPrintItem::set_crmsg(boolean v1)  {_p_crmsg     = v1;}
-void DebugPrintItem::set_lvl(uint8_t v1)        {_lvl = AP_DEBUGLVLARR_T[v1];}
+void DebugPrintItem::set_crmsg(boolean v1)      {_p_crmsg       = v1;}
+void DebugPrintItem::set_lvl(uint8_t v1)        {_lvl           = AP_DEBUGLVLARR_T[v1];}
 
 
 boolean DebugPrintItem::is_macro()              {return _p_macro;}
@@ -476,29 +546,41 @@ pattern
 void  DebugPrintList::keyboardSet(const String & cmd, const String & value){
   Serial.printf_P(PSTR("[keyboardSet] cmd[%s] value[%s]\n"), cmd.c_str(), value.c_str());
 
-  int rSize = 0;
-  LList<SplitItem *> _SplitItem;
+  String              sCmd  = cmd;
+  int                 rSize = 0;
+  LList<SplitItem *>  _SplitItem;
 
-  splitText(cmd, "&",  ':', &_SplitItem);
+  splitText(sCmd, "&",  ':', &_SplitItem);
   for(int i = 0; i < _SplitItem.size(); ++i) {
-    if (_SplitItem[i]->_cmd == FPSTR(APPT_DEBUGREGIONMC_001)) {
-      String arg[2];
-      AP_explode(_SplitItem[i]->_value, ',', rSize, arg) ;
+    if (strcmp_P(_SplitItem[i]->_cmd, APPT_DEBUGREGIONMC_001) == 0) {
+
+      const char** split = AP_explode(String(_SplitItem[i]->_value), ',', rSize);
+
+      if (!split)     continue; 
+      if (rSize < 2)  continue;
+
       ketboardPrintHeader();
-      for(int j = arg[0].toInt(); j < arg[1].toInt(); ++j) {
+      for(int j = atoi(split[0]); j < atoi(split[1]); ++j) {
         DebugPrintItem * item = _list.get(j);
         keyboardSet(item, value);
       }
+      for(int i = 0; i < rSize; ++i) {
+        delete split[i];
+      }
+      delete[] split;      
     }
   }
+
+  if (_SplitItem.size()==0) sCmd = sCmd.substring(1, sCmd.length());
+
   while (_SplitItem.size()) {
-    SplitItem *eff = _SplitItem.shift();
-    delete eff;
+    SplitItem *ptr = _SplitItem.shift();
+    delete ptr;
   }
   _SplitItem.clear();   
 
 
-  DebugPrintItem * item = get_item(cmd.c_str());
+  DebugPrintItem * item = get_item(sCmd.c_str());
   keyboardSet(item, value);
 
   DebugPrintItem_maxlen_1 = 0;
@@ -506,6 +588,7 @@ void  DebugPrintList::keyboardSet(const String & cmd, const String & value){
 } 
 void DebugPrintList::keyboardSet(DebugPrintItem * item, const String & value){
   if (!item) return;
+  // Serial.printf_P(PSTR("[keyboardSet V2] value[%s]\n"), value.c_str());
 
   uint8_t aPos  = 0;
   uint8_t vPos  = 0;
@@ -515,22 +598,28 @@ void DebugPrintList::keyboardSet(DebugPrintItem * item, const String & value){
   splitText(value, "&",  ':', &_SplitItem);
 
   for(int i = 0; i < _SplitItem.size(); ++i) {
-    // if (_SplitItem[i]->_cmd == "set") {
-      if (_SplitItem[i]->_cmd == FPSTR(APPT_DEBUGREGIONMC_001)) {
-        AP_explode(_SplitItem[i]->_value, ',', rSize, nullptr) ;  
-        if (rSize < 3) continue;
-        String arg[rSize+1];
-        AP_explode(_SplitItem[i]->_value, ',', rSize, arg) ;  
-        for(int j = arg[0].toInt(); j < arg[1].toInt(); ++j) {
-          keyboardSet(item, j, arg[2].toInt());
-        }
-      } else {
-        aPos = _SplitItem[i]->_cmd.toInt();
-        vPos = _SplitItem[i]->_value.toInt();
-        keyboardSet(item, aPos, vPos);        
+    if (strcmp_P(_SplitItem[i]->_cmd, APPT_DEBUGREGIONMC_001) == 0) {
+
+      const char** split = AP_explode(String(_SplitItem[i]->_value), ',', rSize);
+
+      if (!split)     continue;
+      if (rSize < 3)  continue;
+
+      for(int j = atoi(split[0]); j < atoi(split[1]); ++j) {
+        keyboardSet(item, j, atoi(split[2]));
       }
+      for(int i = 0; i < rSize; ++i) {
+        delete split[i];
+      }
+      delete[] split;   
+    
+    } else {
+      aPos = atoi(_SplitItem[i]->_cmd);
+      vPos = atoi(_SplitItem[i]->_value);
+      keyboardSet(item, aPos, vPos);        
     }
-  // }
+  }
+
   while (_SplitItem.size()) {
     SplitItem *eff = _SplitItem.shift();
     delete eff;
@@ -557,7 +646,14 @@ void DebugPrintList::keyboardSet(DebugPrintItem * item, uint8_t aPos, uint8_t vP
 #endif
 
 
-
+/*
+ *
+  Serial.printf("[size: %d]\n", _SplitItem.size());
+  for(int i = 0; i < _SplitItem.size(); ++i) {
+    SplitItem * ptr = _SplitItem.get(i);
+    Serial.printf("[%d][c: %s][v: %s]\n", i, ptr->_cmd, ptr->_value);
+  }
+*/
 
 
 /*
