@@ -71,7 +71,8 @@ boolean socketQueue::receiveToQueue(const String & msg) {
 void socketQueue::handle(){
   // if(_task) {if (_task->isEnabled()) _task->execute();}
   if (!_task) return;
-  if ( (_list->get_size() == 0) && _executeQuee ) {_executeQuee = false;_task_socketCleanupClient->set_enabled(true);}
+  if ( (_list->get_size() == 0) && _executeQuee ) {_executeQuee = false;
+    _task_socketCleanupClient->set_enabled(true);}
   if ( (_list->get_size() > 0) && ((millis()-_last_item) > _timer_handle) && !_executeQuee ){
     LOG(APPT_DEBUGREGION_QUEUE, "[socketQueueSetter::handle]\n");
     LOG(APPT_DEBUGREGION_QUEUE, "&c:1&s:\t[T: %d] QUEUE ETD_DELAY -> %d\n", _task->get_id() , _task_delay);
@@ -241,12 +242,12 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
     _Webserver.set_socketIsConnected(true);
     // client->printf_P(PSTR("Hello Client %u :)"), client->id());
     // client->ping();
-    delay(2);
+    delay(0);
 
   } else if(type == WS_EVT_DISCONNECT){
    LOG(APPT_DEBUGREGION_WEBSERVER, "ws[%s][%u] disconnect\n", server->url(), client->id());
     _Webserver.set_socketIsConnected(false);
-     delay(2);
+     delay(0);
 
   } else if(type == WS_EVT_ERROR){
    LOG(APPT_DEBUGREGION_WEBSERVER, "ws[%s][%u] error(%u): %s\n", server->url(), client->id(), *((uint16_t*)arg), (char*)data);
@@ -274,7 +275,7 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
 
         _task_socketCleanupClient->set_enabled(false);
 
-        delay(2);
+        delay(0);
 
         _Webserver.set_socketCallbackData(msg);
         _task_socketCallback->set_callbackOstart(std::bind(_task_socketHandle));
@@ -324,7 +325,7 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
 void Webserver::socket_send(const String & message) {
   if ((_socketIsConnected) && (_socketClient!=NULL)) {
 
-    delay(1);
+    delay(0);
 
     _socketClient->text(message);
 

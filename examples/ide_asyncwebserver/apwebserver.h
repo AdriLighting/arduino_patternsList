@@ -50,10 +50,10 @@ typedef enum : uint8_t {
   WSRM_FROMDEF=0,    WSRM_FROMCALLBACK
 } ENUM_WSRM;
 
-typedef struct  WSAPPT_REP_FLAG{ 
+typedef struct  WSREP_FLAG{ 
     ENUM_WSTP _cType;
     ENUM_WSRM _rType ;
-} WSAPPT_REP_flag;
+} WSREP_flag;
 
 typedef std::function<void(AsyncWebServerRequest *request, uint8_t pos, const String & data)> _webServerRequest_f;
 typedef std::function<void(const String & v1)> callback_function_t;
@@ -63,7 +63,7 @@ class Webserver_request
   
   const char            * _name = "";
   WebRequestMethod      _method;
-  WSAPPT_REP_flag            _repFlag;
+  WSREP_flag            _repFlag;
 public:
   _webServerRequest_f   _callback = nullptr;
 

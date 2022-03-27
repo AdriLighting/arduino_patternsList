@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <Wificonnect.h>
 #include <arduinoPatternList.h>
+#include <typeinfo>
 
 #include "apwebserver.h"
 #include "TaskScheduler.h"
@@ -30,6 +31,13 @@ void _socket_cb(const String & s);
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver);
 // endregion >>>> 
 
+
+String _global_s = "_global_s";
+void global_s_onChange() {
+  Serial.printf("chnage");
+}
+DebugWatcher<String> _watcher(&_global_s, &global_s_onChange);
+
 void setup() {
   Serial.begin(115200);
 
@@ -49,7 +57,7 @@ void setup() {
 
   #ifdef DEBUG_KEYBOARD
     _Sr_menu.add("heaploop", "q", keyboard_freeheap);
-    _Sr_menu.add("api setter", "!", keyboard_apiSetter, SR_MM::SRMM_KEY);
+    _Sr_menu.add("api setter socket", "!", keyboard_apiSetter, SR_MM::SRMM_KEY);
   #endif
 
   boolean fs = FILESYSTEM.begin();
@@ -57,8 +65,8 @@ void setup() {
   // region ################################################ WIFI
   _DeviceWifi = new WifiConnect(
     "apdebug_1",
-    "freebox_123_EXT",
-    "phcaadax",
+    "SSID",
+    "SSIDPASS",
     "adsap1234",
     "adsota1234");
   _DeviceWifi->setFunc_STAinitServer  ( [](){_Webserver.begin();} );
@@ -140,12 +148,19 @@ void setup() {
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str());
 }
 
-
+// uint32_t _timer_watch = 0;
+// boolean _testStr  =true;
 void loop() {
   #ifdef DEBUG_KEYBOARD
     _Sr_menu.serialRead();
   #endif
   _TaskScheduler->loop();
+  // if ( (millis() - _timer_watch) > 3000 ) {
+  //   _timer_watch = millis();
+  //   _global_s = (_testStr)? "value_1" : "value_2";
+  //   _testStr = !_testStr;
+  // }
+  // _watcher.loop();
 }
 
 void _http_get_cb(AsyncWebServerRequest * request, uint8_t pos, const String & data){
@@ -154,7 +169,7 @@ void _http_get_cb(AsyncWebServerRequest * request, uint8_t pos, const String & d
 void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String & data){
   String json = data;
   json.replace("\r\n", "");
-  // Serial.printf_P(PSTR("[_callPost /json] %s\n"), json.c_str());  
+  // Serial.printf_P(PSTR("[_callPost /json] %s\n"), json.c_str(()));  
   String reply = "";
   DynamicJsonDocument doc(2048);  
   DeserializationError error = deserializeJson(doc, json);
