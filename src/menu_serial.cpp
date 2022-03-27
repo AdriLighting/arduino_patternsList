@@ -24,7 +24,12 @@ namespace {
       Rcommand = strtok(0, sep); 
     }
   }
+
+boolean _APSR_heapMonitor = false;
+uint32_t _APSR_timer_heapMonitor = 0;  
+uint32_t _APSR_timerMax_heapMonitor = 3000;  
 }
+
 
 
 Sr_menu _Sr_menu;
@@ -85,6 +90,7 @@ Sr_menu::Sr_menu(){
     _Sr_menu.add("menu",          "a", []() { _Sr_menu.print(); });
     _Sr_menu.add("ESPreset",      "z", []() { ESP.restart();    });
     _Sr_menu.add("freeHeap",      "e", []() { String time; on_time_d(time);Serial.printf_P(PSTR("time: %s\n"), time.c_str()); Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
+    _Sr_menu.add("heapmonitor",   "-", [](const String & v1, const String & v2) {_APSR_timerMax_heapMonitor = v1.toInt(); _APSR_heapMonitor =!_APSR_heapMonitor;}, SR_MM::SRMM_KEY);
     _Sr_menu.add("getter list",   "r", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, APPT_SETTER_ARRAY[i]);}});
     _Sr_menu.add("setter list",   "t", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, APPT_REQ_ARRAY[i]);}});
     _Sr_menu.add("api getter",    "@", [](const String & v1, const String & v2) {  
@@ -95,7 +101,8 @@ Sr_menu::Sr_menu(){
       arr.add(v1);
       DynamicJsonDocument reply(2048);
       _AP_Api.parsingRequest(doc, reply, "");
-      serializeJsonPretty(reply, Serial);     
+      serializeJsonPretty(reply, Serial); 
+      Serial.println();      
     }, SR_MM::SRMM_KEY); 
     _Sr_menu.add("api setter",   "#", [](const String & v1, const String & v2) {  
       DynamicJsonDocument doc(1024);
@@ -109,7 +116,8 @@ Sr_menu::Sr_menu(){
       arr = doc.createNestedArray(F("get"));  
       DynamicJsonDocument reply(2048);
       _AP_Api.parsingRequest(doc, reply, "");
-      serializeJsonPretty(reply, Serial);     
+      serializeJsonPretty(reply, Serial); 
+      Serial.println();    
     }, SR_MM::SRMM_KEY);     
     #ifdef DEBUG_AP
     _Sr_menu.add("debugregion", "u", []() { _DebugPrintList.ketboardPrint(); });    
@@ -143,6 +151,10 @@ void Sr_menu::add(const char* v1, const char* v2, sr_cb_ss_f v3, SR_MM v4){
 }
 
 void Sr_menu::serialRead(){
+  if (_APSR_heapMonitor && ((millis() - _APSR_timer_heapMonitor) > _APSR_timerMax_heapMonitor) ) {
+    _APSR_timer_heapMonitor=millis(); String time; on_time_d(time);
+    Serial.printf_P(PSTR("%s - %d\n"), time.c_str(), ESP.getFreeHeap());
+  }
   if(!Serial.available()) return;
   String str = Serial.readStringUntil('\n');
   serialReadString(str);
