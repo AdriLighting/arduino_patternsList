@@ -2,7 +2,12 @@
 #define _APWEBSERVER_H
 
 #include <Arduino.h>
-#include <ESPAsyncTCP.h>
+
+#if defined(ESP8266)
+  #include <ESPAsyncTCP.h>
+#elif defined(ESP32)
+  #include <AsyncTCP.h>
+#endif
 #include <ESPAsyncWebServer.h>
 #include <arduinoPatternList.h>
 

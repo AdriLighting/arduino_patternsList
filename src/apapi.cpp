@@ -58,14 +58,14 @@ void apapiItemList_obj(const char * const v1, std::function<void(JsonObject & ob
   func(var_1);
 }
 void apapiItemList_obj(const char * const v1, const char * const v2, std::function<void(JsonObject & obj)> func, DynamicJsonDocument& obj ) {
-    LOG(APPT_DEBUGREGION_APAPI,"");
+    LOG(APPT_DEBUGREGION_APAPI,"-");
     JsonObject var_1;
     JsonObject var_2;
     if (!obj[FPSTR(v1)]) {
-      LOG(APPT_DEBUGREGION_APAPI,"");
+      LOG(APPT_DEBUGREGION_APAPI,"-");
       var_1 = obj.createNestedObject(FPSTR(v1));
       if (!obj[FPSTR(v1)][FPSTR(v2)]) {
-         LOG(APPT_DEBUGREGION_APAPI,"");
+         LOG(APPT_DEBUGREGION_APAPI,"-");
         var_2 = var_1.createNestedObject(FPSTR(v2));
         func(var_2); 
       } else {
@@ -78,7 +78,7 @@ void apapiItemList_obj(const char * const v1, const char * const v2, std::functi
         temp.clear();        
       }
     } else {
-       LOG(APPT_DEBUGREGION_APAPI,"");
+       LOG(APPT_DEBUGREGION_APAPI,"-");
       if (!obj[FPSTR(v1)][FPSTR(v2)]) {
         LOG(APPT_DEBUGREGION_APAPI,"[heap: %d]\n", ESP.getFreeHeap());
         // StaticJsonDocument <2048> temp;
@@ -121,16 +121,16 @@ void AP_ApiItemList_setup(){
   }); 
   // list = lb - cmax: items:[n: cmax:] , pl - cmax: items:[ cmax: cnt: pos: lbl: lref: ]
   _apapiItemList.add(APPT_REQ_006, [](DynamicJsonDocument & reply){
-    LOG(APPT_DEBUGREGION_APAPI,"");
+    LOG(APPT_DEBUGREGION_APAPI,"-");
     JsonObject var;
     if (!reply[FPSTR(APPT_REQ_006)]) {
-      LOG(APPT_DEBUGREGION_APAPI,"");
+      LOG(APPT_DEBUGREGION_APAPI,"-");
       var = reply.createNestedObject(FPSTR(APPT_REQ_006));
       apapiItemList_obj(APPT_REP_003, std::bind(&Program::get_json_lb_items, ProgramPtrGet(), std::placeholders::_1, false), var);
-      LOG(APPT_DEBUGREGION_APAPI,"");  
+      LOG(APPT_DEBUGREGION_APAPI,"-");  
       apapiItemList_obj(APPT_REP_001, std::bind(&Program::get_json_allpl_items, ProgramPtrGet(), std::placeholders::_1, false, false), var);       
     } else {
-      LOG(APPT_DEBUGREGION_APAPI,"");
+      LOG(APPT_DEBUGREGION_APAPI,"-");
       
       if (!reply[FPSTR(APPT_REQ_006)][FPSTR(APPT_REP_003)]) {
         LOG(APPT_DEBUGREGION_APAPI,"[heap: %d]\n", ESP.getFreeHeap());

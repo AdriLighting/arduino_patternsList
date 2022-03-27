@@ -44,7 +44,7 @@ void ListSortItems_sort(apListSortType_t _effSort) {
   }
 }
 void ListSortItems_print(){
-  for(int i=0; i<ListSortItemsPtr.size(); i++){ Serial.printf_P(PSTR("[%-3d][pos: %3d][name: %S]\n"), i, ListSortItemsPtr[i]->_id, ListSortItemsPtr[i]->_name.c_str());}  
+  for(int i=0; i<ListSortItemsPtr.size(); i++){ Serial.printf_P(PSTR("[%-3d][pos: %3d][name: %s]\n"), i, ListSortItemsPtr[i]->_id, ListSortItemsPtr[i]->_name.c_str());}  
 }
 void ListSortItems_delete(){
   while (ListSortItemsPtr.size()) {
@@ -80,7 +80,7 @@ void LBnames::print(uint8_t p){
   for(int i=0; i<_cnt; i++){ 
     const char * menu_pgm_ptr = _arr[i];
     strcpy_P(buf,menu_pgm_ptr);
-    Serial.printf_P(PSTR("[%5d] %S\n"), i, buf);}  
+    Serial.printf_P(PSTR("[%5d] %s\n"), i, buf);}  
 }
 void LBnames::json(JsonArray & arr){
   char buf[80];
@@ -417,7 +417,7 @@ void Program::set_callback(callback_function_t f)  {_callback = std::move(f);}
 
 void Program::remote_action(apSetter_t action, const char * const & key, const char * const & val){
   #ifdef DEBUG
-    LOG(APPT_DEBUGREGION_PROGRAM, "");
+    LOG(APPT_DEBUGREGION_PROGRAM, "-");
     LOG(APPT_DEBUGREGION_PROGRAM, "&c:1&s:\tapSetter_t %-4d[%-20s]\n", action, APPT_SETTER_ARRAY[action]);  
   #endif
   // char *key = NULL, *val = NULL, *key_val = NULL;
@@ -741,7 +741,7 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
       LOG(APPT_DEBUGREGION_PROGRAM, "[%d]\n", pP);   
     #endif
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pP) + (String)FPSTR(FNEXT_PLAYLIST) ;
-    File f=FILESYSTEM.open(path,"w");
+    File f=FILESYSTEM.open(path, FILE_WRITE);
     if (!f) {
       #ifdef DEBUG
         LOG(APPT_DEBUGREGION_PROGRAM, "&c:1&s:\t[Error open /w]\n\t%s\n", path.c_str());  

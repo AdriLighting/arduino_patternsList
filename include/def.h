@@ -13,8 +13,14 @@
     #ifdef FSOK
       #ifndef FILESYSTEM 
         #if defined USE_LITTLEFS
-          #include <LittleFS.h> 
-          #define FILESYSTEM LittleFS
+          #if defined(ESP8266)
+            #include <LittleFS.h> 
+            #define FILESYSTEM LittleFS
+          #elif defined(ESP32)
+            #include <FS.h>
+            #include <LITTLEFS.h>
+            #define FILESYSTEM LITTLEFS
+          #endif
         #elif defined USE_SPIFFS
           #include <FS.h>
           #define FILESYSTEM SPIFFS

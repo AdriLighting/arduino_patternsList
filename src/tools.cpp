@@ -347,8 +347,26 @@ void AP_debugPrint(const String & msg, const String & file, const String & line,
 
   char * b_file = nullptr;
   if (ptr->is_file()) {
-    b_file = new char[file.length()+1];
-    strcpy(b_file, file.c_str());
+    String  fileName = file;
+    int     rSize = 0;
+    const char** split = AP_explode(file, '/', rSize);
+    if (split) {
+      fileName = ch_toString(split[rSize-1]);
+      for(int i = 0; i < rSize; ++i) {
+        delete split[i];
+      }
+      delete[] split;      
+    }
+    split = AP_explode(file, '\\', rSize);
+    if (split) {
+      fileName = ch_toString(split[rSize-1]);
+      for(int i = 0; i < rSize; ++i) {
+        delete split[i];
+      }
+      delete[] split;      
+    }    
+    b_file = new char[fileName.length()+1];
+    strcpy(b_file, fileName.c_str());
   }
 
   char * b_line = nullptr;
@@ -427,7 +445,7 @@ void AP_debugPrint(const String & msg, const String & file, const String & line,
           size  = s2.length();
           if (DebugPrintItem_maxlen_2 < s2.length() ) DebugPrintItem_maxlen_2 = s2.length() ;
           while (size < DebugPrintItem_maxlen_2) {s2 += " "; size = s2.length();}  
-          Serial.printf_P(PSTR("%s%s%S"), s.c_str(), s2.c_str(), pMsg.c_str());
+          Serial.printf_P(PSTR("%s%s%s"), s.c_str(), s2.c_str(), pMsg.c_str());
 
         } else Serial.printf_P(PSTR("%s%s"), s.c_str(), pMsg.c_str()); 
     }      

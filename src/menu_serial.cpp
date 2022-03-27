@@ -134,8 +134,8 @@ Sr_menu::Sr_menu(){
       _timer_h.set_delay(v1.toInt() * 1000);
       _timer_i1.set_enabled(v2.toInt());
     }, SR_MM::SRMM_KEY);
-    _Sr_menu.add("setter list",   "r", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, APPT_SETTER_ARRAY[i]);}});
-    _Sr_menu.add("getter list",   "t", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, APPT_REQ_ARRAY[i]);}});
+    _Sr_menu.add("setter list",   "r", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_SETTER_ARRAY[i]);}});
+    _Sr_menu.add("getter list",   "t", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_REQ_ARRAY[i]);}});
     _Sr_menu.add("api getter",    "@", [](const String & v1, const String & v2) {  
       DynamicJsonDocument doc(1024);
       JsonArray           arr;

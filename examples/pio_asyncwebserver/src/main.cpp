@@ -18,6 +18,14 @@ socketQueue     * _socketQueueReply;
 socketQueue     * _socketQueueSetter;  
 // endregion >>>> 
    
+void createDir(fs::FS &fs, const char * path){
+    Serial.printf("Creating Dir: %s\n", path);
+    if(fs.mkdir(path)){
+        Serial.println("Dir created");
+    } else {
+        Serial.println("mkdir failed");
+    }
+}
 
 #ifdef DEBUG_KEYBOARD
   void keyboard_freeheap();
@@ -36,7 +44,7 @@ String _global_s = "_global_s";
 void global_s_onChange() {
   Serial.printf("chnage");
 }
-DebugWatcher<String> _watcher(&_global_s, &global_s_onChange);
+// DebugWatcher<String> _watcher(&_global_s, &global_s_onChange);
 
 void setup() {
   Serial.begin(115200);
@@ -60,7 +68,12 @@ void setup() {
     _Sr_menu.add("api setter socket", "!", keyboard_apiSetter, SR_MM::SRMM_KEY);
   #endif
 
-  boolean fs = FILESYSTEM.begin();
+    #if defined(ESP8266)
+      boolean fs = FILESYSTEM.begin();
+    #elif defined(ESP32)
+      boolean fs = FILESYSTEM.begin(false);
+    #endif
+    createDir(LITTLEFS, "/playlist");
 
   // region ################################################ WIFI
   _DeviceWifi = new WifiConnect(
@@ -127,7 +140,7 @@ void setup() {
   // region ################################################ TASKS
   _TaskScheduler = new TaskScheduler(9);
   
-  _TaskScheduler->get_task(0)->set_callback([](){ProgramPtrGet()->handle();});
+  _TaskScheduler->get_task(0)->set_callback([](){if (_Program) _Program->handle();});
   _TaskScheduler->get_task(1)->set_callback([](){_DeviceWifi->handleConnection();});
   _TaskScheduler->get_task(2)->set_callback([](){if (_DeviceWifi->WIFIsetupIsReady())_Webserver.handle();});
   _TaskScheduler->get_task(3)->set_callback([](){if(_socketQueueReply)_socketQueueReply->handle();;});
@@ -146,6 +159,7 @@ void setup() {
   String heap, time;
   on_time_h(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str());
+
 }
 
 // uint32_t _timer_watch = 0;

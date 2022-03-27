@@ -85,7 +85,6 @@ boolean TaskDelay::execute () {
 void TaskDelay::set_enabled(boolean v1)         {_enabled = v1;}
 void TaskDelay::set_delay(const uint32_t & v1)  {_delay = v1;}
 void TaskDelay::get_delay(uint32_t & v1)        {v1 = _delay;}
-
 boolean TaskDelay::isEnabled()                  {return _enabled;}
 
 void TaskDelay::reset() {_last = _TASK_TIME_FUNCTION();}
