@@ -9,7 +9,7 @@
     String  _itemBaseCfg  = "null";
   public:
     Playlist_item(){};
-    ~Playlist_item(){};
+    ~Playlist_item(){Serial.printf("Playlist_item::destructor\n"); };
 
     void print();
 
@@ -35,7 +35,9 @@
     Playlist_item     * _Playlist_itemArray = nullptr;
 
     Playlist_list( ) {}
-    ~Playlist_list() {delete[] _Playlist_itemArray;};
+    ~Playlist_list() {
+      Serial.printf("Playlist_list::destructor\n"); 
+      delete[] _Playlist_itemArray;};
 
      void print() ;
 

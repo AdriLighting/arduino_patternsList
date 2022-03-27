@@ -65,7 +65,7 @@ void loop() {
   #ifdef DEBUG_KEYBOARD
     _Sr_menu.serialRead();
   #endif
-  _Program->handle();
+  if (_Program) _Program->handle();
 }
 
 

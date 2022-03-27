@@ -4,10 +4,8 @@ ListLoop::ListLoop(){
   _timer = new adri_timer(_delayCurrent*1000, false);
 }
 ListLoop::~ListLoop(){
-#ifdef DEBUG
   Serial.printf("ListLoop::destructor\n");  
-#endif
-  if(_timer)delete _timer;
+  if(_timer) delete _timer;
 }
 
 void ListLoop::get_remainingTime(uint32_t & v){_timer->get_remainingTime(v);}

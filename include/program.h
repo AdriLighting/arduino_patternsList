@@ -133,4 +133,5 @@
   };
 
   Program * ProgramPtrGet();
+  void ProgramPtrSet(Program*);
 #endif // PROGRAM_H   

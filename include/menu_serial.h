@@ -10,7 +10,21 @@
   typedef std::function<void()> sr_cb_v_f;
   typedef std::function<void(const String &, const String &)> sr_cb_ss_f;
   typedef enum sr_menumod { SRMM_SIMPLE, SRMM_KEY  } SR_MM;
-
+  class Sr_timer
+  {
+    unsigned long _last =      0;
+    uint32_t      _delay      = 0;
+    boolean       _enabled    = false; 
+  public:
+    Sr_timer();
+    Sr_timer(const uint32_t & max);
+    ~Sr_timer();
+    boolean execute();  
+    void set_enabled(boolean);
+    void set_delay(const uint32_t &);
+    void get_delay(uint32_t &);
+    boolean isEnabled();
+  };
   class Sr_item
   {
     const char*   _name   = "";
@@ -32,6 +46,8 @@
   };
   class Sr_menu
   {
+    Sr_timer _timer_i1;
+    Sr_timer _timer_h;    
     LList<Sr_item *> _list;
   public:
     Sr_menu();

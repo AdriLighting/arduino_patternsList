@@ -564,13 +564,17 @@ void AP_ApiReply::reply_generate(DynamicJsonDocument & doc){
  */
 void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const String & upd) {
   DynamicJsonDocument reply(2048);
-  parsingRequest(doc, reply, upd);
-  serializeJson(reply, rep);
+    parsingRequest(doc, reply, upd);
+    serializeJson(reply, rep);    
 }
 void AP_Api::parsingRequest(DynamicJsonDocument & doc, DynamicJsonDocument & reply, const String & upd) {
+    Program * pPtr = ProgramPtrGet();
+
+    if (!pPtr){ /*reply[F("program ptr")] = "not foud";*/return;}
+
     JsonArray arr;
     uint8_t sizeReponse, posReponse, size;
-    Program * pPtr = ProgramPtrGet();
+
 
     // need to determine size befor
        

@@ -373,7 +373,7 @@ void AP_debugPrint(const String & msg, const String & file, const String & line,
       delete[] split;
       split = nullptr;
 
-      split = AP_explode(funcName, ',', rSize);
+      split = AP_explode(funcName, ' ', rSize);
       if (split) {
         if (rSize > 0) {
           funcName = split[1];

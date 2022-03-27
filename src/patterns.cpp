@@ -13,9 +13,7 @@ Listbase::Listbase(){
   ListbasePtr = this;
 }
 Listbase::~Listbase(){
-#ifdef DEBUG
   Serial.printf("Listbase::destructor\n");  
-#endif
   delete[] _list;
 }
 void Listbase::initialize(const uint16_t & maxCnt, const char * const & n){

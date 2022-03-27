@@ -94,8 +94,9 @@ void LBnames::json(JsonArray & arr){
 
 Program * ProgramPtr = nullptr;
 Program * ProgramPtrGet(){return ProgramPtr;}
+void ProgramPtrSet(Program *ptr){ProgramPtr = ptr;}
 Program::Program(uint8_t nbLB, boolean fs){
-  ProgramPtr = this;
+  ProgramPtrSet(this);
 
   #ifdef DEBUG_AP
     ap_debugBuffer    = new char[1024];
@@ -145,6 +146,7 @@ Program::~Program(){
 #ifdef DEBUG
    LOG(APPT_DEBUGREGION_PROGRAM, "Program::destructor\n");  
  #endif 
+  ProgramPtrSet(nullptr); 
   delete[] _Playlists;    
   delete[] _LBnames;    
 }
