@@ -4,7 +4,7 @@
 #include <arduinoPatternList.h>
 
 
-#include <Wificonnect.h>
+#include <alwificonnect.h>
 #include <ESP8266WiFi.h>  
 extern WifiConnect * _DeviceWifi; 
 #ifdef FSOK

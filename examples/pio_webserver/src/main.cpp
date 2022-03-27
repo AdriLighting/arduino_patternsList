@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <Wificonnect.h>
+#include <alwificonnect.h>
 
 #include "apwebserver.h"
 WifiConnect* _DeviceWifi;

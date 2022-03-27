@@ -1,7 +1,7 @@
 #include "main.h"
 
 #include <Arduino.h>
-#include <Wificonnect.h>
+#include <alwificonnect.h>
 #include <arduinoPatternList.h>
 #include <typeinfo>
 

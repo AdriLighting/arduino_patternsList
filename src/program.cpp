@@ -746,7 +746,12 @@ void Program::get_json_allpl_items(JsonObject & doc, boolean pL, boolean lRef) {
       LOG(APPT_DEBUGREGION_PROGRAM, "[%d]\n", pP);   
     #endif
     String path = (String)FPSTR(FOPATH_PLAYLIST) + (String)FPSTR(FNPREFIX_PLAYLIST) + String(pP) + (String)FPSTR(FNEXT_PLAYLIST) ;
-    File f=FILESYSTEM.open(path, FILE_WRITE);
+    
+    #if defined(ESP8266)
+      File f=FILESYSTEM.open(path, "w");
+    #elif defined(ESP32)
+      File f=FILESYSTEM.open(path, FILE_WRITE);
+    #endif    
     if (!f) {
       #ifdef DEBUG
         LOG(APPT_DEBUGREGION_PROGRAM, "&c:1&s:\t[Error open /w]\n\t%s\n", path.c_str());  
