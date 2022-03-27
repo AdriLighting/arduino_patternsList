@@ -1,13 +1,18 @@
 #include "apwebserver.h"
 
-#include <LittleFS.h>
-#ifdef ESP32
-#include <WiFi.h>
-#include <AsyncTCP.h>
-#elif defined(ESP8266)
-#include <ESP8266WiFi.h>
-#include <ESPAsyncTCP.h>
+
+
+#if defined(ESP8266)
+  #include <LittleFS.h>
+  #include <ESP8266WiFi.h>
+  #include <ESPAsyncTCP.h>
+#elif defined(ESP32)
+  #include <FS.h>
+  #include <LITTLEFS.h>
+  #include <WiFi.h>
+  #include <AsyncTCP.h>
 #endif
+
 #include <ESPAsyncWebServer.h>
 #include <functional>
 

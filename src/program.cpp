@@ -4,7 +4,12 @@
   #if defined USE_SPIFFS
     #include <FS.h>
   #elif defined USE_LITTLEFS
-    #include <LittleFS.h> 
+    #if defined(ESP8266)
+      #include <LittleFS.h> 
+    #elif defined(ESP32)
+      #include <FS.h>
+      #include <LITTLEFS.h>
+    #endif
   #endif
 #endif
 
