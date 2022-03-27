@@ -112,6 +112,74 @@ void HeapStatu::print(String & ret){
 } 
 
 
+
+
+void millis2time_m(const uint32_t & s, char * time){
+uint32_t milliseconds   =       (s / 1000) % 1000;
+uint32_t seconds        = ((    (s / 1000) - milliseconds)/1000)%60;
+uint32_t minutes        = ((((  (s / 1000) - milliseconds)/1000) - seconds)/60) %60;
+uint32_t hours          = ((((( (s / 1000) - milliseconds)/1000) - seconds)/60) - minutes)/60;  
+  sprintf(time,"%lu:%02lu:%02lu:%02lu", (unsigned long)hours, (unsigned long)minutes , (unsigned long)seconds, (unsigned long)milliseconds);
+
+}
+void millis2time_d(const uint32_t & s, char * time) {
+  uint32_t seconds    = (s /   (1000)           ) % 60    ;
+  uint32_t minutes    = (s /   (1000UL*60UL)    ) % 60    ;
+  uint32_t hours      = (s /   (1000UL*3600UL)  ) % 24    ;
+  uint32_t days       = (s /   (1000UL*3600UL*24UL)  )    ;
+  sprintf(time,"%lu-%02lu:%02lu:%02lu", (unsigned long)days, (unsigned long)hours , (unsigned long)minutes, (unsigned long)seconds);
+}
+void millis2time_h(unsigned long s, char * time) {
+  uint32_t seconds    = (s /   (1000)           ) % 60    ;
+  uint32_t minutes    = (s /   (1000UL*60UL)    ) % 60    ;
+  uint32_t hours      = (s /   (1000UL*3600UL)  ) % 24    ;
+  sprintf(time,"%02lu:%02lu:%02lu", (unsigned long)hours , (unsigned long)minutes, (unsigned long)seconds);
+}
+void on_time_h(String & result) {
+   char t[12];
+   millis2time_h(millis(), t);
+   result = String(t);
+}
+void on_time_m(String & result) {
+   char t[12];
+   millis2time_m(millis(), t);
+   result = String(t);
+}
+void on_time_d(String & result) {
+   char t[14];
+   millis2time_d(millis(), t);
+   result = String(t);
+}
+
+
+
+#ifdef FSOK
+bool AP_deserializeFile(DynamicJsonDocument& doc, const char* filepath){
+    if (!filepath || !*filepath)
+        return false;
+
+    File jfile = FILESYSTEM.open(filepath, "r");
+    DeserializationError error;
+    if (jfile){
+        error = deserializeJson(doc, jfile);
+        jfile.close();
+    } else {
+        return false;
+    }
+
+    if (error) {
+        // ADRI_LOG(-1,2,2,"\nFile: failed to load json file: %s, deserializeJson error: %d", filepath, error.code());
+        // fsprintf("\t");
+        // Serial.println(error.code());
+        return false;
+    }
+    // ADRI_LOG(-1,2,2,"\nFile: %s ", filepath);
+    return true;
+}  
+#endif
+
+
+
 /**
  * @brief      split string with sep
  *
@@ -196,74 +264,6 @@ const char** AP_explode(const String & s, char sep, int & rSize) {
 
   return list;
 }
-
-void millis2time_m(const uint32_t & s, char * time){
-uint32_t milliseconds   =       (s / 1000) % 1000;
-uint32_t seconds        = ((    (s / 1000) - milliseconds)/1000)%60;
-uint32_t minutes        = ((((  (s / 1000) - milliseconds)/1000) - seconds)/60) %60;
-uint32_t hours          = ((((( (s / 1000) - milliseconds)/1000) - seconds)/60) - minutes)/60;  
-  sprintf(time,"%lu:%02lu:%02lu:%02lu", (unsigned long)hours, (unsigned long)minutes , (unsigned long)seconds, (unsigned long)milliseconds);
-
-}
-void millis2time_d(const uint32_t & s, char * time) {
-  uint32_t seconds    = (s /   (1000)           ) % 60    ;
-  uint32_t minutes    = (s /   (1000UL*60UL)    ) % 60    ;
-  uint32_t hours      = (s /   (1000UL*3600UL)  ) % 24    ;
-  uint32_t days       = (s /   (1000UL*3600UL*24UL)  )    ;
-  sprintf(time,"%lu-%02lu:%02lu:%02lu", (unsigned long)days, (unsigned long)hours , (unsigned long)minutes, (unsigned long)seconds);
-}
-void millis2time_h(unsigned long s, char * time) {
-  uint32_t seconds    = (s /   (1000)           ) % 60    ;
-  uint32_t minutes    = (s /   (1000UL*60UL)    ) % 60    ;
-  uint32_t hours      = (s /   (1000UL*3600UL)  ) % 24    ;
-  sprintf(time,"%02lu:%02lu:%02lu", (unsigned long)hours , (unsigned long)minutes, (unsigned long)seconds);
-}
-void on_time_h(String & result) {
-   char t[12];
-   millis2time_h(millis(), t);
-   result = String(t);
-}
-void on_time_m(String & result) {
-   char t[12];
-   millis2time_m(millis(), t);
-   result = String(t);
-}
-void on_time_d(String & result) {
-   char t[14];
-   millis2time_d(millis(), t);
-   result = String(t);
-}
-
-
-
-#ifdef FSOK
-bool AP_deserializeFile(DynamicJsonDocument& doc, const char* filepath){
-    if (!filepath || !*filepath)
-        return false;
-
-    File jfile = FILESYSTEM.open(filepath, "r");
-    DeserializationError error;
-    if (jfile){
-        error = deserializeJson(doc, jfile);
-        jfile.close();
-    } else {
-        return false;
-    }
-
-    if (error) {
-        // ADRI_LOG(-1,2,2,"\nFile: failed to load json file: %s, deserializeJson error: %d", filepath, error.code());
-        // fsprintf("\t");
-        // Serial.println(error.code());
-        return false;
-    }
-    // ADRI_LOG(-1,2,2,"\nFile: %s ", filepath);
-    return true;
-}  
-#endif
-
-
-
-
 
   /*  
     LList<SplitItem *>  _SplitItem;

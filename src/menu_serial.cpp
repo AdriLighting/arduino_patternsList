@@ -84,7 +84,7 @@ void Sr_menu::print(){
 Sr_menu::Sr_menu(){
     _Sr_menu.add("menu",          "a", []() { _Sr_menu.print(); });
     _Sr_menu.add("ESPreset",      "z", []() { ESP.restart();    });
-    _Sr_menu.add("freeHeap",      "e", []() { Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
+    _Sr_menu.add("freeHeap",      "e", []() { String time; on_time_d(time);Serial.printf_P(PSTR("time: %s\n"), time.c_str()); Serial.printf_P(PSTR("freeHeap: %d\n"), ESP.getFreeHeap()); });
     _Sr_menu.add("getter list",   "r", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, APPT_SETTER_ARRAY[i]);}});
     _Sr_menu.add("setter list",   "t", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25S]\n"), i, APPT_REQ_ARRAY[i]);}});
     _Sr_menu.add("api getter",    "@", [](const String & v1, const String & v2) {  
@@ -109,7 +109,8 @@ void Sr_menu::add(const char* v1, const char* v2, sr_cb_v_f v3, SR_MM v4){
   const char  * key = "";
   for(int i = 0; i < _list.size(); ++i) {
     _list[i]->get_key(key);
-    if (strcmp(v2, key) == 0) {Serial.printf_P(PSTR("[Sr_menu::add | cb void] key %s already registered!\n"), v2);return;}}
+    if (strcmp(v2, key) == 0) {Serial.printf_P(PSTR("[Sr_menu::add | cb void] key %s already registered!\n"), v2);return;}
+  }
   Serial.printf_P(PSTR("[Sr_menu::add | cb void] adding key: %s\n"), v2);
   _list.add(new Sr_item());
   uint8_t pos = _list.size()-1;
@@ -119,7 +120,8 @@ void Sr_menu::add(const char* v1, const char* v2, sr_cb_ss_f v3, SR_MM v4){
   const char  * key = "";
   for(int i = 0; i < _list.size(); ++i) {
     _list[i]->get_key(key);
-    if (strcmp(v2, key) == 0) {Serial.printf_P(PSTR("[Sr_menu::add | cb ss] key %s already registered!\n"), v2);return;}}
+    if (strcmp(v2, key) == 0) {Serial.printf_P(PSTR("[Sr_menu::add | cb ss] key %s already registered!\n"), v2);return;}
+  }
   Serial.printf_P(PSTR("[Sr_menu::add | cb ss] adding key: %s\n"), v2);
   _list.add(new Sr_item());
   uint8_t pos = _list.size()-1;

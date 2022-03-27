@@ -15,9 +15,14 @@ void _Program_cb(const String itemBaseName, const uint16_t& itemBasePos, boolean
 void setup() {
   Serial.begin(115200);
 
-  for (unsigned long const serialBeginTime = millis(); !Serial && (millis() - serialBeginTime > 5000); ) {}
-  delay(300);
+  while (!Serial);
 
+  Serial.print(F("Beginning sketch in "));
+  for (int i = 3; i > 0; i--) {
+    Serial.print(i);
+    Serial.print(' ');
+    delay(500);
+  }
   Serial.println(F("\n##################################################\n"));
 
   Serial.printf_P(PSTR("\t[freeheap: %d]\n"), ESP.getFreeHeap());

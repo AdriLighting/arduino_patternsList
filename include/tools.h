@@ -73,25 +73,7 @@
         AP_debugPrint(String(ap_debugBuffer), String(__FILE__), String(__LINE__), String(ARDUINOTRACE_FUNCTION_NAME), ptr, mod);} \
     } 
 
-/*struct debugGlobal_t {
-  const char* name = 0;             // Name
-#ifdef DEBUG_USE_FLASH_F
-  const __FlashStringHelper *nameF = 0;     // Name (in flash)
-#endif
-  uint8_t type = 0;               // Type of variable (see enum below)
-  void *pointer = 0;                // Generic pointer
-  uint8_t showLength = 0;             // To show only a part (strings)
-#ifndef BOARD_LOW_MEMORY // Not for low memory boards
-  const char* description = 0;          // Description
-#ifdef DEBUG_USE_FLASH_F
-  const __FlashStringHelper *descriptionF = 0;  // Description (in flash)
-#endif
-#endif
-  uint8_t typeOld = 0;              // Type of old value variable (used to strings)
-  void *pointerOld = 0;             // Generic pointer for old value
-  boolean changed = false;            // Value change (between 2 debug handle call)
-  boolean updateOldValue = false;         // Update old value ? (in debug handle call)
-};*/
+
   static const char APPT_DEBUGREGIONMC_001   [] PROGMEM = "range";
 
   static const char APPT_DEBUGREGIONMS_001   [] PROGMEM = "macro";
@@ -108,13 +90,13 @@
 
 
     class DebugPrintItem {
-      boolean _p_macro     = true;
-      boolean _p_timeStamp = true;
-      boolean _p_heap      = true;
-      boolean _p_line      = true;
-      boolean _p_file      = true;
-      boolean _p_func      = true;
-      boolean _p_crmsg   = false;
+      boolean _p_macro      = true;
+      boolean _p_timeStamp  = true;
+      boolean _p_heap       = true;
+      boolean _p_line       = true;
+      boolean _p_file       = true;
+      boolean _p_func       = true;
+      boolean _p_crmsg      = false;
       // boolean _p_arg       = true;
 
       AP_DEBUGLVL_T      _lvl = AP_DEBUGLVL_NORMAL;
@@ -213,6 +195,7 @@
   String ch_toString(const char * c);
   void define_print();
   void on_time_h(String & result);
+  void on_time_d(String & result);
 /*
   int rSize = 0;
   AP_explode(func, '(', rSize, nullptr) ;
@@ -227,10 +210,23 @@
   const char** list = AP_explode(split, ',', splitSize);
   Serial.printf("\n");
   for(int i = 0; i < splitSize; ++i) {Serial.printf("[%d] %s\n", i, list[i]);}
+  for(int i = 0; i < rSize; ++i) {
+    delete list[i];
+  }
   delete[] list;
 */  
   const char** AP_explode(const String & s, char sep, int & rSize);
   // const char** _AP_explode(String s, char sep, int & rSize);
+
+
+
+
+
+
+
+
+
+  
 /*
   class Node {
   public:
@@ -257,6 +253,79 @@
 
   };
 */
+/*
+  String split = "s1,s2,s3";
+  int splitSize;
+  const char** list = AP_explode(split, ',', splitSize);
+  Serial.printf("\n");
+  for(int i = 0; i < splitSize; ++i) {Serial.printf("[%d] %s\n", i, list[i]);}
+  for(int i = 0; i < splitSize; ++i) {
+    delete list[i];
+  }
+  delete[] list;
 
+Serial.println(ESP.getFreeHeap());
+Serial.printf("\n");
+String str_o = "&debut du string";
+int len = str_o.length()+1;
+// const char * str_ca = str_o.c_str();
+char str_ca_end[len];
+strcpy(str_ca_end, "");
+Serial.printf("start\n");
+for(int i = 1; i < len-1; ++i) {
+  // String word = String(str_ca[i]);
+  Serial.printf("%c-", str_o[i]);
+  // char buffer[1];
+  // strcpy(buffer, word.c_str());
+  strcat(str_ca_end, String(str_o[i]).c_str());
+}
+Serial.printf("\nend\n");
+Serial.printf("%s\n", str_ca_end);
+Serial.println(ESP.getFreeHeap());
+
+char testString[] = "Lorem ipsum dolor sit amet, \
+consectetur adipiscing elit, sed do eiusmod tempor \
+incididunt ut labore et dolore magna aliqua. Ut enim \
+ad minim veniam, quis nostrud exercitation ullamco \
+laboris nisi ut aliquip ex ea commodo consequat. Duis \
+aute irure dolor in reprehenderit in voluptate velit \
+esse cillum dolore eu fugiat nulla pariatur. Excepteur \
+sint occaecat cupidatat non proident, sunt in culpa qui \
+officia deserunt mollit anim id est laborum.";
+Serial.printf("\n");
+Serial.println("Loading some strings into the linked list");
+Serial.printf("\n");
+char *p;
+int col = 0;
+for (p = strtok(testString, " ,"); p; p = strtok(NULL, " ,.")) {
+  Serial.print(p);
+  Serial.print(' ');
+  col += strlen(p) + 1;
+  if (col >= 80) {
+    Serial.println();
+    col = 0;
+  }
+  // list.add(p);
+}
+if (col) {
+  Serial.println();
+  col = 0;
+}
+
+Serial.printf_P(PSTR("%d\n"), ESP.getFreeHeap());
+String split = "&a:1&b:2&&ssid:freebox=1234&f";
+LList<SplitItem *>  _SplitItem;
+splitText(split, "&",  ':', &_SplitItem);
+for(int i = 0; i < _SplitItem.size(); ++i) {
+  // SplitItem * ptr = _SplitItem.get(i);
+  // Serial.printf_P(PSTR("[%d][cmd: %s][value: %s]\n"), i, ptr->_cmd, ptr->_value);
+}
+while (_SplitItem.size()) {
+  SplitItem *ptr = _SplitItem.shift();
+  delete ptr;
+}
+_SplitItem.clear();   
+Serial.printf_P(PSTR("%d\n"), ESP.getFreeHeap());
+*/
 
 #endif // TOOLS_H
