@@ -153,7 +153,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties config.Debug.customdebug_esp8266_d1_mini_debugger_type="universal" custom_esp8266_d1_mini_stacksmash="enabled" debug.local.portname="" debug.local.portspeed="" debug.remote.portname="" debug.remote.portspeed="" debug.view.AnalogPins="" debug.view.DigitalPins="" debug.view.FreeMemory="" debug.view.RunMonitorsOnAllBP="" VM_ADDITIONAL_PREPROC="DEBUG_AP;DEBUG_KEYBOARD;DEBUG_PROGRAM;DEBUG_PLAYLIST;DEBUG_TASK;DEBUG_WEBSERVER;DEBUG_QUEUE;FSOK;USE_LITTLEFS" />
+      <UserProperties config.Debug.customdebug_esp8266_d1_mini_debugger_type="universal" custom_esp8266_d1_mini_stacksmash="enabled" debug.local.portname="" debug.local.portspeed="" debug.remote.portname="" debug.remote.portspeed="" debug.view.AnalogPins="" debug.view.DigitalPins="" debug.view.FreeMemory="" debug.view.RunMonitorsOnAllBP="" VM.DebugTextMessages.MessageWindow="0" VM.DebugTextMessages.SerialWindow="0" VM_ADDITIONAL_PREPROC="DEBUG_AP;DEBUG_KEYBOARD;DEBUG_PROGRAM;DEBUG_PLAYLIST;DEBUG_TASK;DEBUG_WEBSERVER;DEBUG_QUEUE;FSOK;USE_LITTLEFS" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

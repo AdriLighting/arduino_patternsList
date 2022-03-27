@@ -97,6 +97,20 @@ Sr_menu::Sr_menu(){
       _AP_Api.parsingRequest(doc, reply, "");
       serializeJsonPretty(reply, Serial);     
     }, SR_MM::SRMM_KEY); 
+    _Sr_menu.add("api setter",   "#", [](const String & v1, const String & v2) {  
+      DynamicJsonDocument doc(1024);
+      JsonArray           arr;
+      JsonObject          obj;
+      uint8_t             p = v1.toInt();
+      arr = doc.createNestedArray(F("set"));  
+      obj = arr.createNestedObject();
+      obj[F("n")] = FPSTR(APPT_SETTER_ARRAY[p]);
+      obj[F("v")] = v2;
+      arr = doc.createNestedArray(F("get"));  
+      DynamicJsonDocument reply(2048);
+      _AP_Api.parsingRequest(doc, reply, "");
+      serializeJsonPretty(reply, Serial);     
+    }, SR_MM::SRMM_KEY);     
     #ifdef DEBUG_AP
     _Sr_menu.add("debugregion", "u", []() { _DebugPrintList.ketboardPrint(); });    
     _Sr_menu.add("debugset",    ";", [](const String & v1, const String & v2) { 

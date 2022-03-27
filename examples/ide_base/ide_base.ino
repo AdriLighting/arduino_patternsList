@@ -16,7 +16,6 @@ void setup() {
   Serial.begin(115200);
 
   while (!Serial);
-
   Serial.print(F("Beginning sketch in "));
   for (int i = 3; i > 0; i--) {
     Serial.print(i);
@@ -24,9 +23,7 @@ void setup() {
     delay(500);
   }
   Serial.println(F("\n##################################################\n"));
-
   Serial.printf_P(PSTR("\t[freeheap: %d]\n"), ESP.getFreeHeap());
-
   Serial.setDebugOutput(false);
 
   _Program = new Program(1, false);
