@@ -38,7 +38,7 @@ static const char* const WRMTP_ARR[] PROGMEM = {
   WRMTP_005, WRMTP_006, WRMTP_007, WRMTP_008
 };
 
-static const char WSTP_001 [] PROGMEM = "text/json";
+static const char WSTP_001 [] PROGMEM = "text/html";
 static const char WSTP_002 [] PROGMEM = "application/json";
 static const char WSTP_003 [] PROGMEM = "text/plain";
 static const char WSTP_004 [] PROGMEM = "FS INIT ERROR";
@@ -91,20 +91,21 @@ class Webserver {
   uint8_t                 _requestArrayCnt      = 0;
   uint8_t                 _requestArrayCntMax   = 0;
 
-  String                  _httpCallbackData       = "";
-  AsyncWebServerRequest   * _httpCallbackRequest    = NULL;
+  // String                  _httpCallbackData       = "";
+  // AsyncWebServerRequest   * _httpCallbackRequest    = NULL;
   
   AsyncWebSocketClient    * _socketClient     = NULL;
   AsyncWebSocket          * _socketServer     = NULL;
   boolean                 _socketTrace        = true;
   boolean                 _socketIsConnected  = false;
   callback_function_t     _socketCallback     = nullptr;
-  String                  _socketCallbackData  = "";
+  // String                  _socketCallbackData  = "";
 
   Task * _task_httpCallback = nullptr;
   
 public:
   boolean _httpTrace = true;
+  String uploadFOpath = "/";
 
 
   Webserver();
@@ -122,15 +123,16 @@ public:
   void set_socketIsConnected(boolean v1);
   void set_socketClient(AsyncWebSocketClient * v1);
   void set_socketServer(AsyncWebSocket * v1);
-  void set_socketCallbackData(const String & v1);
-  void socketHandle();  
+  // void set_socketCallbackData(const String & v1);
+  void socketHandle(const String & v1);  
+  boolean socketIsConnected();  
 
 
   void begin();
   void setup();
 
   void handle();  
-  void httpHandle();
+  void httpHandle(AsyncWebServerRequest * request, const String & v1);
 
 };
 extern Webserver _Webserver;

@@ -220,8 +220,9 @@
 
 
 
-
-
+// void _AP_SPIFFS_printFiles(const String & path, JsonObject & obj);
+void AP_SPIFFS_printFiles(const String & path, JsonObject & obj);
+void AP_SPIFFS_PRINT(boolean sPrint = false);
 
 
 

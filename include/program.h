@@ -50,7 +50,7 @@
     // typedef std::function<void(const String & v1)> callback_error;
 
     LBnames             * _LBnames    = nullptr;  
-    apBasiclistFlag_t             _lbStatu;
+    apBasiclistFlag_t   _lbStatu;
 
     Playlist_list       * _Playlists  = nullptr;
 
@@ -83,6 +83,7 @@
     apPlaylistFlag_t _plStatu;
 
     void initialize(const uint16_t & , const char* const* arr, const char  * const &, apListSortType_t t = ST_BASE);
+    void initialize(const uint16_t & maxCnt, const char* const* arr, apListSortType_t t);
     void initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
     void initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);
 

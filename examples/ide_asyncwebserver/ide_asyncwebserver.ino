@@ -8,7 +8,7 @@
 #include "apwebserver.h"
 #include "TaskScheduler.h"
 
-// region ################################################ GLOBALS
+// region ################################################ INSTANCE 
 WifiConnect     * _DeviceWifi;
 Program         * _Program = nullptr;
 HeapStatu       _HeapStatu;
@@ -40,10 +40,10 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
 // endregion >>>> 
 
 
-String _global_s = "_global_s";
-void global_s_onChange() {
-  Serial.printf("chnage");
-}
+// String _global_s = "_global_s";
+// void global_s_onChange() {
+//   Serial.printf("chnage");
+// }
 // DebugWatcher<String> _watcher(&_global_s, &global_s_onChange);
 
 void setup() {
@@ -72,8 +72,9 @@ void setup() {
       boolean fs = FILESYSTEM.begin();
     #elif defined(ESP32)
       boolean fs = FILESYSTEM.begin(false);
+      createDir(FILESYSTEM, "/playlist");
     #endif
-    createDir(LITTLEFS, "/playlist");
+    
 
   // region ################################################ WIFI
   _DeviceWifi = new WifiConnect(
@@ -160,6 +161,25 @@ void setup() {
   on_time_h(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str());
 
+  Serial.println(ESP.getFreeHeap());
+  AP_SPIFFS_PRINT(false);
+  Serial.println(ESP.getFreeHeap());
+
+/*
+  APTRACEC("main", "%d\n", ESP.getFreeHeap());
+  String **_sList = nullptr;
+  _sList = new String*[10];
+  for(int i = 0; i < 10; ++i) {
+    _sList[i] = new String;
+    String ptr = *(String*)_sList[i];
+    ptr = "TEST_1" + String(i);
+    APTRACEC("main", "&c:1&s:%d - %s\n", i, ptr.c_str());
+  }
+  for(int i=0; i<10; i++) delete _sList[i];
+  delete[] _sList;  
+  APTRACEC("main", "%d\n", ESP.getFreeHeap());
+*/
+
 }
 
 // uint32_t _timer_watch = 0;
@@ -201,7 +221,8 @@ void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String & 
 uint32_t _socket_cb_last = 0;
 void _socket_cb(const String & s){
 
-  APTRACEC("main", "[last: %d]\n", millis()-_socket_cb_last);
+  uint32_t last = millis()-_socket_cb_last;
+  APTRACEC("main", "[last: %d]\n", last);
   
   _socket_cb_last = millis();
 
@@ -220,6 +241,7 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   APTRACEC("main", "&c:1&s:\t[%d] %s\n", itemBasePos, itemBaseName.c_str());
   APTRACEC("main", "&c:1&s:\t%s\n", heap.c_str());
   if (!updWebserver) return; 
+  if (!_Webserver.socketIsConnected()) {APTRACEC("main", "[UPD WEBSERVER] no socket connected\n");return;} 
   APTRACEC("main", "UPD WEBSERVER\n");
   String                    reply;
   DynamicJsonDocument       doc(2048);
@@ -229,7 +251,7 @@ void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolea
   delete _ApiReply; 
   serializeJson(doc, reply); 
   doc.clear();
-  _socketQueueReply->receive(reply);
+   _socketQueueReply->receive(reply);
 }
 
 #ifdef DEBUG_KEYBOARD

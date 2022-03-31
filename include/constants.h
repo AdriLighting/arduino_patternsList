@@ -32,6 +32,7 @@
   static const char APPT_DEBUGREGION_WEBSERVER  [] PROGMEM = "webserver";
   static const char APPT_DEBUGREGION_QUEUE      [] PROGMEM = "queue";
   static const char APPT_DEBUGREGION_TASK       [] PROGMEM = "task";
+  static const char APPT_DEBUGREGION_BASICLIST  [] PROGMEM = "basicList";
 
 
   static const char APPT_001   [] PROGMEM = "gv";

@@ -21,62 +21,123 @@ https://stackoverflow.com/questions/16982015/getting-const-char-array-from-funct
 
 void define_print(){
 
-  #ifdef AP_DEFAULT
-    Serial.println(F("[AP_DEFAULT][OK]"));  
-  #else
-    Serial.println(F("[AP_DEFAULT][NO]"));  
-  #endif
-  #ifdef DEBUG_KEYBOARD
-    Serial.println(F("[DEBUG_KEYBOARD][OK]"));  
-  #else
-    Serial.println(F("[DEBUG_KEYBOARD][NO]"));  
-  #endif
-  #ifdef USE_SPIFFS
-    Serial.println(F("[USE_SPIFFS][OK]"));  
-  #else
-    Serial.println(F("[USE_SPIFFS][NO]"));  
-  #endif
-  #ifdef USE_LITTLEFS
-    Serial.println(F("[USE_LITTLEFS][OK]"));  
-  #else
-    Serial.println(F("[USE_LITTLEFS][NO]"));  
-  #endif  
-  #ifdef FSOK
-    Serial.println(F("[FSOK][OK]"));  
-  #else
-    Serial.println(F("[FSOK][NO]"));  
-  #endif
-  #ifdef DEBUG_AP
-    Serial.println(F("[DEBUG_AP][OK]"));  
-  #else
-    Serial.println(F("[DEBUG_AP][NO]"));  
-  #endif 
-  #ifdef DEBUG_BASICLIST
-    Serial.println(F("[DEBUG_BASICLIST][OK]"));  
-  #else
-    Serial.println(F("[DEBUG_BASICLIST][NO]"));  
-  #endif 
-  #ifdef DEBUG_PROGRAM
-    Serial.println(F("[DEBUG_PROGRAM][OK]"));  
-  #else
-    Serial.println(F("[DEBUG_PROGRAM][NO]"));  
-  #endif 
-  #ifdef DEBUG_PLAYLIST
-    Serial.println(F("[DEBUG_PLAYLIST][OK]"));  
-  #else
-    Serial.println(F("[DEBUG_PLAYLIST][NO]"));  
-  #endif 
-  #ifdef DEBUG_TASK
-    Serial.println(F("[DEBUG_TASK][OK]"));  
-  #else
-    Serial.println(F("[DEBUG_TASK][NO]"));  
-  #endif 
-  #ifdef DEBUG_WEBSERVER
-    Serial.println(F("[DEBUG_WEBSERVER][OK]"));  
-  #else
-    Serial.println(F("[DEBUG_WEBSERVER][NO]"));  
-  #endif 
 
+}
+
+unsigned int _SPIFFS_printFiles_size;
+void _AP_SPIFFS_printFiles(fs::FS &fs, const String & path, JsonObject & obj, JsonArray & folders){
+  int         totalsize = 0;
+  JsonObject  root      = obj.createNestedObject(path);
+  JsonArray   arr       = root.createNestedArray(F("items"));
+  folders.add(path);
+  #if defined(ESP8266)
+    Dir sub_dir = FILESYSTEM.openDir(path);
+    while (sub_dir.next()) {
+      if (sub_dir.isDirectory()) _AP_SPIFFS_printFiles(fs, path + "/" + sub_dir.fileName(), obj, folders);
+      else {
+        JsonObject var = arr.createNestedObject();     
+        var[F("file")] = sub_dir.fileName();
+        var[F("size")] = sub_dir.fileSize();   
+        totalsize += sub_dir.fileSize();
+      }
+    }
+    _SPIFFS_printFiles_size += totalsize;
+  #elif defined(ESP32)
+    File dir = fs.open(path);
+    File sub_dir = dir.openNextFile();
+    while (sub_dir) {
+      if (sub_dir.isDirectory()) {
+        _AP_SPIFFS_printFiles(fs, sub_dir.name(), obj, folders);
+      }
+      else {
+        int LarraySize;
+        const char  ** Larray = AP_explode(sub_dir.name(), '/', LarraySize);
+        String      fileName  = Larray[LarraySize-1];
+        for(int i = 0; i < LarraySize; ++i) {delete Larray[i];}
+        delete[] Larray; 
+        JsonObject var = arr.createNestedObject(); 
+        var[F("file")] = fileName;
+        var[F("size")] = sub_dir.size();   
+        totalsize += sub_dir.size();
+      }
+
+      sub_dir = dir.openNextFile();
+    }
+  #endif
+}
+void AP_SPIFFS_printFiles(const String & path, JsonObject & obj){
+    _SPIFFS_printFiles_size = 0;
+    int         totalsize = 0;
+    JsonObject  root      = obj.createNestedObject(path);
+    JsonArray   aFolder   = obj.createNestedArray(F("folders"));
+    JsonArray   arr       = root.createNestedArray(F("items")); 
+    aFolder.add(path);
+    #if defined(ESP8266)
+      Dir dir = FILESYSTEM.openDir(path);
+      while (dir.next()) {
+        if (dir.isDirectory()) {
+          _AP_SPIFFS_printFiles(FILESYSTEM, dir.fileName(), root, aFolder);
+        } else  {
+          JsonObject var = arr.createNestedObject();          
+          var[F("file")] = dir.fileName();
+          var[F("size")] = dir.fileSize();   
+          totalsize += dir.fileSize();
+        }
+      }
+      root[F("size")] = totalsize;
+      root[F("sizeTotal")] = totalsize+_SPIFFS_printFiles_size;
+    #elif defined(ESP32)
+      File dir = FILESYSTEM.open(path);
+      File fFile = dir.openNextFile();
+      while (fFile) {
+        if (fFile.isDirectory()) {
+          _AP_SPIFFS_printFiles(FILESYSTEM, fFile.name(), root, aFolder);
+        } else  {
+          int LarraySize;
+          const char  ** Larray = AP_explode(fFile.name(), '/', LarraySize);
+          String      fileName  = Larray[LarraySize-1];
+          for(int i = 0; i < LarraySize; ++i) {delete Larray[i];}
+          delete[] Larray; 
+          // Larray = AP_explode(fileName, '.', LarraySize);
+          // String key = ""; 
+          // for (int i = 0; i < LarraySize-1; ++i) {
+          //   if (i >= LarraySize-2)  key += String(Larray[i]) ;
+          //   else key += String(Larray[i]) + ".";
+          // }
+          // for(int i = 0; i < LarraySize; ++i) {delete Larray[i];}
+          // delete[] Larray; 
+          // JsonObject file = root.createNestedObject(key);
+          JsonObject var = arr.createNestedObject(); 
+          var[F("file")] = fileName;
+          var[F("size")] = fFile.size();   
+          totalsize += fFile.size();
+        }
+        fFile = dir.openNextFile();
+      }
+      root[F("size")] = totalsize;
+      root[F("sizeTotal")] = totalsize+_SPIFFS_printFiles_size;
+    #else
+    #endif    
+    
+}
+void AP_SPIFFS_PRINT(boolean SerializePrint) {
+  DynamicJsonDocument doc(10000);
+  JsonObject root = doc.to<JsonObject>();
+  AP_SPIFFS_printFiles("/", root);
+  if (SerializePrint) {serializeJsonPretty(doc, Serial);Serial.println("");}
+  Serial.printf_P(PSTR("[AP_SPIFFS_PRINT]\n"));
+  JsonArray arr = doc[F("folders")].as<JsonArray>();
+  for (size_t i = 0; i < arr.size(); i++) {
+    String path = arr[i].as<String>();
+    Serial.printf_P(PSTR("[%-3d][%s]\n"), i, path.c_str());
+    JsonArray oPath;
+    if (path == "/")  oPath = doc[path][F("items")].as<JsonArray>();
+    else              oPath = doc[F("/")][path][F("items")].as<JsonArray>();
+    for (size_t j = 0; j < oPath.size(); j++) {
+      String file = oPath[j][F("file")].as<String>();
+      Serial.printf_P(PSTR("\t[%-3d][%s]\n"), j, file.c_str());
+    }
+  }
 }
 
 String ch_toString(const char * c){
@@ -302,7 +363,7 @@ uint32_t DebugPrintItem_maxlen_1 = 0;
 uint32_t DebugPrintItem_maxlen_2 = 0;
 
 void AP_debugPrint(const String & msg, const String & file, const String & line, const String & func) {
-  Serial.printf_P(PSTR("[%s:%S] %s\n"), file.c_str() , line.c_str() , func.c_str());
+  Serial.printf_P(PSTR("[%s:%s] %s\n"), file.c_str() , line.c_str() , func.c_str());
   if (msg!="") Serial.printf_P(PSTR("%s"), msg.c_str() ); 
 }
 void AP_debugPrint(const String & msg, const String & file, const String & line, const String & func, const char * _id, AP_DEBUGLVL_T mod) {
@@ -443,7 +504,7 @@ void AP_debugPrint(const String & msg, const String & file, const String & line,
         if (b_func) {
           String s2 = String(b_func) + " ";
           size  = s2.length();
-          if (DebugPrintItem_maxlen_2 < s2.length() ) DebugPrintItem_maxlen_2 = s2.length() ;
+          if (DebugPrintItem_maxlen_2 < s2.length()+1 ) DebugPrintItem_maxlen_2 = s2.length()+1 ;
           while (size < DebugPrintItem_maxlen_2) {s2 += " "; size = s2.length();}  
           Serial.printf_P(PSTR("%s%s%s"), s.c_str(), s2.c_str(), pMsg.c_str());
 
@@ -478,7 +539,7 @@ void DebugPrintItem::print(){
       is_file(), 
       is_func(), 
       is_crmsg(),
-      FPSTR(APPT_DEBUGREGIONML_ALL[_lvl])
+      APPT_DEBUGREGIONML_ALL[_lvl]
       );
 }
 
@@ -525,7 +586,7 @@ void DebugPrintList::ketboardPrintHeader(boolean pNbId){
   else          Serial.printf_P(PSTR("[%3s][%12s]"), "nb", "_id");
   uint8_t size = ARRAY_SIZE(APPT_DEBUGREGIONMS_ALL);
   for(uint8_t i = 0; i < size; ++i) {
-    Serial.printf_P(PSTR("[%d %5s]"),i, FPSTR(APPT_DEBUGREGIONMS_ALL[i]) );
+    Serial.printf_P(PSTR("[%d %5s]"),i, APPT_DEBUGREGIONMS_ALL[i] );
   }   
   Serial.println();          
 }

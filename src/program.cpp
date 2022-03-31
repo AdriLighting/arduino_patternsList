@@ -75,6 +75,7 @@ void ListSortItems_delete(){
   Serial.printf_P(PSTR(">>>>%-15d\n"), ESP.getFreeHeap()); 
 */
 void LBnames::setup(const char * name,  uint8_t items, const char * const * arr){
+  LOG(APPT_DEBUGREGION_BASICLIST, "\n\t[name: %s]\n\t[cnt: %d]\n", name, items);  
   _name   = name;
   _cnt    = items; 
   _arr    = arr;
@@ -107,6 +108,8 @@ Program::Program(uint8_t nbLB, boolean fs){
     ap_debugBuffer    = new char[1024];
 
       _DebugPrintList.add(APPT_DEBUGREGION_APAPI); 
+
+      _DebugPrintList.add(APPT_DEBUGREGION_BASICLIST); 
 
     #ifdef DEBUG_PLAYLIST
       _DebugPrintList.add(APPT_DEBUGREGION_PLAYLIST);    
@@ -327,13 +330,20 @@ void Program::get_json_jsInit(JsonObject & doc){
 }
 void Program::initialize(const uint16_t & maxCnt, const char* const* arr, const char  * const & n, apListSortType_t t){
 #ifdef DEBUG
-  LOG(APPT_DEBUGREGION_PROGRAM, "Program::initialize\n");  
+  LOG(APPT_DEBUGREGION_PROGRAM, "-\n");  
 #endif
 
   Listbase::initialize(maxCnt, n);
+  
+  initialize(maxCnt, arr, t);
 
-  stringList aStringList;   // An instance of the stringList class we created above.
+  uint16_t pC; 
+  Listbase::get_cnt(pC);
+  ListLoop::setup(&_lbtFlag, pC-1);
+}
 
+void Program::initialize(const uint16_t & maxCnt, const char* const* arr, apListSortType_t t){
+  stringList aStringList;   // An instance of the stringList class we created above.  
   switch (t) {
       case apListSortType_t::ST_AB:
         for (int i = 0; i < maxCnt; ++i) {
@@ -349,14 +359,8 @@ void Program::initialize(const uint16_t & maxCnt, const char* const* arr, const 
         for (int i = 0; i < ListSortItemsPtr.size(); ++i) {item_add(ListSortItemsPtr[i]->_name.c_str());}  
         ListSortItems_delete();
       break;
-  }
-
-  uint16_t pC; 
-  Listbase::get_cnt(pC);
-  ListLoop::setup(&_lbtFlag, pC-1);
+  }  
 }
-
-
 
 void Program::get_itemPosBase(uint16_t & v1){   
   String name = "";
@@ -422,7 +426,7 @@ void Program::set_callback(callback_function_t f)  {_callback = std::move(f);}
 
 void Program::remote_action(apSetter_t action, const char * const & key, const char * const & val){
   #ifdef DEBUG
-    LOG(APPT_DEBUGREGION_PROGRAM, "-");
+    LOG(APPT_DEBUGREGION_PROGRAM, "-\n");
     LOG(APPT_DEBUGREGION_PROGRAM, "&c:1&s:\tapSetter_t %-4d[%-20s]\n", action, APPT_SETTER_ARRAY[action]);  
   #endif
   // char *key = NULL, *val = NULL, *key_val = NULL;

@@ -42,7 +42,45 @@ extern socketQueue      * _socketQueueSetter;
 
 void not_found_server(AsyncWebServerRequest * request);
 
-
+#define AP_WS_FS
+#ifdef AP_WS_FS
+const char FileSystemStatu_html[] PROGMEM = "<p id=\"FileSystem_statu\" >Free Storage: %FREESPIFFS% | Used Storage: %USEDSPIFFS% | Total Storage: %TOTALSPIFFS%</p>";
+const char FileSystemIndex_html[] PROGMEM = R"rawliteral(
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <style>
+    #dbg{font-family:monaco;font-size:12px;line-height:13px;color:#aaa;margin:0;padding:0;padding-left:4px}body{font-family:Arial,Helvetica,sans-serif}*{box-sizing:border-box}.form-inline{display:flex;flex-flow:row wrap;align-items:center}.form-inline label{margin:5px 10px 5px 0}.form-inline input{vertical-align:middle;margin:5px 10px 5px 0;padding:10px;background-color:#fff;border:1px solid #ddd}.form-inline button{padding:10px 20px;background-color:#1e90ff;border:1px solid #ddd;color:#fff;cursor:pointer}.form-inline button:hover{background-color:#4169e1}@media (max-width:800px){.form-inline input{margin:10px 0}.form-inline{flex-direction:column;align-items:stretch}}.row{--bs-gutter-x:1.5rem;--bs-gutter-y:0;display:flex;flex-wrap:wrap;margin-top:calc(var(--bs-gutter-y) * -1);margin-right:calc(var(--bs-gutter-x) * -.5);margin-left:calc(var(--bs-gutter-x) * -.5)}.row>*{flex-shrink:0;width:100%;max-width:100%;padding-right:calc(var(--bs-gutter-x) * .5);padding-left:calc(var(--bs-gutter-x) * .5);margin-top:var(--bs-gutter-y)}.col{width:auto}
+  </style>   
+</head>
+<body id="body"  onload="onBodyLoad()">
+  <pre onclick="clearEvent()" id="dbg"></pre>
+  <p><h1>FileSystem</h1></p>
+  <p id="FileSystem_statu" >Free Storage: %FREESPIFFS% | Used Storage: %USEDSPIFFS% | Total Storage: %TOTALSPIFFS%</p>
+  <div class=row>
+    <div class="col">
+      <div class="form-inline">
+        <input id="fileupload" type="file" name="data">
+        <button onclick="uploadFile()">Upload File</button>
+      </div>
+    </div>
+    <div class="col">
+      <div class="form-inline">
+        <input type="text" id="filePath" value="%FOPATH%">
+        <button onclick="sendPath()">update</button>
+      </div>
+    </div>
+  </div>
+  <div id="FileSystem_list" >%FILELIST%</div>
+  <script type="text/javascript">
+    function ge(e){return document.getElementById(e)}function ce(e){return document.createElement(e)}function stb(){window.scrollTo(0,document.body.scrollHeight||document.documentElement.scrollHeight)}function clearEvent(){ge("dbg").innerText=""}function addMessage(e){var t=ce("div");t.innerText=e,ge("dbg").appendChild(t),stb()}function startEvents(){var e=new EventSource("/events");e.onopen=function(e){},e.onerror=function(e){e.target.readyState!=EventSource.OPEN&&addMessage("Events Closed")},e.onmessage=function(e){addMessage(e.data)},e.addEventListener("ota",function(e){addMessage(e.data)},!1)}function onBodyLoad(){startEvents()}function request_format_http(e,t,n){return"/"+e+"?"+t+"="+n}function request_format_httpX2(e,t,n,s,o){return"/"+e+"?"+t+"="+n+"&"+s+"="+o}function request_http(e,t){var n=new XMLHttpRequest;n.onreadystatechange=function(){4==this.readyState&&200==this.status&&t&&t(n.responseText)},n.open("GET",e,!0),n.send()}function request_send_http(e,t,n,s){request_http(request_format_http(e,t,n),s)}function request_send_httpX2(e,t,n,s,o,a){request_http(request_format_httpX2(e,t,n,s,o),a)}function sendPath(){request_send_http("FileSystem_upload","path",document.getElementById("filePath").value,null)}function downloadDeleteButton(e,t){if("delete"==t&&request_send_httpX2("FileSystem_set","name",e,"action",t,function(e){ge("FileSystem_list").innerHTML=e,request_http("/FileSystem_statu",function(e){ge("FileSystem_statu").innerHTML=e})}),"download"==t){var n="/FileSystem_set?name="+e+"&action="+t;window.open(n,"_blank")}}async function uploadFile(){let e=new FormData;e.append("file",fileupload.files[0]),await fetch("/FileSystem_upload",{method:"POST",body:e}),request_http("/FileSystem_list",function(e){ge("FileSystem_list").innerHTML=e,request_http("/FileSystem_statu",function(e){ge("FileSystem_statu").innerHTML=e})})}
+  </script>  
+</body>
+</html>
+)rawliteral";  
+#endif
 
 
 socketQueue::socketQueue() {
@@ -234,11 +272,11 @@ void Webserver::set_socketIsConnected(boolean v1) {
 void Webserver::set_socketClient(AsyncWebSocketClient * v1) {_socketClient = v1;}
 void Webserver::set_socketServer(AsyncWebSocket * v1)       {_socketServer = v1;}
 void Webserver::set_socketCallback(callback_function_t f)   {_socketCallback = std::move(f);}
-void Webserver::set_socketCallbackData(const String & v1)   {_socketCallbackData = v1;}
-void Webserver::socketHandle() {
-  if (_socketCallback) _socketCallback(_socketCallbackData);
+// void Webserver::set_socketCallbackData(const String & v1)   {_socketCallbackData = v1;}
+boolean Webserver::socketIsConnected() {return _socketIsConnected;}
+void Webserver::socketHandle(const String & v1) {
+  if (_socketCallback) _socketCallback(v1);
 }
-void _task_socketHandle()                                   {_Webserver.socketHandle();}
 void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
   if(type == WS_EVT_CONNECT){
    LOG(APPT_DEBUGREGION_WEBSERVER, "ws[%s][%u] connect\n", server->url(), client->id());
@@ -282,8 +320,8 @@ void socket_event(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEve
 
         delay(0);
 
-        _Webserver.set_socketCallbackData(msg);
-        _task_socketCallback->set_callbackOstart(std::bind(_task_socketHandle));
+        // _Webserver.set_socketCallbackData(msg);
+        _task_socketCallback->set_callbackOstart(std::bind(&Webserver::socketHandle, _Webserver, msg));
         _task_socketCallback->set_taskDelay(ETD::ETD_DELAY, true, 5000, 0);
         _task_socketCallback->set_taskDelayEnabled(ETD::ETD_DELAY, true);
         _task_socketCallback->set_iteration_max(0);
@@ -360,22 +398,117 @@ void Webserver::http_send(AsyncWebServerRequest * request, const int & code, ENU
   
 }
 
-
-void Webserver::httpHandle(){
-  if (_httpCallbackRequest) {
+void Webserver::httpHandle(AsyncWebServerRequest * request, const String & v1){
+  if (request) {
     const char * requestName;
     WebRequestMethod method;
     for(int i=0; i<_requestArrayCnt; i++){
       _requestArray[i].get_name(requestName);       
       _requestArray[i].get_method(method);       
-      if (_httpCallbackRequest->url() == requestName && _httpCallbackRequest->method() == method){
-        _requestArray[i]._callback(_httpCallbackRequest, i, _httpCallbackData);
-        _httpCallbackData = "";
+      if (request->url() == requestName && request->method() == method){
+        _requestArray[i]._callback(request, i, v1);
         break;              
       }
     }
   }  
 }
+
+#ifdef AP_WS_FS
+String humanReadableSize(const size_t bytes);
+
+String FileSystem_recursiveList() {
+  String returnText = "";
+  returnText += "<table><tr><th align='left'>Folder</th><th align='left'>Name</th><th align='left'>Size</th><th></th><th></th></tr>";
+  DynamicJsonDocument doc(10000);
+  JsonObject root = doc.to<JsonObject>();
+  AP_SPIFFS_printFiles("/", root);
+  JsonArray arr = doc[F("folders")].as<JsonArray>();
+  for (size_t i = 0; i < arr.size(); i++) {
+    String path = arr[i].as<String>();
+    JsonArray oPath;
+    if (path == "/")  oPath = doc[path][F("items")].as<JsonArray>();
+    else              oPath = doc[F("/")][path][F("items")].as<JsonArray>();
+    for (size_t j = 0; j < oPath.size(); j++) {
+      String file = oPath[j][F("file")].as<String>();
+      size_t size = oPath[j][F("size")].as<size_t>();
+      returnText += "<tr align='left'><td>" + path+ "</td><td>" + file+ "</td><td>" + humanReadableSize(size) + "</td>";
+      String fullpath = (path=="/")?path+file:"/"+path+"/"+file;
+      returnText += "<td><button onclick=\"downloadDeleteButton(\'" + fullpath + "\', \'download\')\">Download</button>";
+      returnText += "<td><button onclick=\"downloadDeleteButton(\'" + fullpath + "\', \'delete\')\">Delete</button></tr>";
+    }
+  }
+  returnText += "</table>";
+  return returnText;
+}
+
+// source: https://github.com/CelliesProjects/minimalUploadAuthESP32
+String humanReadableSize(const size_t bytes) {
+  if (bytes < 1024) return String(bytes) + " B";
+  else if (bytes < (1024 * 1024)) return String(bytes / 1024.0) + " KB";
+  else if (bytes < (1024 * 1024 * 1024)) return String(bytes / 1024.0 / 1024.0) + " MB";
+  else return String(bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
+}
+
+String FileSystem_processor(const String& var) {
+  #if defined(ESP8266)
+    FSInfo fs_info;
+    FILESYSTEM.info(fs_info); 
+  #endif   
+  if (var == "FILELIST") {
+    return FileSystem_recursiveList();
+  }
+  if (var == "FREESPIFFS") {
+    #if defined(ESP8266)
+      return humanReadableSize((fs_info.totalBytes - fs_info.usedBytes));  
+    #elif defined(ESP32)
+      return humanReadableSize((FILESYSTEM.totalBytes() - FILESYSTEM.usedBytes()));
+    #endif      
+  }
+  if (var == "USEDSPIFFS") {
+    #if defined(ESP8266)
+      return humanReadableSize(fs_info.usedBytes);
+    #elif defined(ESP32)
+      return humanReadableSize(FILESYSTEM.usedBytes());
+    #endif
+    
+  }
+  if (var == "TOTALSPIFFS") {
+    #if defined(ESP8266)
+      return humanReadableSize(fs_info.totalBytes);
+    #elif defined(ESP32)
+      return humanReadableSize(FILESYSTEM.totalBytes());
+    #endif    
+  }
+  if (var == "FOPATH") {
+    return _Webserver.uploadFOpath;
+  }
+  return String();
+}
+
+// https://github.com/smford/esp32-asyncwebserver-fileupload-example
+void FileSystem_upload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+  LOG(APPT_DEBUGREGION_WEBSERVER, "\n\tclient: %s - url: %s\n",  request->client()->remoteIP().toString().c_str(), request->url().c_str());
+  if (!index) {
+    request->_tempFile = FILESYSTEM.open(_Webserver.uploadFOpath + filename, "w");
+    LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\tUpload Start: %s\n", String(filename).c_str());
+    event.send("Upload in progress", "ota"); 
+  }
+  if (len) {
+    request->_tempFile.write(data, len);
+    LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\tWriting file: %s", String(filename).c_str());
+    LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s: - index: %s", String(index).c_str());
+    LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s: - len: %s\n", String(len).c_str());
+  }
+  if (final) {
+    request->_tempFile.close();
+    LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\tUpload Complete: %s", String(filename).c_str());
+    LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s: - size: %s\n", String(String(index) + len).c_str());
+    event.send("Upload finish", "ota");
+    request->redirect("/FileSystem");
+  }
+}
+#endif
+
 void Webserver::setup(){
   if(!_task_httpCallback)   _task_httpCallback              = new Task();
   if(!_task_socketCallback) _task_socketCallback            = new Task();
@@ -388,7 +521,11 @@ void Webserver::setup(){
   web_server.addHandler(&web_socket);
 
   event.onConnect([](AsyncEventSourceClient *client){
-    client->send("hello!",NULL,millis(),1000);
+    char buffer[100];
+    String time;
+    on_time_d(time);
+    sprintf_P(buffer, PSTR("client connected at : %s"), time.c_str());
+    client->send(buffer,NULL,millis(),1000);
   });
   web_server.addHandler(&event);
 
@@ -412,15 +549,15 @@ void Webserver::setup(){
     if (method== HTTP_POST) { 
       web_server.on(requestName, HTTP_POST, [](AsyncWebServerRequest * request){}, NULL, [=](AsyncWebServerRequest * request, uint8_t *data, size_t len, size_t index, size_t total) {  
         if (_requestArray[i]._callback) {
-          _httpCallbackRequest  = request;
-          _httpCallbackData     = "";
-          for (size_t i = 0; i < len; i++) {_httpCallbackData += (char) data[i];}
-          _httpCallbackData.replace("\r\n", "");
+          // _httpCallbackRequest  = request;
+          String sData = "";
+          for (size_t i = 0; i < len; i++) {sData += (char) data[i];}
+          sData.replace("\r\n", "");
           #ifdef DEBUG
             LOG(APPT_DEBUGREGION_WEBSERVER, "http <<<[%s][%s][%s] %s-message[%d]\n\t%s\n", 
-            request->host().c_str(), request->url().c_str(), WRMTP_ARR[request->method()-1], request->contentType().c_str(), _httpCallbackData.length(), _httpCallbackData.c_str());    
+            request->host().c_str(), request->url().c_str(), WRMTP_ARR[request->method()-1], request->contentType().c_str(), sData.length(), sData.c_str());    
           #endif                 
-          _task_httpCallback->set_callbackOstart(std::bind(&Webserver::httpHandle, this));
+          _task_httpCallback->set_callbackOstart(std::bind(&Webserver::httpHandle, this, request, sData));
           _task_httpCallback->set_iteration_max(0);
           _task_httpCallback->set_taskDelay(ETD::ETD_DELAY, true, 5000, 0);
           _task_httpCallback->set_taskDelayEnabled(ETD::ETD_DELAY, true);
@@ -435,8 +572,8 @@ void Webserver::setup(){
             LOG(APPT_DEBUGREGION_WEBSERVER, "http <<<[%s][%s][%s] %s\n", 
               request->host().c_str(), request->url().c_str(), WRMTP_ARR[request->method()-1], request->contentType().c_str());                   
           #endif               
-          _httpCallbackRequest  = request;
-          _task_httpCallback->set_callbackOstart(std::bind(&Webserver::httpHandle, this));
+          // _httpCallbackRequest  = request;
+          _task_httpCallback->set_callbackOstart(std::bind(&Webserver::httpHandle, this, request, ""));
           _task_httpCallback->set_iteration_max(0);
           _task_httpCallback->set_taskDelay(ETD::ETD_DELAY, true, 5000, 0);
           _task_httpCallback->set_taskDelayEnabled(ETD::ETD_DELAY, true);
@@ -444,8 +581,6 @@ void Webserver::setup(){
         }
       });       
     }
-     
-
   }
 
   web_server.onNotFound([](AsyncWebServerRequest *request) {
@@ -467,6 +602,69 @@ void Webserver::setup(){
       LOG(APPT_DEBUGREGION_WEBSERVER, "BodyEnd: %u\n", total);
   });  
 
+#ifdef AP_WS_FS
+  web_server.on("/FileSystem", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/html", FileSystemIndex_html, FileSystem_processor);
+  });
+  web_server.on("/FileSystem_statu", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send_P(200, "text/html", FileSystemStatu_html, FileSystem_processor);
+  }); 
+  web_server.on("/FileSystem_list", HTTP_GET, [](AsyncWebServerRequest * request) {
+    request->send(200, "text/html", FileSystem_recursiveList());
+  }); 
+  web_server.on("/FileSystem_set", HTTP_GET, [](AsyncWebServerRequest * request) {
+    LOG(APPT_DEBUGREGION_WEBSERVER, "\n\tclient: %s - url: %s\n",  request->client()->remoteIP().toString().c_str(), request->url().c_str());
+    if (request->hasParam("name") && request->hasParam("action")) {
+      const char *fileName = request->getParam("name")->value().c_str();
+      const char *fileAction = request->getParam("action")->value().c_str();
+
+      LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\tfile: %s\n", fileName);
+      LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\taction: %s\n", fileAction);
+      
+      if (!FILESYSTEM.exists(fileName)) {
+        LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\tERROR: file does not exist\n");
+        request->send(400, "text/plain", "ERROR: file does not exist");
+      } else {
+        LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\tfile exists\n");;
+        if (strcmp(fileAction, "download") == 0) {
+          LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\tdownloaded\n");
+          request->send(FILESYSTEM, fileName, "application/octet-stream");
+        } else if (strcmp(fileAction, "delete") == 0) {
+          LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\tdeleted\n");
+          FILESYSTEM.remove(fileName);
+          event.send("File deleted", "ota");  
+          request->send(200, "text/plain", FileSystem_recursiveList());
+        } else {
+          LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\tERROR: invalid action param supplied\n");
+          request->send(400, "text/plain", "ERROR: invalid action param supplied");
+        }
+      }
+    } else {
+      request->send(400, "text/plain", "ERROR: name and action params required");
+    }
+  });
+  web_server.on("/FileSystem_upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+        request->send(200);
+      }, FileSystem_upload);
+  web_server.on("/FileSystem_upload", HTTP_GET, [&](AsyncWebServerRequest * request) {
+    LOG(APPT_DEBUGREGION_WEBSERVER, "http://%s%s\n", request->host().c_str(), request->url().c_str());
+    int params = request->params();
+    for(int i=0;i<params;i++){
+      AsyncWebParameter* p = request->getParam(i);
+      if (p->isFile())      {LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\t_FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());} 
+      else if(p->isPost())  {LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\t_POST[%s]: %s\n", p->name().c_str(), p->value().c_str());} 
+      else                  {LOG(APPT_DEBUGREGION_WEBSERVER, "&c:1&s:\t_GET[%s]: %s\n", p->name().c_str(), p->value().c_str());}
+      if (p->name() == "path") {
+        uploadFOpath = p->value();
+      }
+    }
+    char buffer[100];
+    sprintf_P(buffer, PSTR("filesystem download path set to : %s"), uploadFOpath.c_str());
+    event.send(buffer, "ota");  
+    request->send(200, "text/plain", uploadFOpath);
+  });  
+#endif
+
   _task_socketCleanupClient->set_callback([](){/*Serial.println("-");*/ web_socket.cleanupClients();});
   _task_socketCleanupClient->set_taskDelay(ETD::ETD_TIMER, true, 500, 1);
   _task_socketCleanupClient->set_taskDelay(ETD::ETD_DELAY, true, 1, 2);
@@ -475,6 +673,7 @@ void Webserver::setup(){
   _task_socketCleanupClient->set_iteration_max(-1);
   _task_socketCleanupClient->set_enabled(true);   
 } 
+
 
 void Webserver::begin() {
   web_server.begin();
