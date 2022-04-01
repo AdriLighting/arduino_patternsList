@@ -22,7 +22,7 @@ uint8_t Task_unique_id = 0;
   #endif
 #endif
 #ifdef DEBUG
-  #define LOG(func, ...) APTRACEC(func, __VA_ARGS__)
+  #define LOG(func, ...) ALT_TRACEC(func, __VA_ARGS__)
 #else
   #define LOG(func, ...) ;
 #endif

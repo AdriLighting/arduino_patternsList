@@ -62,7 +62,7 @@ keyboard for serial monitor
 ````
 trace macro 
 ````c++
-#define DEBUG_AP          // include/def.h
+#define ALT_DEBUG_TARCE          // include/def.h
 ````
 degug 
 ````c++

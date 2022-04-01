@@ -35,6 +35,11 @@
     },
     {
         "owner": "Grellard Adrien",
+        "name": "esp_al_tools",
+        "version": "https://github.com/AdriLighting/esp_al_tools.git"
+    },
+    {
+        "owner": "Grellard Adrien",
         "name": "arduino_ALmillisTimer",
         "version": "https://github.com/AdriLighting/arduino_ALmillisTimer.git"
     } 

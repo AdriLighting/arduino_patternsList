@@ -54,7 +54,7 @@ void setup() {
 
   HeapStatu::setupHeap_v1();
 
-  #ifdef DEBUG_AP
+  #ifdef ALT_DEBUG_TARCE
     _DebugPrintList.add("main");  
   #endif
 
@@ -166,18 +166,18 @@ void setup() {
   Serial.println(ESP.getFreeHeap());
 
 /*
-  APTRACEC("main", "%d\n", ESP.getFreeHeap());
+  ALT_TRACEC("main", "%d\n", ESP.getFreeHeap());
   String **_sList = nullptr;
   _sList = new String*[10];
   for(int i = 0; i < 10; ++i) {
     _sList[i] = new String;
     String ptr = *(String*)_sList[i];
     ptr = "TEST_1" + String(i);
-    APTRACEC("main", "&c:1&s:%d - %s\n", i, ptr.c_str());
+    ALT_TRACEC("main", "&c:1&s:%d - %s\n", i, ptr.c_str());
   }
   for(int i=0; i<10; i++) delete _sList[i];
   delete[] _sList;  
-  APTRACEC("main", "%d\n", ESP.getFreeHeap());
+  ALT_TRACEC("main", "%d\n", ESP.getFreeHeap());
 */
 
 }
@@ -222,14 +222,14 @@ uint32_t _socket_cb_last = 0;
 void _socket_cb(const String & s){
 
   uint32_t last = millis()-_socket_cb_last;
-  APTRACEC("main", "[last: %d]\n", last);
+  ALT_TRACEC("main", "[last: %d]\n", last);
   
   _socket_cb_last = millis();
 
   DynamicJsonDocument doc(1024);  
   DeserializationError error = deserializeJson(doc, s);
   if (error) {      
-    APTRACEC("main", "[deserializeJson ERROR: %d]\nstring:\n\t%s", error, s.c_str());  
+    ALT_TRACEC("main", "[deserializeJson ERROR: %d]\nstring:\n\t%s", error, s.c_str());  
   } else {
     _socketQueueSetter->receive(doc);
   }
@@ -237,12 +237,12 @@ void _socket_cb(const String & s){
 void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
   String heap;
   _HeapStatu.update();_HeapStatu.print(heap);
-  APTRACEC("main", "\n");
-  APTRACEC("main", "&c:1&s:\t[%d] %s\n", itemBasePos, itemBaseName.c_str());
-  APTRACEC("main", "&c:1&s:\t%s\n", heap.c_str());
+  ALT_TRACEC("main", "\n");
+  ALT_TRACEC("main", "&c:1&s:\t[%d] %s\n", itemBasePos, itemBaseName.c_str());
+  ALT_TRACEC("main", "&c:1&s:\t%s\n", heap.c_str());
   if (!updWebserver) return; 
-  if (!_Webserver.socketIsConnected()) {APTRACEC("main", "[UPD WEBSERVER] no socket connected\n");return;} 
-  APTRACEC("main", "UPD WEBSERVER\n");
+  if (!_Webserver.socketIsConnected()) {ALT_TRACEC("main", "[UPD WEBSERVER] no socket connected\n");return;} 
+  ALT_TRACEC("main", "UPD WEBSERVER\n");
   String                    reply;
   DynamicJsonDocument       doc(2048);
   AP_ApiReply             * _ApiReply = new AP_ApiReply();

@@ -10,7 +10,8 @@
 #include "../include/apapi.h"
 #include "../include/constants.h"
 #include "../include/program.h"
-#include <functional>
+
+
 #define DEBUG
 #ifndef DEBUG
   #ifdef DEBUG_APAPI
@@ -18,7 +19,7 @@
   #endif
 #endif
 #ifdef DEBUG
-  #define LOG(func, ...) APTRACEC(func, __VA_ARGS__)
+  #define LOG(func, ...) ALT_TRACEC(func, __VA_ARGS__)
 #else
   #define LOG(func, ...) ;
 #endif
@@ -39,7 +40,7 @@ void AP_ApiItemList::add (const char * const v1, _apapiItem_f v2){
 }
 void AP_ApiItemList::parsingRequest(const String & v1, DynamicJsonDocument & doc){
   for(int i = 0; i < _list.size(); ++i) {
-    if (v1 == ch_toString( _list[i]->_id)){
+    if (v1 == al_tools::ch_toString( _list[i]->_id)){
       // Serial.printf("[AP_ApiItemList::parsingRequest][%s]\n", v1.c_str());
       _list[i]->_generateJson(doc);
       LOG(APPT_DEBUGREGION_APAPI,"END [heap: %d]\n", ESP.getFreeHeap());
@@ -264,7 +265,7 @@ void AP_userApiItem::set_replyCallback(_wsur_cb_f v1) {
  * @param[out]  v1        
  */
 void AP_userApiItem::get_id(String & v1) {
-  v1 = ch_toString(_id);}
+  v1 = al_tools::ch_toString(_id);}
 /**
  * @fn          void AP_userApiItem::get_mod(WSURM & v1) 
  *

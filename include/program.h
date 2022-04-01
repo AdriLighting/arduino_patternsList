@@ -13,16 +13,17 @@
   #include <Arduino.h>
   #include <ArduinoJson.h>
   #include <LinkedList.h>
+  #include <al_tools.h>
+  #include <functional>
 
   #include "def.h"
   // #include "LList/LinkedList.h"
   
   #include "constants.h"
-  #include "tools.h"
   #include "playlist.h"
   #include "patterns.h"
   #include "lloop.h"
-
+  
 
   class ListSortItems {
   public:

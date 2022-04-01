@@ -3,8 +3,10 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <LinkedList.h>
+#include <functional>
+#include <al_tools.h>
+
 #include "constants.h"
-#include "tools.h"
 
 void AP_ApiItemList_setup();
 

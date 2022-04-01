@@ -2,8 +2,7 @@
 
 #include "../include/def.h"
 #include "../include/program.h"
-#include "../include/tools.h"
 #include "../include/apapi.h"
 #ifdef DEBUG_KEYBOARD
-	#include "../include/menu_serial.h"
+	#include <al_serialmenu.h>
 #endif

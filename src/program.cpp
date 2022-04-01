@@ -24,7 +24,7 @@
   #endif
 #endif
 #ifdef DEBUG
-  #define LOG(func, ...) APTRACEC(func, __VA_ARGS__)
+  #define LOG(func, ...) ALT_TRACEC(func, __VA_ARGS__)
 #else
   #define LOG(func, ...) ;
 #endif
@@ -104,8 +104,8 @@ void ProgramPtrSet(Program *ptr){ProgramPtr = ptr;}
 Program::Program(uint8_t nbLB, boolean fs){
   ProgramPtrSet(this);
 
-  #ifdef DEBUG_AP
-    ap_debugBuffer    = new char[1024];
+  #ifdef ALT_DEBUG_TARCE
+    ALT_debugBuffer    = new char[1024];
 
       _DebugPrintList.add(APPT_DEBUGREGION_APAPI); 
 
