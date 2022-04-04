@@ -1,5 +1,4 @@
 #include "main.h"
-
 #include <Arduino.h>
 #include <alwificonnect.h>
 #include <arduinoPatternList.h>
