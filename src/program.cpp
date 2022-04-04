@@ -12,6 +12,9 @@
     #endif
   #endif
 #endif
+#ifdef DEBUG_KEYBOARD
+  #include <al_serialmenu.h>
+#endif
 
 #include "../include/Stringsort.h"
 #include "../include/apapi.h"
@@ -128,7 +131,36 @@ Program::Program(uint8_t nbLB, boolean fs){
     #endif
         
   #endif
-
+  #ifdef DEBUG_KEYBOARD    
+    _Sr_menu.add("setter list",   "r", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_SETTER_ARRAY[i]);}});
+    _Sr_menu.add("getter list",   "t", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_REQ_ARRAY[i]);}});
+    _Sr_menu.add("api getter",    "@", [](const String & v1, const String & v2) {  
+      DynamicJsonDocument doc(1024);
+      JsonArray           arr;
+      arr = doc.createNestedArray(F("set"));  
+      arr = doc.createNestedArray(F("get"));  
+      arr.add(v1);
+      DynamicJsonDocument reply(2048);
+      _AP_Api.parsingRequest(doc, reply, "");
+      serializeJsonPretty(reply, Serial); 
+      Serial.println();      
+    }, SR_MM::SRMM_KEY); 
+    _Sr_menu.add("api setter",   "#", [](const String & v1, const String & v2) {  
+      DynamicJsonDocument doc(1024);
+      JsonArray           arr;
+      JsonObject          obj;
+      uint8_t             p = v1.toInt();
+      arr = doc.createNestedArray(F("set"));  
+      obj = arr.createNestedObject();
+      obj[F("n")] = FPSTR(APPT_SETTER_ARRAY[p]);
+      obj[F("v")] = v2;
+      arr = doc.createNestedArray(F("get"));  
+      DynamicJsonDocument reply(2048);
+      _AP_Api.parsingRequest(doc, reply, "");
+      serializeJsonPretty(reply, Serial); 
+      Serial.println();    
+    }, SR_MM::SRMM_KEY);   
+  #endif
 
   #ifdef FSOK
     if (!fs) {

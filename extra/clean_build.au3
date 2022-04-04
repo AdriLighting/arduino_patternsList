@@ -2,7 +2,7 @@
 #include <Array.au3>
 
 
-Global Const $main_path = "D:\programmation_code\Arduino\Arduino_Projet\0A_projet\2_mylib_v1\lib\arduino_patternsList\"
+Global Const $main_path = "C:\Users\adri\.platformio\lib\arduino_patternsList\"
 
 clean($main_path)
 Func clean($p1)

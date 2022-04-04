@@ -3,7 +3,14 @@
 #include <Arduino.h>
 #include <alwificonnect.h>
 #include <arduinoPatternList.h>
-#include <typeinfo>
+#ifdef FILESYSTEM
+  #if defined(ESP8266)
+    #include <LittleFS.h> 
+  #elif defined(ESP32)
+    #include <FS.h>
+    #include <LITTLEFS.h>
+  #endif  
+#endif  
 
 #include "apwebserver.h"
 #include "TaskScheduler.h"
@@ -158,11 +165,11 @@ void setup() {
 
   delay(2);
   String heap, time;
-  on_time_h(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
+  al_tools::on_time_h(time);_HeapStatu_2.setupHeap_v2();_HeapStatu_2.update();_HeapStatu_2.print(heap);
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str());
 
   Serial.println(ESP.getFreeHeap());
-  AP_SPIFFS_PRINT(false);
+  al_tools::SPIFFS_PRINT(false);
   Serial.println(ESP.getFreeHeap());
 
 /*

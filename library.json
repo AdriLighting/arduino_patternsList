@@ -44,7 +44,17 @@
         "version": "https://github.com/AdriLighting/arduino_ALmillisTimer.git"
     } 
   ],
-  
+  "examples": [
+      {
+          "name": "pio_asyncwebserver",
+          "base": "examples/pio_asyncwebserver",
+          "files": [
+              "platformio.ini",
+              "include/main.h",
+              "src/main.cpp"
+          ]
+      }
+  ],    
   "frameworks": "arduino",
   "platforms": "espressif8266",
   "headers": "arduino_patternsList.h"

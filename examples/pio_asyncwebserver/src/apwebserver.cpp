@@ -421,7 +421,7 @@ String FileSystem_recursiveList() {
   returnText += "<table><tr><th align='left'>Folder</th><th align='left'>Name</th><th align='left'>Size</th><th></th><th></th></tr>";
   DynamicJsonDocument doc(10000);
   JsonObject root = doc.to<JsonObject>();
-  AP_SPIFFS_printFiles("/", root);
+  al_tools::SPIFFS_printFiles("/", root);
   JsonArray arr = doc[F("folders")].as<JsonArray>();
   for (size_t i = 0; i < arr.size(); i++) {
     String path = arr[i].as<String>();
@@ -523,7 +523,7 @@ void Webserver::setup(){
   event.onConnect([](AsyncEventSourceClient *client){
     char buffer[100];
     String time;
-    on_time_d(time);
+    al_tools::on_time_d(time);
     sprintf_P(buffer, PSTR("client connected at : %s"), time.c_str());
     client->send(buffer,NULL,millis(),1000);
   });
