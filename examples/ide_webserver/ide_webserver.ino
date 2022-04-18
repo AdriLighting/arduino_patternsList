@@ -42,7 +42,7 @@ void setup() {
   Serial.setDebugOutput(false);
 
   #ifdef DEBUG_KEYBOARD
-    _Sr_menu.add("name_1",             "!", serial_menu_cmd, SR_MM::SRMM_KEY);
+    _Sr_menu.add("name_1",             "!", serial_menu_cmd, SR_MM::SRMM_KEYVAL);
   #endif
   boolean fs = FILESYSTEM.begin();
 

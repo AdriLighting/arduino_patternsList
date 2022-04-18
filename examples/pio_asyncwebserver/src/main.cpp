@@ -71,7 +71,7 @@ void setup() {
 
   #ifdef DEBUG_KEYBOARD
     _Sr_menu.add("heaploop", "q", keyboard_freeheap);
-    _Sr_menu.add("api setter socket", "!", keyboard_apiSetter, SR_MM::SRMM_KEY);
+    _Sr_menu.add("api setter socket", "!", keyboard_apiSetter, SR_MM::SRMM_KEYVAL);
   #endif
 
     #if defined(ESP8266)

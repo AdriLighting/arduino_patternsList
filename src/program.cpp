@@ -144,7 +144,7 @@ Program::Program(uint8_t nbLB, boolean fs){
       _AP_Api.parsingRequest(doc, reply, "");
       serializeJsonPretty(reply, Serial); 
       Serial.println();      
-    }, SR_MM::SRMM_KEY); 
+    }, SR_MM::SRMM_KEYVAL); 
     _Sr_menu.add("api setter",   "#", [](const String & v1, const String & v2) {  
       DynamicJsonDocument doc(1024);
       JsonArray           arr;
@@ -159,7 +159,7 @@ Program::Program(uint8_t nbLB, boolean fs){
       _AP_Api.parsingRequest(doc, reply, "");
       serializeJsonPretty(reply, Serial); 
       Serial.println();    
-    }, SR_MM::SRMM_KEY);   
+    }, SR_MM::SRMM_KEYVAL);   
   #endif
 
   #ifdef FSOK

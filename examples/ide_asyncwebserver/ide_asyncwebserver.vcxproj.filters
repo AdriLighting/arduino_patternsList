@@ -9,25 +9,13 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Misc Files">
+    <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>xml;json;txt;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="lib">
-      <UniqueIdentifier>{7bfbe339-7e98-4d76-9959-f4cf9fd70c5e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\src">
-      <UniqueIdentifier>{7b9f8d03-5a7c-4b68-89cf-23eb64800921}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\header">
-      <UniqueIdentifier>{6709dddb-52ca-41a9-b22f-00fb1ee10df6}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ide_asyncwebserver.ino" />
-    <None Include="src\arduino folders read me.txt">
-      <Filter>Misc Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.ide_asyncwebserver.vsarduino.h">
@@ -39,46 +27,13 @@
     <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TaskScheduler.h">
+    <ClInclude Include="queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\arduinoPatternList.h">
-      <Filter>lib\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\apapi.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\constants.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\def.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\lloop.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\menu_serial.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\patterns.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\playlist.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\program.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\Stringsort.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\tools.h">
-      <Filter>lib\header</Filter>
-    </ClInclude>
-    <ClInclude Include="queue.h">
+    <ClInclude Include="TaskScheduler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,43 +41,11 @@
     <ClCompile Include="apwebserver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TaskScheduler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\tools.cpp">
-      <Filter>lib\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Stringsort.cpp">
-      <Filter>lib\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\program.cpp">
-      <Filter>lib\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\playlist.cpp">
-      <Filter>lib\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\patterns.cpp">
-      <Filter>lib\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\menu_serial.cpp">
-      <Filter>lib\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\lloop.cpp">
-      <Filter>lib\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\constants.cpp">
-      <Filter>lib\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\apapi.cpp">
-      <Filter>lib\src</Filter>
-    </ClCompile>
     <ClCompile Include="queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="ide_asyncwebserver.rc">
-      <Filter>Misc Files</Filter>
-    </ResourceCompile>
+    <ClCompile Include="TaskScheduler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
