@@ -1,4 +1,5 @@
 #include "main.h"
+
 #include <Arduino.h>
 #include <alwificonnect.h>
 #include <arduinoPatternList.h>
@@ -85,8 +86,8 @@ void setup() {
   // region ################################################ WIFI
   _DeviceWifi = new WifiConnect(
     "apdebug_1",
-    "free3C3786_EXT",
-    "phcaadax",
+    "SSID",
+    "SSIDPASS",
     "adsap1234",
     "adsota1234");
   _DeviceWifi->setFunc_STAinitServer  ( [](){_Webserver.begin();} );

@@ -12,6 +12,7 @@
   // typedef enum : uint8_t {PM_LB=0,PM_LBNAME,PM_PL,PM_LOOP, PM_LL, PM_LLI} PRINT_MOD; 
   typedef struct  APLISTLOOPFLAG_T{ 
     int       _pos          = 0;
+    int       _posOld       = 0;
     uint8_t   _posMin       = 0;
     uint16_t  _posMax       = 0; 
   } apListLoopFlag_t;

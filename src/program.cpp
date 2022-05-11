@@ -32,7 +32,9 @@
   #define LOG(func, ...) ;
 #endif
 
+const char**  _AP_DEFAULTLIST = nullptr;
 LList<ListSortItems*> ListSortItemsPtr; 
+
 void ListSortItems_sort(apListSortType_t _effSort) {
   switch(_effSort){
     case apListSortType_t::ST_BASE :
@@ -46,6 +48,7 @@ void ListSortItems_sort(apListSortType_t _effSort) {
     break;
     case apListSortType_t::ST_AB2 :
     case apListSortType_t::ST_AB :
+      ListSortItemsPtr.sort([](ListSortItems *&a, ListSortItems *&b){ String tmp=FPSTR(_AP_DEFAULTLIST[(uint8_t)a->_id]); return strcmp_P(tmp.c_str(), (_AP_DEFAULTLIST[(uint8_t)b->_id]));});
     break;
     default:
     break;
@@ -132,9 +135,9 @@ Program::Program(uint8_t nbLB, boolean fs){
         
   #endif
   #ifdef DEBUG_KEYBOARD    
-    _Sr_menu.add("setter list",   "r", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_SETTER_ARRAY[i]);}});
-    _Sr_menu.add("getter list",   "t", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_REQ_ARRAY[i]);}});
-    _Sr_menu.add("api getter",    "@", [](const String & v1, const String & v2) {  
+    _Sr_menu.add("setter list",   "o", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_SETTER_ARRAY[i]);}});
+    _Sr_menu.add("getter list",   "p", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_REQ_ARRAY[i]);}});
+    _Sr_menu.add("api getter",    "$", [](const String & v1, const String & v2) {  
       DynamicJsonDocument doc(1024);
       JsonArray           arr;
       arr = doc.createNestedArray(F("set"));  
@@ -324,8 +327,10 @@ void Program::get_json_lb(JsonObject & obj){
   const char * lbN;
   String ilbN;
   uint16_t pC, pCmax;
+  uint8_t iId;
   get_name(lbN);
   get_itemNameByPos(_lbtFlag._pos, ilbN);
+  get_itemIdByPos(_lbtFlag._pos, iId);
   get_cnt(pC);
   get_cntMax(pCmax); 
   
@@ -333,6 +338,7 @@ void Program::get_json_lb(JsonObject & obj){
   obj[F("pos")]       = _lbStatu.pos;
   obj[F("cnt")]       = _lbStatu.cnt;
   obj[F("iname")]     = ilbN;
+  obj[F("iid")]       = iId;
   obj[F("icnt")]      = pC;
   obj[F("icmax")]     = pCmax;
 }
@@ -373,7 +379,19 @@ void Program::initialize(const uint16_t & maxCnt, const char* const* arr, const 
   Listbase::get_cnt(pC);
   ListLoop::setup(&_lbtFlag, pC-1);
 }
+void Program::initialize(const uint16_t & maxCnt, const char* const* arr, uint8_t * arrId, const char  * const & n, apListSortType_t t){
+#ifdef DEBUG
+  LOG(APPT_DEBUGREGION_PROGRAM, "-\n");  
+#endif
 
+  Listbase::initialize(maxCnt, n);
+  
+  initialize(maxCnt, arr, arrId, t);
+
+  uint16_t pC; 
+  Listbase::get_cnt(pC);
+  ListLoop::setup(&_lbtFlag, pC-1);
+}
 void Program::initialize(const uint16_t & maxCnt, const char* const* arr, apListSortType_t t){
   stringList aStringList;   // An instance of the stringList class we created above.  
   switch (t) {
@@ -386,14 +404,43 @@ void Program::initialize(const uint16_t & maxCnt, const char* const* arr, apList
         aStringList.dumpList();               
       break;
       default:
-        for (int i = 0; i < maxCnt; ++i) {ListSortItemsPtr.add(new ListSortItems(FPSTR(arr[i]), i));} 
+        for (int i = 0; i < maxCnt; ++i) {ListSortItemsPtr.add(new ListSortItems(FPSTR(arr[i]), i, i));} 
         ListSortItems_sort(t);
         for (int i = 0; i < ListSortItemsPtr.size(); ++i) {item_add(ListSortItemsPtr[i]->_name.c_str());}  
         ListSortItems_delete();
       break;
   }  
 }
-
+void Program::initialize(const uint16_t & maxCnt, const char* const* arr, uint8_t * arrId, apListSortType_t t){
+        for (int i = 0; i < maxCnt; ++i) {ListSortItemsPtr.add(new ListSortItems(FPSTR(arr[i]), i, arrId[i]));} 
+        ListSortItems_sort(t);
+        for (int i = 0; i < ListSortItemsPtr.size(); ++i) {item_add(ListSortItemsPtr[i]->_name.c_str(), ListSortItemsPtr[i]->_pos);}  
+        ListSortItems_delete();
+          
+  // stringList aStringList;   // An instance of the stringList class we created above.  
+  // switch (t) {
+  //     case apListSortType_t::ST_AB:
+  //       for (int i = 0; i < maxCnt; ++i) {
+  //         String s = FPSTR(arr[i]);
+  //         aStringList.addString(&s);
+  //       }
+  //       aStringList.printStrings();                
+  //       aStringList.dumpList();               
+  //     break;
+  //     default:
+  //       for (int i = 0; i < maxCnt; ++i) {ListSortItemsPtr.add(new ListSortItems(FPSTR(arr[i]), i, arrId[i]));} 
+  //       ListSortItems_sort(t);
+  //       for (int i = 0; i < ListSortItemsPtr.size(); ++i) {item_add(ListSortItemsPtr[i]->_name.c_str(), ListSortItemsPtr[i]->_pos);}  
+  //       ListSortItems_delete();
+  //     break;
+  // }  
+}
+void Program::get_itemId(uint8_t & v1){   
+  if (_plStatu.isPlaying && _plStatu.isSet)  
+    _Playlists[_plStatu.pos].get_itemIdItemByArrayPos(_pltFlag._pos, v1) ;
+  else 
+    get_itemIdByPos(_lbtFlag._pos, v1); 
+}
 void Program::get_itemPosBase(uint16_t & v1){   
   String name = "";
   get_itemBase(name);
@@ -421,13 +468,15 @@ void Program::set_itemRnd(){
 void Program::set_itemPos(const uint16_t & p){ 
   uint16_t sP = p;  
   if (_plStatu.isPlaying && _plStatu.isSet) {
+    _pltFlag._posOld  = _pltFlag._pos;
     if (sP > _pltFlag._posMax) sP = _pltFlag._posMin;
     if (sP < _pltFlag._posMin) sP = _pltFlag._posMax;
-    _pltFlag._pos = sP;
+    _pltFlag._pos     = sP;
   } else {
+    _lbtFlag._posOld  = _lbtFlag._pos; 
     if (sP > _lbtFlag._posMax) sP = _lbtFlag._posMin;
     if (sP < _lbtFlag._posMin) sP = _lbtFlag._posMax;  
-    _lbtFlag._pos = sP;  
+    _lbtFlag._pos     = sP; 
   }
   reset();
 }
@@ -444,13 +493,15 @@ void Program::handle(){
   if (_timer->loop(del*(delMin ? 60000 : 1000))) {
     String    name;
     uint16_t  pB = 0;
+    uint8_t   id = 0;
 
     set_itemNext();
 
     get_itemBase(name);
     get_itemPosBase(pB);
+    get_itemId(id);
 
-    if(_callback)_callback(name, pB, true);
+    if(_callback)_callback(name, pB, id, true);
 
   }
 }
@@ -526,7 +577,9 @@ void Program::remote_action(apSetter_t action, const char * const & key, const c
         uint16_t  pB = 0;
         get_itemBase(name);
         get_itemPosBase(pB);
-        _callback(name, pB, (String(val) == "upd" )?true:false);}
+        uint8_t   id = 0;
+        get_itemId(id);
+        _callback(name, pB, id, (String(val) == "upd" )?true:false);}
     }
     break;
     default:break;

@@ -28,6 +28,11 @@ void Playlist_list::get_lbl         (String & v1)       {v1 = _lbl;}
 void Playlist_list::get_items_max   (uint16_t & v1)     {v1 = _items_max;}
 void Playlist_list::get_items_cnt   (uint16_t & v1)     {v1 = _items_cnt;} 
 
+boolean Playlist_list::get_itemIdItemByArrayPos(uint8_t aP, uint8_t & r) { 
+  if (aP > _items_cnt-1) return false;
+  _Playlist_itemArray[aP].get_itemId(r);
+  return true;
+}
 boolean Playlist_list::get_itemIdByArrayPos(uint8_t aP, uint8_t & r) { 
   if (aP > _items_cnt-1) return false;
   _Playlist_itemArray[aP].get_id(r);
@@ -43,6 +48,7 @@ void Playlist_list::item_df() {
   _items_cnt = 0;
   for (int i=0; i < _items_max; i++) {
     _Playlist_itemArray[i].set_id(0)                ;
+    _Playlist_itemArray[i].set_itemId(0)            ;
     _Playlist_itemArray[i].set_itemBase("null")     ;
     _Playlist_itemArray[i].set_lbl("null")          ;
     _Playlist_itemArray[i].set_itemBaseCfg("null")  ;    
@@ -59,6 +65,7 @@ void Playlist_list::item_restore(DynamicJsonDocument & doc) {
           break;
         } else {
           _Playlist_itemArray[i].set_id(item[F("id")].as<uint8_t>());
+          _Playlist_itemArray[i].set_itemId(item[F("itemid")].as<uint8_t>());
           _Playlist_itemArray[i].set_lbl(item[F("lbl")].as<String>());
           _Playlist_itemArray[i].set_itemBase(item[F("ib")].as<String>());
           _Playlist_itemArray[i].set_itemBaseCfg(item[F("ibcfg")].as<String>());
@@ -75,14 +82,17 @@ void Playlist_list::item_remove(uint8_t id) {
     Playlist_item * temp = new Playlist_item[_items_max];
     uint8_t cnt = 0;
     uint8_t sId;
+    uint8_t sItemId;
     String sLbl, sIb, sIbCfg;
     for (int i=0; i < _items_max; i++) {
         _Playlist_itemArray[i].get_id(sId);
         if (sId == id) continue;
         _Playlist_itemArray[i].get_lbl(sLbl);
+        _Playlist_itemArray[i].get_itemId(sItemId);
         _Playlist_itemArray[i].get_itemBase(sIb);
         _Playlist_itemArray[i].get_itemBaseCfg(sIbCfg);
         temp[cnt].set_id(sId);
+        temp[cnt].set_itemId(sItemId);
         temp[cnt].set_itemBase(sIb);
         temp[cnt].set_lbl(sLbl);
         temp[cnt].set_itemBaseCfg(sIbCfg);
@@ -94,10 +104,12 @@ void Playlist_list::item_remove(uint8_t id) {
 
     for (int i=0; i < _items_max; i++) {
       temp[i].get_id(sId);
+      temp[i].get_itemId(sItemId);
       temp[i].get_lbl(sLbl);
       temp[i].get_itemBase(sIb);
       temp[i].get_itemBaseCfg(sIbCfg);
       _Playlist_itemArray[i].set_id(sId);
+      _Playlist_itemArray[i].set_itemId(sItemId);
       _Playlist_itemArray[i].set_itemBase(sIb);
       _Playlist_itemArray[i].set_lbl(sLbl);
       _Playlist_itemArray[i].set_itemBaseCfg(sIbCfg);     
@@ -113,7 +125,7 @@ void Playlist_list::item_remove(uint8_t id) {
     #endif
 }
 
-uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg) {
+uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String & itemBase, const String & itemBaseCfg, uint8_t itemId) {
   #ifdef DEBUG
     LOG(APPT_DEBUGREGION_PLAYLIST, "[Playlist_list::item_toArray][START]\n");    
     LOG(APPT_DEBUGREGION_PLAYLIST, "\t[iP][%d]", iP);   
@@ -166,6 +178,7 @@ uint8_t Playlist_list::item_toArray(uint8_t iP, const String & lbl, const String
   _Playlist_itemArray[iP].set_itemBase(itemBase);
   _Playlist_itemArray[iP].set_lbl(lbl);
   _Playlist_itemArray[iP].set_itemBaseCfg(itemBaseCfg); 
+  _Playlist_itemArray[iP].set_itemId(itemId); 
 
   // item_toTxt(); 
 
@@ -211,7 +224,7 @@ void Playlist_list::item_json(JsonObject & root, boolean pItem){
   root[F("lref")]  = _listRef;
   if (!pItem) return;
   JsonArray arr = root.createNestedArray(F("items")); 
-  uint8_t sId;
+  uint8_t sId, sItemId;
   String sLbl, sIb, sIbCfg;
   for (int i=0; i < _items_cnt; i++) {
     JsonObject var = arr.createNestedObject();
@@ -219,20 +232,24 @@ void Playlist_list::item_json(JsonObject & root, boolean pItem){
     _Playlist_itemArray[i].get_lbl(sLbl);
     _Playlist_itemArray[i].get_itemBase(sIb);
     _Playlist_itemArray[i].get_itemBaseCfg(sIbCfg);
+    _Playlist_itemArray[i].get_itemId(sItemId);
     var[F("id")] = sId;
     var[F("lbl")] = sLbl;
     var[F("ib")] = sIb;
     var[F("ibcfg")] = sIbCfg;
+    var[F("itemid")] = sItemId;
     
   }
 }
 
 void Playlist_item::set_id(uint8_t v1)                  {_id = v1;}
+void Playlist_item::set_itemId(uint8_t v1)              {_itemId = v1;}
 void Playlist_item::set_lbl(const String & v1)          {_lbl = v1;}
 void Playlist_item::set_itemBase(const String & v1)     {_itemBase = v1;}
 void Playlist_item::set_itemBaseCfg(const String & v1)  {_itemBaseCfg = v1;}
 
 void Playlist_item::get_id(uint8_t & v1)          {v1 = _id;}
+void Playlist_item::get_itemId(uint8_t & v1)      {v1 = _itemId;}
 void Playlist_item::get_lbl(String & v1)          {v1 = _lbl;}
 void Playlist_item::get_itemBase(String & v1)     {v1 = _itemBase;}
 void Playlist_item::get_itemBaseCfg(String & v1)  {v1 = _itemBaseCfg;}   

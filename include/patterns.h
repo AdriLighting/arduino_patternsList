@@ -27,7 +27,8 @@ strcpy_P(buffer, (char*)pgm_read_word(&(string_table[i])));// i being 0 or 1
   private:
     const char  * _name   = "df";
     // const char  **  _list   = nullptr;
-    String      ** _list   = nullptr;
+    String      ** _list  = nullptr;
+    uint8_t     ** _id    = nullptr;
     uint16_t    _cnt      = 0;
     uint16_t    _cntMax   = 0;
     // STATU       _STATU      = 
@@ -42,7 +43,7 @@ strcpy_P(buffer, (char*)pgm_read_word(&(string_table[i])));// i being 0 or 1
     void initialize(const uint16_t & maxCnt, const char  * const & n);
 
     void list_delete();
-    void item_add(const String & n);
+    void item_add(const String & n, uint8_t id = 0);
 
     void get_name   (const char * & v1);
     void get_cnt    (uint16_t & v1);
@@ -50,8 +51,11 @@ strcpy_P(buffer, (char*)pgm_read_word(&(string_table[i])));// i being 0 or 1
 
     void    get_itemRnd         (String & value, uint16_t & p);
     void    get_itemNameByPos   (const uint16_t & pos, String & value);
+    void    get_itemIdByPos     (uint8_t, uint8_t & value);
     boolean get_itemPosByName   (const String & search, uint16_t & result);
+    boolean get_itemPosById     (uint8_t, uint16_t & result);
     boolean get_item            (const String & search);
+    boolean get_item            (uint8_t);
 
     void jsonObject(JsonObject & root);
 

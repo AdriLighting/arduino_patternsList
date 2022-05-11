@@ -25,11 +25,14 @@
   #include "lloop.h"
   
 
+  extern const char**  _AP_DEFAULTLIST ;
+
   class ListSortItems {
   public:
     String    _name;
     uint16_t  _id;
-    ListSortItems(String n, uint16_t id) : _name(n), _id(id) {};
+    uint8_t   _pos;
+    ListSortItems(String n, uint16_t id, uint8_t pos) : _name(n), _id(id) , _pos(pos) {};
   };
   class LBnames
   {
@@ -47,7 +50,7 @@
   };
   
   class Program : public Listbase, public ListLoop {
-    typedef std::function<void(const String & v1, const uint16_t & v2, boolean upd)> callback_function_t;
+    typedef std::function<void(const String & v1, const uint16_t & v2, uint8_t itemId, boolean upd)> callback_function_t;
     // typedef std::function<void(const String & v1)> callback_error;
 
     LBnames             * _LBnames    = nullptr;  
@@ -63,12 +66,12 @@
     void get_itemBase(String &);
     void get_itemPosBase(uint16_t &);
     void get_itemPos(uint16_t &);
+    void get_itemId(uint8_t &);
 
     void set_itemNext();
     void set_itemPrev();
     void set_itemRnd();
     void set_itemPos(const uint16_t & p);
-    void lb_print();
 
     void pl_print();
     void pl_print(uint8_t);
@@ -82,8 +85,12 @@
     ~Program ();
 
     apPlaylistFlag_t _plStatu;
+    
+    void lb_print();
 
+    void initialize(const uint16_t & maxCnt, const char* const* arr, uint8_t * arrId, apListSortType_t t);
     void initialize(const uint16_t & , const char* const* arr, const char  * const &, apListSortType_t t = ST_BASE);
+    void initialize(const uint16_t & , const char* const* arr, uint8_t * arrId, const char  * const &, apListSortType_t t = ST_BASE);
     void initialize(const uint16_t & maxCnt, const char* const* arr, apListSortType_t t);
     void initialize_playlist(uint8_t , const uint8_t * const &, const char ** const &);
     void initialize_lb(uint8_t p, const char * name, uint8_t items, const char * const * arr);

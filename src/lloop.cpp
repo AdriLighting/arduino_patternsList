@@ -30,27 +30,32 @@ void ListLoop::loop_prev(apListLoopFlag_t * flag){
   else          prev(flag);
 }
 void ListLoop::next(apListLoopFlag_t * flag){
+  flag->_posOld = flag->_pos;
   flag->_pos++;
   if (flag->_pos > flag->_posMax) flag->_pos = flag->_posMin;
 }
 void ListLoop::prev(apListLoopFlag_t * flag){
+  flag->_posOld = flag->_pos;
   flag->_pos--;
   if (flag->_pos < flag->_posMin) flag->_pos = flag->_posMax;
 }
 void ListLoop::rnd(apListLoopFlag_t * flag){
+  flag->_posOld = flag->_pos;
   flag->_pos = random(flag->_posMin, flag->_posMax);
   if (flag->_pos > flag->_posMax) flag->_pos = flag->_posMin;
 }
 void ListLoop::setup(apListLoopFlag_t * flag, const uint16_t & v){
   flag->_pos        = 0;
   flag->_posMax     = v;
+  flag->_posOld     = flag->_pos;
 }
 void ListLoop::updatePos(apListLoopFlag_t * flag, const uint16_t & v){
   flag->_posMax = v;
   if (flag->_pos > flag->_posMax) flag->_pos = flag->_posMax;
 }
 void ListLoop::reset(apListLoopFlag_t * flag, int v){
-  flag->_pos        = v;
+  flag->_pos    = v;
+  flag->_posOld = flag->_pos;
   _timer->reset();    
 }
 void ListLoop::reset(){
