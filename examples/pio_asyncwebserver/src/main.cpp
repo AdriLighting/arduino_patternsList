@@ -86,10 +86,10 @@ void setup() {
   // region ################################################ WIFI
   _DeviceWifi = new WifiConnect(
     "apdebug_1",
-    "free3C3786_EXT",
-    "phcaadax",
-    "adsap1234",
-    "adsota1234");
+    "SSID",
+    "PSK",
+    "apdebug1234",
+    "apdebug1234");
   _DeviceWifi->setFunc_STAinitServer  ( [](){_Webserver.begin();} );
   _DeviceWifi->setFunc_APinitServer   ( [](){_Webserver.begin();} );  
   // endregion >>>> WIFI
