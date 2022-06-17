@@ -52,7 +52,7 @@ void Listbase::list_delete(){
 
 void Listbase::item_add(const String & value, uint8_t id){
   #ifdef DEBUG
-   LOG(APPT_DEBUGREGION_BASICLIST, "&c:1&s:[Listbase::item_add] pos: %d name: %s\n", _cnt, value.c_str());
+   // LOG(APPT_DEBUGREGION_BASICLIST, "&c:1&s:[Listbase::item_add] pos: %d name: %s\n", _cnt, value.c_str());
   #endif
   *(String*)_list[_cnt] = value;
   *(uint8_t*)_id[_cnt] = id;
@@ -122,6 +122,15 @@ void Listbase::jsonObject(JsonObject & root){
   root[F("cmax")]   = _cntMax;
   JsonArray arr = root.createNestedArray(F("items"));  
   for (int i = 0; i < _cntMax; i++) {arr.add(*(String*)_list[i]);}}
+void Listbase::jsonObjectId(JsonObject & root){
+  root[F("cmax")]   = _cntMax;
+  JsonArray arr = root.createNestedArray(F("items"));  
+  for (int i = 0; i < _cntMax; i++) {
+    JsonArray arr2 = arr.createNestedArray();  
+    arr2.add(*(String*)_list[i]);
+    arr2.add(String(*(uint8_t*)_id[i]));
+  }
+}    
 void Listbase::print() {
   Serial.printf_P(PSTR("[Listbase::print][_cnt: %d][_cntMax: %d][_name: %s]\n"), _cnt, _cntMax, _name);
   for (int i = 0; i < _cntMax; ++i) {

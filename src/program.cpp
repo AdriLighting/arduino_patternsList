@@ -135,9 +135,9 @@ Program::Program(uint8_t nbLB, boolean fs){
         
   #endif
   #ifdef DEBUG_KEYBOARD    
-    _Sr_menu.add("setter list",   "o", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_SETTER_ARRAY[i]);}});
-    _Sr_menu.add("getter list",   "p", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_REQ_ARRAY[i]);}});
-    _Sr_menu.add("api getter",    "$", [](const String & v1, const String & v2) {  
+    _Sr_menu.add("ap setterL",   "o", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[&loop=] - [&APSET_ITEM=1]\n[%-3d][%-25s]\n"), i, APPT_SETTER_ARRAY[i]);}});
+    _Sr_menu.add("ap getterL",   "p", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[&loop=] - [&APSET_ITEM=1]\n[%-3d][%-25s]\n"), i, APPT_REQ_ARRAY[i]);}});
+    _Sr_menu.add("ap getter",    "$", [](const String & v1, const String & v2) {  
       DynamicJsonDocument doc(1024);
       JsonArray           arr;
       arr = doc.createNestedArray(F("set"));  
@@ -148,7 +148,7 @@ Program::Program(uint8_t nbLB, boolean fs){
       serializeJsonPretty(reply, Serial); 
       Serial.println();      
     }, SR_MM::SRMM_KEYVAL); 
-    _Sr_menu.add("api setter",   "#", [](const String & v1, const String & v2) {  
+    _Sr_menu.add("ap setter",   "#", [](const String & v1, const String & v2) {  
       DynamicJsonDocument doc(1024);
       JsonArray           arr;
       JsonObject          obj;
@@ -449,6 +449,45 @@ void Program::get_itemPosBase(uint16_t & v1){
 void Program::get_itemPos(uint16_t & v1){ 
   v1 = (_plStatu.isPlaying && _plStatu.isSet) ? _pltFlag._pos : _lbtFlag._pos;
 }
+
+void Program::get_itemNext(uint16_t & v1){ 
+  uint16_t current = (_plStatu.isPlaying && _plStatu.isSet) ? _pltFlag._pos : _lbtFlag._pos;
+  current++;
+  if (_plStatu.isPlaying && _plStatu.isSet) {
+    if (current > _pltFlag._posMax) current = _pltFlag._posMin;
+  } else {
+    if (current > _lbtFlag._posMax) current = _lbtFlag._posMin;
+  }
+  v1 = current;
+}
+void Program::get_itemNext(uint16_t p, String & v1){ 
+  if (_plStatu.isPlaying) {_Playlists[_plStatu.pos].get_itemBaseByArrayPos(p, v1);} 
+  else {get_itemNameByPos(p, v1);}    
+}
+void Program::get_itemNext(String & v1){ 
+  uint16_t p = 0;
+  get_itemNext(p);
+  if (_plStatu.isPlaying) {_Playlists[_plStatu.pos].get_itemBaseByArrayPos(p, v1);} 
+  else {get_itemNameByPos(p, v1);}    
+}
+
+void Program::get_itemPrev(uint16_t & v1){ 
+  uint16_t current = (_plStatu.isPlaying && _plStatu.isSet) ? _pltFlag._pos : _lbtFlag._pos;
+  current--;
+  if (_plStatu.isPlaying && _plStatu.isSet) {
+    if (current < _pltFlag._posMin) current = _pltFlag._posMax;
+  } else {
+    if (current < _lbtFlag._posMin) current = _lbtFlag._posMax;
+  }
+  v1 = current;
+}
+void Program::get_itemPrev(String & v1){ 
+  uint16_t p = 0;
+  get_itemPrev(p);
+  if (_plStatu.isPlaying) {_Playlists[_plStatu.pos].get_itemBaseByArrayPos(p, v1);} 
+  else {get_itemNameByPos(p, v1);}    
+}
+
 void Program::get_itemBase(String & v1){ 
   if (_plStatu.isPlaying) {_Playlists[_plStatu.pos].get_itemBaseByArrayPos(_pltFlag._pos, v1);} 
   else {get_itemNameByPos(_lbtFlag._pos, v1);}  
@@ -480,7 +519,12 @@ void Program::set_itemPos(const uint16_t & p){
   }
   reset();
 }
-
+void Program::set_itemById(uint8_t id){ 
+  uint16_t result;
+  (_plStatu.isPlaying && _plStatu.isSet) ? _Playlists[_plStatu.pos].get_itemPosById(id, result) : get_itemPosById(id , result);
+  set_itemPos(result);
+  reset();
+}
 
 void Program::handle(){
   if ( !isPlaying() ) {
@@ -528,7 +572,11 @@ void Program::remote_action(apSetter_t action, const char * const & key, const c
   const char * pN;
 
   switch (action) { 
-    case apSetter_t::APSET_ITEM:             if(String(key)!="") set_itemPos((uint16_t)atoi(key)); break;;
+    case apSetter_t::APSET_ITEM:             
+      if(String(key)!="") set_itemPos((uint16_t)atoi(key)); 
+      if(String(key)=="") set_itemPos((_plStatu.isPlaying && _plStatu.isSet)? _pltFlag._pos : _lbtFlag._pos); 
+    break;
+    case apSetter_t::APSET_ITEMID:           if(String(key)!="") set_itemById((uint16_t)atoi(key)); break;
     case apSetter_t::APSET_ITEM_NEXT:        set_itemNext();   break;
     case apSetter_t::APSET_ITEM_PREV:        set_itemPrev();   break;
     case apSetter_t::APSET_ITEM_RND:         set_itemRnd();    break;
@@ -568,6 +616,7 @@ void Program::remote_action(apSetter_t action, const char * const & key, const c
   // USER CALLBACK
   switch (action) { 
     case apSetter_t::APSET_ITEM:       ;
+    case apSetter_t::APSET_ITEMID:       ;
     case apSetter_t::APSET_ITEM_NEXT:  ;
     case apSetter_t::APSET_ITEM_PREV:  ;
     case apSetter_t::APSET_ITEM_RND:   

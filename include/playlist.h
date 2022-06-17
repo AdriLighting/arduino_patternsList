@@ -68,6 +68,8 @@
     boolean get_itemBaseByArrayPos(uint8_t aP, String & r); 
 
     Playlist_item * get_array(uint8_t pos) {return &_Playlist_itemArray[pos];}
+
+    boolean get_itemPosById(uint8_t search, uint16_t & result);
   };
 
 #endif // PLAYLIST_CPP

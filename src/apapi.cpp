@@ -12,7 +12,7 @@
 #include "../include/program.h"
 
 
-#define DEBUG
+// #define DEBUG
 #ifndef DEBUG
   #ifdef DEBUG_APAPI
     #define DEBUG
@@ -101,6 +101,9 @@ void AP_ApiItemList_setup(){
   _apapiItemList.add(APPT_REQ_002, [](DynamicJsonDocument & reply){ // n: cmax: items:[]
     apapiItemList_obj(APPT_REQ_002, std::bind(&Program::jsonObject, ListbasePtrGet(), std::placeholders::_1), reply, true); // A
   }); 
+  _apapiItemList.add(APPT_REQ_017, [](DynamicJsonDocument & reply){ // n: cmax: items:[[name, id]]
+    apapiItemList_obj(APPT_REQ_017, std::bind(&Program::jsonObjectId, ListbasePtrGet(), std::placeholders::_1), reply, true); // A
+  });   
   // list_allpl
   _apapiItemList.add(APPT_REQ_003, [](DynamicJsonDocument & reply){ // items:[ cmax: cnt: pos: lbl: lref: items:[id: lbl: ib: ibcfg:] ]
     apapiItemList_obj(APPT_REQ_003, std::bind(&Program::get_json_allpl_items, ProgramPtrGet(), std::placeholders::_1, true, false), reply, true); // A
@@ -428,6 +431,7 @@ void AP_ApiReply::reply_generate(DynamicJsonDocument & doc){
   switch (_action) { 
     case apSetter_t::APSET_PLAY_LT:        
     case apSetter_t::APSET_ITEM:        
+    case apSetter_t::APSET_ITEMID:        
     case apSetter_t::APSET_ITEM_PREV:        
     case apSetter_t::APSET_ITEM_RND:             
     case apSetter_t::APSET_ITEM_NEXT:   
@@ -565,8 +569,8 @@ void AP_ApiReply::reply_generate(DynamicJsonDocument & doc){
  */
 void AP_Api::parsingRequest(DynamicJsonDocument & doc, String & rep, const String & upd) {
   DynamicJsonDocument reply(2048);
-    parsingRequest(doc, reply, upd);
-    serializeJson(reply, rep);    
+  parsingRequest(doc, reply, upd);
+  serializeJson(reply, rep);    
 }
 void AP_Api::parsingRequest(DynamicJsonDocument & doc, DynamicJsonDocument & reply, const String & upd) {
     Program * pPtr = ProgramPtrGet();

@@ -63,13 +63,12 @@
     callback_function_t _callback     = nullptr;
     // callback_error      _callbackError  = nullptr;
  
-    void get_itemBase(String &);
     void get_itemPosBase(uint16_t &);
     void get_itemPos(uint16_t &);
     void get_itemId(uint8_t &);
+    void get_itemNext(uint16_t p, String & v1);
 
-    void set_itemNext();
-    void set_itemPrev();
+
     void set_itemRnd();
     void set_itemPos(const uint16_t & p);
 
@@ -127,8 +126,17 @@
     void get_json_lb(JsonObject &);     // obj: lb
     void get_json_lbt(JsonObject &);    // obj: lbt
 
+    void get_itemPrev(uint16_t & v1);
+    void get_itemNext(uint16_t & v1);
+    void get_itemPrev(String & v1);
+    void get_itemNext(String & v1);
+    void get_itemBase(String &);
 
+    void set_itemNext();
+    void set_itemPrev();
+    void set_itemById(uint8_t id);
 
+    
     void handle();
     void set_callback(callback_function_t);
 
@@ -139,6 +147,7 @@
     // boolean get_pl_itemIdByArrayPos(uint8_t aP); 
 
     void apapiItemList_initialize();
+
   };
 
   Program * ProgramPtrGet();

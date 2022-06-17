@@ -58,6 +58,7 @@ strcpy_P(buffer, (char*)pgm_read_word(&(string_table[i])));// i being 0 or 1
     boolean get_item            (uint8_t);
 
     void jsonObject(JsonObject & root);
+    void jsonObjectId(JsonObject & root);
 
         
     // void loop(apPatternloppMod_t & mod, String & v1, boolean delayInMin);

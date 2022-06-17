@@ -28,6 +28,18 @@ void Playlist_list::get_lbl         (String & v1)       {v1 = _lbl;}
 void Playlist_list::get_items_max   (uint16_t & v1)     {v1 = _items_max;}
 void Playlist_list::get_items_cnt   (uint16_t & v1)     {v1 = _items_cnt;} 
 
+
+boolean Playlist_list::get_itemPosById(uint8_t search, uint16_t & result){
+  uint8_t id;
+  for (int i=0; i < _items_max; i++) {
+    _Playlist_itemArray[i].get_id(id);
+    if (id == search) {
+      result = i;
+      return true;
+    } 
+  }
+  return false;
+}
 boolean Playlist_list::get_itemIdItemByArrayPos(uint8_t aP, uint8_t & r) { 
   if (aP > _items_cnt-1) return false;
   _Playlist_itemArray[aP].get_itemId(r);

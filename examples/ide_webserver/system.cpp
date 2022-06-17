@@ -31,7 +31,6 @@ namespace {
 
     return INADDR_NONE;
   } 
-
 }
 
 void serverSystem::sys_firmWareJson(JsonObject & root){

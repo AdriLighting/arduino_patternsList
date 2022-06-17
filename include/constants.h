@@ -27,13 +27,13 @@
       uint8_t pos;
   } apBasiclistFlag_t;
   
-  static const char APPT_DEBUGREGION_APAPI      [] PROGMEM = "apapi";
-  static const char APPT_DEBUGREGION_PLAYLIST   [] PROGMEM = "playlist";
-  static const char APPT_DEBUGREGION_PROGRAM    [] PROGMEM = "Program";
-  static const char APPT_DEBUGREGION_WEBSERVER  [] PROGMEM = "webserver";
-  static const char APPT_DEBUGREGION_QUEUE      [] PROGMEM = "queue";
-  static const char APPT_DEBUGREGION_TASK       [] PROGMEM = "task";
-  static const char APPT_DEBUGREGION_BASICLIST  [] PROGMEM = "basicList";
+  static const char APPT_DEBUGREGION_APAPI      [] PROGMEM = "ap api";
+  static const char APPT_DEBUGREGION_PLAYLIST   [] PROGMEM = "ap playlist";
+  static const char APPT_DEBUGREGION_PROGRAM    [] PROGMEM = "ap Program";
+  static const char APPT_DEBUGREGION_WEBSERVER  [] PROGMEM = "ap webserver";
+  static const char APPT_DEBUGREGION_QUEUE      [] PROGMEM = "ap queue";
+  static const char APPT_DEBUGREGION_TASK       [] PROGMEM = "ap task";
+  static const char APPT_DEBUGREGION_BASICLIST  [] PROGMEM = "ap basicList";
 
 
   static const char APPT_001   [] PROGMEM = "gv";
@@ -77,6 +77,7 @@
   static const char APPT_SETTER_027[] PROGMEM = "APSET_PLI_REM";
   static const char APPT_SETTER_028[] PROGMEM = "APSET_PLI_REP";
   static const char APPT_SETTER_029[] PROGMEM = "APSET_PL_TOFS";
+  static const char APPT_SETTER_030[] PROGMEM = "APSET_ITEMID";
   // static const char APPT_SETTER_021[] PROGMEM = "APSET_LGET_PL";
   // static const char APPT_SETTER_022[] PROGMEM = "APSET_LGET_LB";
   static const char* const APPT_SETTER_ARRAY[] PROGMEM = {
@@ -85,7 +86,7 @@
   APPT_SETTER_011, APPT_SETTER_012, APPT_SETTER_013, APPT_SETTER_014, APPT_SETTER_015,
   APPT_SETTER_016, APPT_SETTER_017, APPT_SETTER_018, APPT_SETTER_019, APPT_SETTER_020, 
   APPT_SETTER_021, APPT_SETTER_022, APPT_SETTER_023, APPT_SETTER_024,
-  APPT_SETTER_026, APPT_SETTER_027, APPT_SETTER_028, APPT_SETTER_029
+  APPT_SETTER_026, APPT_SETTER_027, APPT_SETTER_028, APPT_SETTER_029, APPT_SETTER_030
   };
   typedef enum APSET_T {
     APSET_ITEM,      
@@ -115,7 +116,8 @@
     APSET_PLI_NEW,
     APSET_PLI_REM,
     APSET_PLI_REP,
-    APSET_PL_TOFS
+    APSET_PL_TOFS,
+    APSET_ITEMID
   } apSetter_t;
   extern apSetter_t RAARR[];
   
@@ -146,11 +148,13 @@
   static const char APPT_REQ_015[] PROGMEM = "loop_select";  // "get":[{"loop_select":["statu", "pl"]}]      
   static const char APPT_REQ_016[] PROGMEM = "list_pld";     // "get":[{"gv":{"n":"list_pld","v":"0"}}]
 
+  static const char APPT_REQ_017[] PROGMEM = "list_lbid";
+
   static const char* const APPT_REQ_ARRAY[] PROGMEM = {
   APPT_REQ_001, APPT_REQ_002, APPT_REQ_003, APPT_REQ_004, APPT_REQ_005,
   APPT_REQ_006, APPT_REQ_007, APPT_REQ_008, APPT_REQ_009, APPT_REQ_010,
   APPT_REQ_011, APPT_REQ_012, APPT_REQ_013, APPT_REQ_014, APPT_REQ_015, 
-  APPT_REQ_016
+  APPT_REQ_016, APPT_REQ_017
   };  
   // typedef enum _requette_type {
   //     APPT_REQ_LB,      

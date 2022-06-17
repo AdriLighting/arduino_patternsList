@@ -42,7 +42,7 @@ void createDir(fs::FS &fs, const char * path){
 void _http_post_cb(AsyncWebServerRequest * request, uint8_t pos, const String &data);
 void _http_get_cb(AsyncWebServerRequest * request, uint8_t pos, const String &data);
 void _socket_cb(const String & s); 
-void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver);
+void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, uint8_t iid, boolean updWebserver);
 // endregion >>>> 
 
 
@@ -61,6 +61,7 @@ void setup() {
   HeapStatu::setupHeap_v1();
 
   #ifdef ALT_DEBUG_TARCE
+    ALT_debugBuffer = new char[1024]; 
     _DebugPrintList.add("main");  
   #endif
 
@@ -168,9 +169,23 @@ void setup() {
   Serial.printf_P(PSTR("[HEAP MONITOR]\n\t%-15s%s\n##########################\n"), time.c_str(), heap.c_str());
 
   Serial.println(ESP.getFreeHeap());
-  al_tools::SPIFFS_PRINT(false);
+  al_tools::SPIFFS_PRINT("/", false);
   Serial.println(ESP.getFreeHeap());
-
+    DynamicJsonDocument doc(1024);
+    JsonArray           arr;
+    JsonObject          var;
+    String              reply;
+    doc[F("op")]    = 0;
+    doc[F("type")]  = "SOSKCET";
+    arr = doc.createNestedArray(F("set"));  
+    var = arr.createNestedObject();
+    // var[F("n")] = FPSTR(APPT_SETTER_ARRAY[p]);
+    // var[F("v")] = value;
+    arr = doc.createNestedArray(F("get"));  
+    arr.add("loop");
+    _AP_Api.parsingRequest(doc, reply, "");
+    // _Webserver.socket_send(reply);
+    Serial.printf("testapapi:\n%s\n", reply.c_str());
 /*
   ALT_TRACEC("main", "%d\n", ESP.getFreeHeap());
   String **_sList = nullptr;
@@ -240,7 +255,7 @@ void _socket_cb(const String & s){
     _socketQueueSetter->receive(doc);
   }
 }  
-void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, boolean updWebserver){
+void _Program_cb(const String itemBaseName, const uint16_t & itemBasePos, uint8_t iid, boolean updWebserver){
   String heap;
   _HeapStatu.update();_HeapStatu.print(heap);
   ALT_TRACEC("main", "\n");
