@@ -422,6 +422,7 @@ String FileSystem_recursiveList() {
   DynamicJsonDocument doc(10000);
   JsonObject root = doc.to<JsonObject>();
   al_tools::SPIFFS_printFiles("/", root);
+  serializeJsonPretty(doc, Serial);Serial.println();
   JsonArray arr = doc[F("folders")].as<JsonArray>();
   for (size_t i = 0; i < arr.size(); i++) {
     String path = arr[i].as<String>();

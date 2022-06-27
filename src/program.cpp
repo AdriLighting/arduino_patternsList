@@ -135,8 +135,8 @@ Program::Program(uint8_t nbLB, boolean fs){
         
   #endif
   #ifdef DEBUG_KEYBOARD    
-    _Sr_menu.add("ap setterL",   "o", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[&loop=] - [&APSET_ITEM=1]\n[%-3d][%-25s]\n"), i, APPT_SETTER_ARRAY[i]);}});
-    _Sr_menu.add("ap getterL",   "p", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[&loop=] - [&APSET_ITEM=1]\n[%-3d][%-25s]\n"), i, APPT_REQ_ARRAY[i]);}});
+    _Sr_menu.add("ap setterL",   "o", []() { uint8_t cnt = ARRAY_SIZE(APPT_SETTER_ARRAY); Serial.printf_P(PSTR("[&loop=] - [&APSET_ITEM=1]\n"));for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_SETTER_ARRAY[i]);}});
+    _Sr_menu.add("ap getterL",   "p", []() { uint8_t cnt = ARRAY_SIZE(APPT_REQ_ARRAY); Serial.printf_P(PSTR("[&loop=] - [&APSET_ITEM=1]\n"));for(int i=0; i<cnt; i++){ Serial.printf_P(PSTR("[%-3d][%-25s]\n"), i, APPT_REQ_ARRAY[i]);}});
     _Sr_menu.add("ap getter",    "$", [](const String & v1, const String & v2) {  
       DynamicJsonDocument doc(1024);
       JsonArray           arr;
