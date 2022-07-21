@@ -63,10 +63,7 @@
     callback_function_t _callback     = nullptr;
     // callback_error      _callbackError  = nullptr;
  
-    void get_itemPosBase(uint16_t &);
-    void get_itemPos(uint16_t &);
-    void get_itemId(uint8_t &);
-    void get_itemNext(uint16_t p, String & v1);
+
 
 
     void set_itemRnd();
@@ -126,6 +123,11 @@
     void get_json_lb(JsonObject &);     // obj: lb
     void get_json_lbt(JsonObject &);    // obj: lbt
 
+    void get_itemPosBase(uint16_t &);
+    void get_itemPos(uint16_t &);
+    void get_itemId(uint8_t &);
+    void get_itemNext(uint16_t p, String & v1);
+    
     void get_itemPrev(uint16_t & v1);
     void get_itemNext(uint16_t & v1);
     void get_itemPrev(String & v1);

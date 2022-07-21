@@ -61,7 +61,7 @@ void setup() {
   HeapStatu::setupHeap_v1();
 
   #ifdef ALT_DEBUG_TARCE
-    ALT_debugBuffer = new char[1024]; 
+    ALT_debugBuffer = new char[2000]; 
     _DebugPrintList.add("main");  
   #endif
 
@@ -86,8 +86,8 @@ void setup() {
   // region ################################################ WIFI
   _DeviceWifi = new WifiConnect(
     "apdebug_1",
-    "SSID",
-    "PSK",
+    "free-3C3786-EXT",
+    "SSIDPASS",
     "apdebug1234",
     "apdebug1234");
   _DeviceWifi->setFunc_STAinitServer  ( [](){_Webserver.begin();} );
